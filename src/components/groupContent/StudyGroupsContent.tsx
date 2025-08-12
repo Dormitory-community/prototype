@@ -14,18 +14,20 @@ import {
     useTheme,
     useMediaQuery,
 } from "@mui/material"
-import { Search, Add, Groups } from "@mui/icons-material"
+import { Search, Add } from "@mui/icons-material"
 import StudyGroupCard from "@/components/groupContent/StudyGroupCard.tsx"
 import type { Post, User } from "@/types" // Fixed import path for types
 import { useNavigation } from "@/hooks/useNavigation.ts"
+import {useNavigate} from "react-router-dom";
+import {ROUTES} from "@/router/routes.ts";
 
 const StudyGroupsContent: React.FC = () => {
     const theme = useTheme()
+    const navigate = useNavigate()
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedCategory, setSelectedCategory] = useState("전체")
     const [currentPage, setCurrentPage] = useState(1)
-    const { goToBoardWrite } = useNavigation()
 
     // Mock User Data
     const mockUser1: User = {
@@ -223,64 +225,20 @@ const StudyGroupsContent: React.FC = () => {
         setCurrentPage(value)
     }
 
+
+    const {goToGroupWrite} = useNavigation()
+
     return (
-        <Box sx={{ px: { xs: 2, md: 4 } }}>
-            <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                mb={4}
-                sx={{
-                    bgcolor: "background.paper",
-                    p: 3,
-                    borderRadius: 3,
-                    border: "1px solid",
-                    borderColor: "divider",
-                }}
-            >
-                <Stack direction="row" alignItems="center" spacing={2}>
-                    <Box
-                        sx={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 2,
-                            bgcolor: "#8b5cf6",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <Groups sx={{ color: "white", fontSize: 24 }} />
-                    </Box>
-                    <Box>
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                fontWeight: 700,
-                                color: "text.primary",
-                                mb: 0.5,
-                            }}
-                        >
-                            모임 & 스터디
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                            함께 성장할 스터디 그룹이나 취미 모임을 찾아보세요
-                        </Typography>
-                    </Box>
-                </Stack>
-
-            </Stack>
-
-            {/* Search and filters */}
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={4} alignItems={{ xs: "stretch", sm: "center" }}>
+        <Box sx={{ px: { xs: 2, md: 4 }, py: { xs: 2, md: 3 } }}>
+            {/* Search and Create Button */}
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={4} alignItems={{ xs: "stretch", sm: "center" }} justifyContent={{ xs: "flex-start", sm: "space-between" }}>
                 <TextField
                     variant="outlined"
                     placeholder="스터디/모임 검색..."
                     value={searchTerm}
                     onChange={handleSearchChange}
                     sx={{
-                        flexGrow: 1,
-                        maxWidth: { sm: "400px" },
+                        width: { xs: "100%", sm: "400px" },
                         "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
                             backgroundColor: theme.palette.background.paper,
@@ -297,15 +255,17 @@ const StudyGroupsContent: React.FC = () => {
                 <Button
                     variant="contained"
                     startIcon={<Add />}
-                    onClick={() => goToBoardWrite("study")}
+                    onClick={() => goToGroupWrite()}
                     sx={{
+                        height: "56px", // Match TextField height
+                        borderRadius: 2,
+                        px: 3,
                         bgcolor: "#8b5cf6",
                         color: "white",
-                        px: 3,
-                        py: 1.5,
-                        borderRadius: 2,
                         fontWeight: 600,
                         textTransform: "none",
+                        minWidth: { xs: "120px", md: "140px" },
+                        alignSelf: { xs: "stretch", sm: "flex-end" },
                         "&:hover": {
                             bgcolor: "#7c3aed",
                         },
@@ -315,6 +275,7 @@ const StudyGroupsContent: React.FC = () => {
                 </Button>
             </Stack>
 
+            {/* Category filters */}
             <Stack
                 direction="row"
                 spacing={1}
@@ -345,13 +306,14 @@ const StudyGroupsContent: React.FC = () => {
                 ))}
             </Stack>
 
+            {/* Study groups grid */}
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 3, mb: 6 }}>
                 {paginatedGroups.length > 0 ? (
                     paginatedGroups.map((group) => (
                         <StudyGroupCard
                             key={group.id}
                             studyGroup={group}
-                            onClick={() => console.log("Navigate to study group:", group.id)}
+                            onClick={() => navigate(ROUTES.GROUP_DETAIL.replace(":id", group.id))}
                         />
                     ))
                 ) : (
@@ -366,6 +328,7 @@ const StudyGroupsContent: React.FC = () => {
                 )}
             </Box>
 
+            {/* Pagination */}
             {totalPages > 1 && (
                 <Stack spacing={2} alignItems="center">
                     <Pagination

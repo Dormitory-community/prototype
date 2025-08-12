@@ -5,6 +5,8 @@ export type AppRoute =
     | "home"
     | "boards" // 통합 게시판 라우트 추가
     | "groups" // 그룹 모집 라우트 타입 추가
+    | "groupDetail"
+    | "groupWrite"
     | "counselingDetail"
     | "freeboardDetail"
     | "delivery"
@@ -39,12 +41,14 @@ export const ROUTES = {
     MY_PAGE: "/my-page",
     BOARDS: "/boards", // 통합 게시판 라우트 추가
     GROUPS: "/groups", // 그룹 모집 라우트 추가
+    GROUP_DETAIL: "/groups/:id",
+    GROUP_WRITE: "/groups/write",
     COUNSELING_DETAIL: "/counseling/:id",
-    BOARD_WRITE: "/write/:type", // Unified write route with type parameter
+    BOARD_WRITE: "/write/:type",
     FREE_BOARD_DETAIL: "/board/:id",
     DELIVERY: "/delivery",
     DELIVERY_WRITE: "/delivery/write",
-    DELIVERY_DETAIL: "/delivery/:id", // Added delivery detail route constant
+    DELIVERY_DETAIL: "/delivery/:id",
     NOTICES: "/notices",
     LOGIN: "/login",
     ERROR: "/404",

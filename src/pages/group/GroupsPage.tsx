@@ -8,7 +8,6 @@ const GroupsPage: React.FC = () => {
     return (
         <Container maxWidth="lg" sx={{ py: { xs: 2, md: 8 } }}>
             <Box sx={{ mb: { xs: 3, md: 6 } }}>
-                
                 <Typography
                     variant="h4"
                     sx={{

@@ -16,20 +16,26 @@ import {
     ListItem,
     ListItemText,
     useTheme,
+    IconButton,
 } from "@mui/material"
 import {
     FavoriteBorderOutlined,
     ChatBubbleOutlineOutlined,
     AccessTimeOutlined,
     PersonOutlineOutlined,
+    ArrowBack,
 } from "@mui/icons-material"
 import type { Post, User } from "@/types"
-import { useParams } from "react-router-dom"
+import {useNavigate, useParams} from "react-router-dom"
 
 const BoardDetailPage: React.FC = () => {
     const theme = useTheme()
     const { id } = useParams<{ id: string }>()
+    const navigate = useNavigate()
 
+    const handleGoBack = () => {
+        navigate(-1) // 이전 페이지로 이동
+    }
     // Mock User Data
     const mockUser1: User = {
         id: "user-1",
@@ -209,6 +215,7 @@ const BoardDetailPage: React.FC = () => {
 
     return (
         <Container maxWidth="md" sx={{ py: 8 }}>
+
             <Paper
                 sx={{
                     p: { xs: 3, md: 5 },
@@ -218,7 +225,16 @@ const BoardDetailPage: React.FC = () => {
                     backgroundColor: "background.paper",
                 }}
             >
+                <Stack direction="row" alignItems="center" spacing={1} mb={3}>
+                    <IconButton onClick={handleGoBack} sx={{ color: "text.primary" }}>
+                        <ArrowBack />
+                    </IconButton>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        게시글 상세
+                    </Typography>
+                </Stack>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
+
                     <Chip
                         label={post.category}
                         size="small"

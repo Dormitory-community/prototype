@@ -14,6 +14,8 @@ import GroupsPage from "@/pages/group/GroupsPage.tsx"
 import { ROUTES } from "./routes"
 import DeliveryDetailPage from "@/pages/delivery/DeliveryDetailPage.tsx"
 import LoginPage from "@/pages/LoginPage.tsx"
+import GroupDetailPage from "@/pages/group/GroupDetailPage.tsx";
+import GroupWritePage from "@/pages/group/GroupWritePage.tsx";
 
 export const AppRouter: React.FC = () => {
     return (
@@ -23,6 +25,8 @@ export const AppRouter: React.FC = () => {
             <Route path={ROUTES.MY_PAGE} element={<MyPage />} />
             <Route path={ROUTES.BOARDS} element={<BoardsPage />} /> {/* 통합 게시판 라우트 */}
             <Route path={ROUTES.GROUPS} element={<GroupsPage />} />
+            <Route path={ROUTES.GROUP_DETAIL} element={<GroupDetailPage />} />{" "}
+            <Route path={ROUTES.GROUP_WRITE} element={<GroupWritePage />} />{" "}
             <Route path={ROUTES.FREE_BOARD_DETAIL} element={<BoardDetailPage />} />{" "}
             <Route path={ROUTES.COUNSELING_DETAIL} element={<BoardDetailPage />} />{" "}
             <Route path={ROUTES.BOARD_WRITE} element={<BoardWritePage />} />{" "}

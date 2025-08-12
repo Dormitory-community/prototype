@@ -16,7 +16,7 @@ import {
     ListItem,
     ListItemText,
     useTheme,
-    LinearProgress,
+    LinearProgress, IconButton,
 } from "@mui/material"
 import {
     FavoriteBorderOutlined,
@@ -25,13 +25,19 @@ import {
     ShoppingCart,
     LocationOn,
     AttachMoney,
+    ArrowBack,
 } from "@mui/icons-material"
 import type { Post, User } from "@/types"
-import { useParams } from "react-router-dom"
+import {useNavigate, useParams} from "react-router-dom"
 
 const DeliveryDetailPage: React.FC = () => {
     const theme = useTheme()
     const { id } = useParams<{ id: string }>()
+    const navigate = useNavigate()
+
+    const handleGoBack = () => {
+        navigate(-1) // 이전 페이지로 이동
+    }
 
     // Mock User Data
     const mockUser1: User = {
@@ -130,6 +136,14 @@ const DeliveryDetailPage: React.FC = () => {
                     backgroundColor: "background.paper",
                 }}
             >
+                <Stack direction="row" alignItems="center" spacing={1} mb={3}>
+                    <IconButton onClick={handleGoBack} sx={{ color: "text.primary" }}>
+                        <ArrowBack />
+                    </IconButton>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        배달주문 상세
+                    </Typography>
+                </Stack>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
                     <Stack direction="row" alignItems="center" spacing={2}>
                         <Avatar sx={{ bgcolor: theme.palette.warning.main, width: 48, height: 48 }}>
