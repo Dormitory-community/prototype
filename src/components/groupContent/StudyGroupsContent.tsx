@@ -1,0 +1,393 @@
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import {
+    Box,
+    Typography,
+    TextField,
+    InputAdornment,
+    Button,
+    Chip,
+    Stack,
+    Pagination,
+    useTheme,
+    useMediaQuery,
+} from "@mui/material"
+import { Search, Add, Groups } from "@mui/icons-material"
+import StudyGroupCard from "@/components/groupContent/StudyGroupCard.tsx"
+import type { Post, User } from "@/types" // Fixed import path for types
+import { useNavigation } from "@/hooks/useNavigation.ts"
+
+const StudyGroupsContent: React.FC = () => {
+    const theme = useTheme()
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+    const [searchTerm, setSearchTerm] = useState("")
+    const [selectedCategory, setSelectedCategory] = useState("전체")
+    const [currentPage, setCurrentPage] = useState(1)
+    const { goToBoardWrite } = useNavigation()
+
+    // Mock User Data
+    const mockUser1: User = {
+        id: "user-1",
+        name: "김영희",
+        email: "younghee.kim@example.com",
+        studentId: "202300001",
+    }
+    const mockUser2: User = {
+        id: "user-2",
+        name: "박철수",
+        email: "chulsoo.park@example.com",
+        studentId: "202200002",
+    }
+
+    // Mock Posts Data
+    const mockPosts: Post[] = [
+        {
+            id: "1",
+            title: "토익 900점 목표 스터디원 모집!",
+            content:
+                "이번 방학에 토익 900점 이상 목표로 하시는 분들 함께 스터디해요! 주 3회 온라인으로 진행하며, 실전 문제 풀이 위주로 진행할 예정입니다. 열정 있는 분들 환영합니다!",
+            author: mockUser1,
+            createdAt: new Date("2024-07-26T10:00:00"),
+            updatedAt: new Date("2024-07-26T10:00:00"),
+            category: "어학",
+            likes: 8,
+            comments: [{ id: "c1", content: "저도 참여하고 싶어요!", author: mockUser2, createdAt: new Date(), likes: 1 }],
+            tags: ["토익", "어학", "스터디"],
+            views: 50,
+        },
+        {
+            id: "2",
+            title: "웹 개발 초보 스터디 (HTML/CSS/JS)",
+            content:
+                "웹 개발에 관심 있는 초보자분들 모여서 함께 공부해요! HTML, CSS, JavaScript 기본부터 시작해서 간단한 프로젝트까지 만들어볼 예정입니다. 매주 토요일 오프라인 모임.",
+            author: mockUser2,
+            createdAt: new Date("2024-07-24T14:00:00"),
+            updatedAt: new Date("2024-07-24T14:00:00"),
+            category: "IT/코딩",
+            likes: 12,
+            comments: [],
+            tags: ["웹개발", "코딩", "스터디"],
+            views: 70,
+        },
+        {
+            id: "3",
+            title: "공모전 아이디어 같이 낼 팀원 구해요!",
+            content:
+                "이번 학기 공모전 준비하려고 하는데, 아이디어 같이 내고 기획부터 실행까지 함께 할 팀원 구합니다. 분야는 자유롭게 논의해요. 열정만 있다면 누구든 환영!",
+            author: mockUser1,
+            createdAt: new Date("2024-07-22T11:00:00"),
+            updatedAt: new Date("2024-07-22T11:00:00"),
+            category: "공모전",
+            likes: 10,
+            comments: [],
+            tags: ["공모전", "팀원", "아이디어"],
+            views: 60,
+        },
+        {
+            id: "4",
+            title: "운동 메이트 구합니다 (헬스/러닝)",
+            content:
+                "기숙사 근처 헬스장에서 같이 운동할 메이트 구해요! 주로 저녁 시간대에 운동하고, 주말에는 같이 러닝도 할 수 있으면 좋겠습니다. 초보자도 환영!",
+            author: mockUser2,
+            createdAt: new Date("2024-07-20T18:00:00"),
+            updatedAt: new Date("2024-07-20T18:00:00"),
+            category: "운동/취미",
+            likes: 5,
+            comments: [],
+            tags: ["운동", "헬스", "러닝"],
+            views: 40,
+        },
+        {
+            id: "5",
+            title: "자격증 스터디 (컴퓨터활용능력 1급)",
+            content:
+                "컴퓨터활용능력 1급 필기/실기 스터디원 모집합니다. 인강 들으면서 같이 진도 나가고, 모르는 부분은 서로 알려주면 공부해요. 카톡으로 질문하고 주 1회 온라인 모임.",
+            author: mockUser1,
+            createdAt: new Date("2024-07-18T09:30:00"),
+            updatedAt: new Date("2024-07-18T09:30:00"),
+            category: "자격증",
+            likes: 7,
+            comments: [],
+            tags: ["자격증", "컴활", "스터디"],
+            views: 48,
+        },
+    ]
+
+    interface StudyGroup {
+        id: string
+        title: string
+        description: string
+        category: string
+        leader: string
+        schedule: string
+        location: string
+        tags: string[]
+        participants: string[]
+        maxParticipants: number
+        createdAt: string
+    }
+
+    const mockStudyGroups: StudyGroup[] = [
+        {
+            id: "1",
+            title: "TOEIC 스터디 모집",
+            description:
+                "토익 900점 목표로 함께 공부할 스터디원을 모집합니다. 매주 화, 목 저녁 7시에 모여서 문제 풀이와 단어 암기를 함께 해요!",
+            category: "어학",
+            leader: "김영어",
+            schedule: "화, 목 19:00",
+            location: "스터디룸 A",
+            tags: ["토익", "영어", "자격증"],
+            participants: ["A", "B", "C", "D"],
+            maxParticipants: 6,
+            createdAt: "1월 15일 생성",
+        },
+        {
+            id: "2",
+            title: "알고리즘 코딩테스트 준비",
+            description: "백준, 프로그래머스 문제를 함께 풀며 코딩테스트를 준비해요. 초보자도 환영합니다!",
+            category: "학습",
+            leader: "박코딩",
+            schedule: "월, 수, 금 20:00",
+            location: "온라인 (디스코드)",
+            tags: ["알고리즘", "코딩테스트", "프로그래밍"],
+            participants: ["A", "B", "C", "D", "E", "F"],
+            maxParticipants: 8,
+            createdAt: "1월 14일 생성",
+        },
+        {
+            id: "3",
+            title: "독서 모임 - 자기계발서",
+            description: "매월 자기계발서 한 권씩 읽고 토론하는 모임입니다. 함께 성장해요!",
+            category: "취미",
+            leader: "이독서",
+            schedule: "매주 일 14:00",
+            location: "카페 북스",
+            tags: ["독서", "자기계발", "토론"],
+            participants: ["A", "B", "C"],
+            maxParticipants: 5,
+            createdAt: "1월 12일 생성",
+        },
+        {
+            id: "4",
+            title: "헬스 운동 메이트",
+            description: "주 3회 헬스장에서 함께 운동할 메이트를 구합니다. 초보자 환영!",
+            category: "운동",
+            leader: "최헬스",
+            schedule: "월, 수, 금 18:00",
+            location: "학교 헬스장",
+            tags: ["헬스", "운동", "다이어트"],
+            participants: ["A", "B"],
+            maxParticipants: 4,
+            createdAt: "1월 10일 생성",
+        },
+    ]
+
+    const categories = ["전체", "학습", "어학", "취미", "운동"]
+
+    const filteredPosts = mockPosts.filter((post) => {
+        const matchesCategory = selectedCategory === "전체" || post.category === selectedCategory
+        const matchesSearch =
+            post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            post.content.toLowerCase().includes(searchTerm.toLowerCase())
+        return matchesCategory && matchesSearch
+    })
+
+    const filteredStudyGroups = mockStudyGroups.filter((group) => {
+        const matchesCategory = selectedCategory === "전체" || group.category === selectedCategory
+        const matchesSearch =
+            group.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            group.description.toLowerCase().includes(searchTerm.toLowerCase())
+        return matchesCategory && matchesSearch
+    })
+
+    const postsPerPage = 6
+    const totalPages = Math.ceil(filteredPosts.length / postsPerPage)
+
+    const groupsPerPage = 6
+    const paginatedGroups = filteredStudyGroups.slice((currentPage - 1) * groupsPerPage, currentPage * groupsPerPage)
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value)
+        setCurrentPage(1)
+    }
+
+    const handleCategoryClick = (category: string) => {
+        setSelectedCategory(category)
+        setCurrentPage(1)
+    }
+
+    const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
+        setCurrentPage(value)
+    }
+
+    return (
+        <Box sx={{ px: { xs: 2, md: 4 } }}>
+            <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+                mb={4}
+                sx={{
+                    bgcolor: "background.paper",
+                    p: 3,
+                    borderRadius: 3,
+                    border: "1px solid",
+                    borderColor: "divider",
+                }}
+            >
+                <Stack direction="row" alignItems="center" spacing={2}>
+                    <Box
+                        sx={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: 2,
+                            bgcolor: "#8b5cf6",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Groups sx={{ color: "white", fontSize: 24 }} />
+                    </Box>
+                    <Box>
+                        <Typography
+                            variant="h5"
+                            sx={{
+                                fontWeight: 700,
+                                color: "text.primary",
+                                mb: 0.5,
+                            }}
+                        >
+                            모임 & 스터디
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            함께 성장할 스터디 그룹이나 취미 모임을 찾아보세요
+                        </Typography>
+                    </Box>
+                </Stack>
+
+            </Stack>
+
+            {/* Search and filters */}
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={4} alignItems={{ xs: "stretch", sm: "center" }}>
+                <TextField
+                    variant="outlined"
+                    placeholder="스터디/모임 검색..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    sx={{
+                        flexGrow: 1,
+                        maxWidth: { sm: "400px" },
+                        "& .MuiOutlinedInput-root": {
+                            borderRadius: 2,
+                            backgroundColor: theme.palette.background.paper,
+                        },
+                    }}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Search sx={{ color: "action.active" }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+                <Button
+                    variant="contained"
+                    startIcon={<Add />}
+                    onClick={() => goToBoardWrite("study")}
+                    sx={{
+                        bgcolor: "#8b5cf6",
+                        color: "white",
+                        px: 3,
+                        py: 1.5,
+                        borderRadius: 2,
+                        fontWeight: 600,
+                        textTransform: "none",
+                        "&:hover": {
+                            bgcolor: "#7c3aed",
+                        },
+                    }}
+                >
+                    모임 만들기
+                </Button>
+            </Stack>
+
+            <Stack
+                direction="row"
+                spacing={1}
+                mb={4}
+                sx={{ overflowX: "auto", pb: 1, "&::-webkit-scrollbar": { display: "none" } }}
+            >
+                {categories.map((category) => (
+                    <Chip
+                        key={category}
+                        label={category}
+                        onClick={() => handleCategoryClick(category)}
+                        sx={{
+                            minWidth: "fit-content",
+                            px: 2,
+                            py: 1,
+                            fontSize: "0.875rem",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            bgcolor: selectedCategory === category ? "#8b5cf6" : theme.palette.background.paper,
+                            color: selectedCategory === category ? "white" : theme.palette.text.secondary,
+                            border: selectedCategory === category ? "none" : "1px solid",
+                            borderColor: theme.palette.divider,
+                            "&:hover": {
+                                bgcolor: selectedCategory === category ? "#7c3aed" : theme.palette.action.hover,
+                            },
+                        }}
+                    />
+                ))}
+            </Stack>
+
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 3, mb: 6 }}>
+                {paginatedGroups.length > 0 ? (
+                    paginatedGroups.map((group) => (
+                        <StudyGroupCard
+                            key={group.id}
+                            studyGroup={group}
+                            onClick={() => console.log("Navigate to study group:", group.id)}
+                        />
+                    ))
+                ) : (
+                    <Box sx={{ textAlign: "center", py: 8, gridColumn: "1 / -1" }}>
+                        <Typography variant="h6" sx={{ color: "text.primary", mb: 1 }}>
+                            모임이 없습니다
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            선택한 카테고리나 검색어에 해당하는 모임이 없습니다.
+                        </Typography>
+                    </Box>
+                )}
+            </Box>
+
+            {totalPages > 1 && (
+                <Stack spacing={2} alignItems="center">
+                    <Pagination
+                        count={totalPages}
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        color="primary"
+                        size={isMobile ? "small" : "medium"}
+                        sx={{
+                            "& .MuiPaginationItem-root": {
+                                borderRadius: 2,
+                                "&.Mui-selected": {
+                                    bgcolor: "#8b5cf6",
+                                    color: "white",
+                                },
+                            },
+                        }}
+                    />
+                </Stack>
+            )}
+        </Box>
+    )
+}
+
+export default StudyGroupsContent
