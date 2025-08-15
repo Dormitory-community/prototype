@@ -8,6 +8,7 @@ import {
     Checkbox,
     Box,
     Typography,
+    InputAdornment,
 } from "@mui/material"
 import { Send, Close } from "@mui/icons-material"
 
@@ -18,7 +19,6 @@ interface CommentFormProps {
     onAnonymousChange: (isAnonymous: boolean) => void
     onSubmit: () => void
     placeholder?: string
-    // 대댓글 모드 관련
     isReplyMode?: boolean
     replyToCommentAuthor?: string
     onCancelReply?: () => void
@@ -40,37 +40,24 @@ const CommentForm: React.FC<CommentFormProps> = ({
             sx={{
                 position: 'sticky',
                 bottom: 0,
-                borderTop: '1px solid #444',
+                borderTop: '1px solid #e0e0e0',
                 zIndex: 100,
                 bgcolor: '#FFFFFF',
+                px: 0,
+                py: 1,
             }}
         >
             {/* 대댓글 모드 헤더 */}
             {isReplyMode && (
-                <Box
-                    sx={{
-                        px: 2,
-                        py: 1,
-                        bgcolor: '#1#FFFFFF',
-                        borderBottom: '1px solid #444'
-                    }}
-                >
+                <Box sx={{ mb: 1, px: 1 }}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between">
-                        <Typography
-                            variant="caption"
-                            sx={{
-                                fontSize: 12
-                            }}
-                        >
+                        <Typography variant="caption" sx={{ fontSize: 12 }}>
                             <Box component="span" fontWeight="bold">@{replyToCommentAuthor}</Box> 님에게 답글
                         </Typography>
                         <IconButton
                             size="small"
                             onClick={onCancelReply}
-                            sx={{
-                                color: '#999',
-                                p: 0.5
-                            }}
+                            sx={{ color: '#999', p: 0.5 }}
                         >
                             <Close sx={{ fontSize: 16 }} />
                         </IconButton>
@@ -78,65 +65,71 @@ const CommentForm: React.FC<CommentFormProps> = ({
                 </Box>
             )}
 
-            <Stack
-                direction="row"
-                spacing={1}
-                alignItems="center"
-                sx={{ px: 2, py: 1.5 }}
+            <Stack direction="row"
+                   alignItems="flex-end"
+                   spacing={1}
+                   sx={{ width: '100%', maxWidth: 900, mx: 'auto' }}
             >
-                {/* 익명 체크박스 - 빨간색 */}
-                <Checkbox
-                    checked={isAnonymous}
-                    onChange={(e) => onAnonymousChange(e.target.checked)}
-                    size="small"
-                    sx={{
-                        p: 0,
-                        '&.Mui-checked': {
-                            color: '#ff6b6b' // 에브리타임 빨간색
-                        },
-                        '& .MuiSvgIcon-root': {
-                            fontSize: 18
-                        }
-                    }}
-                />
-
-                {/* 입력창 */}
                 <TextField
                     variant="outlined"
-                    fullWidth
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     size="small"
-                    sx={{
-                        '& .MuiOutlinedInput-root': {
-                            borderRadius: 3,
-                            fontSize: 14,
-                            height: 36,
-                            '&.Mui-focused fieldset': {
-                                borderWidth: 1,
+                    multiline
+                    minRows={1}   // 기본 높이 작게
+                    maxRows={6}   // 지나치게 커지지 않도록 제한
+                    fullWidth
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment
+                                position="start"
+                                sx={{
+                                    mr: 0,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    // 어드온 자체 여백 줄이기
+                                    '& .adornmentContent': { display: 'flex', alignItems: 'center', gap: 0.5 }
+                                }}
+                            >
+                                <Box className="adornmentContent">
+                                    <Checkbox
+                                        checked={isAnonymous}
+                                        onChange={(e) => onAnonymousChange(e.target.checked)}
+                                        size="small"
+                                        sx={{
+                                            p: 0,
+                                            '&.Mui-checked': { color: '#ff6b6b' },
+                                            '& .MuiSvgIcon-root': { fontSize: 18 },
+                                        }}
+                                    />
+                                    <Typography fontSize={11}>익명</Typography>
+                                </Box>
+                            </InputAdornment>
+                        ),
+                        endAdornment: (
+                            <InputAdornment position="end" sx={{ mr: 0, display: 'flex', alignItems: 'center' }}>
+                                <IconButton
+                                    onClick={onSubmit}
+                                    disabled={!value.trim()}
+                                    sx={{ width: 28, height: 28 }}
+                                >
+                                    <Send sx={{ fontSize: 16 }} />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                        sx: {
+                            '& .MuiInputBase-inputMultiline': {
+                                padding: '8px 10px', // 세로/가로 패딩 조절 (작게)
+                                lineHeight: 1.4,
+                                fontSize: 14,
                             },
-                        },
-                        '& .MuiOutlinedInput-input': {
-                            padding: '8px 12px',
-                            '&::placeholder': {
-                                opacity: 1
+                            '& .MuiOutlinedInput-root': {
+                                paddingRight: 0,
                             }
                         }
                     }}
                 />
-
-                {/* 전송 버튼 - 빨간색 */}
-                <IconButton
-                    onClick={onSubmit}
-                    disabled={!value.trim()}
-                    sx={{
-                        width: 36,
-                        height: 36,
-                    }}
-                >
-                    <Send sx={{ fontSize: 18 }} />
-                </IconButton>
             </Stack>
         </Box>
     )
