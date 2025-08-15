@@ -18,7 +18,7 @@ import {
     Stack,
     useTheme,
 } from "@mui/material"
-import { ROUTES } from "@/router/routes"
+import { ROUTES } from "@/router"
 
 const GroupWritePage: React.FC = () => {
     const navigate = useNavigate()

@@ -16,7 +16,8 @@ import {
 } from "@mui/material"
 import { useAuth } from "../../contexts/AuthContext.tsx"
 import { useNavigate, Link as RouterLink } from "react-router-dom"
-import { ROUTES } from "@/router/routes.ts"
+import { ROUTES } from "@/router"
+import logo from "#/logo.png"
 
 export const Header: React.FC = () => {
     const theme = useTheme()
@@ -51,20 +52,38 @@ export const Header: React.FC = () => {
             }}
         >
             <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, sm: 3, md: 4 } }}>
-                <Typography
-                    variant="h6"
+                <Box
                     component={RouterLink}
                     to={ROUTES.LANDING}
                     sx={{
+                        display: "flex",
+                        alignItems: "center",
                         flexGrow: 1,
-                        fontWeight: 700,
-                        color: "text.primary",
                         textDecoration: "none",
-                        fontSize: { xs: "1.1rem", sm: "1.25rem" },
                     }}
                 >
-                    대학생활 도우미
-                </Typography>
+                    <Box
+                        component="img"
+                        src={logo}
+                        alt="LivingLogos 로고"
+                        sx={{
+                            height: 32, // 이미지 크기
+                            width: 32,
+                            mr: 1,      // 텍스트와 간격
+                        }}
+                    />
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            fontWeight: 700,
+                            color: "text.primary",
+                            fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                        }}
+                    >
+                        LivingLogos
+                    </Typography>
+                </Box>
+
 
 
                 <Box sx={{ flexGrow: 0 }}>

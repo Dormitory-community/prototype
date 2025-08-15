@@ -3,10 +3,14 @@ import ReactDOM from "react-dom/client"
 import { ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import { theme } from "./theme/theme"
-import App from "./App.tsx"
 import "./index.css"
 import { AuthProvider } from "./contexts/AuthContext.tsx"
-import { BrowserRouter } from "react-router-dom"
+import { routes } from "@/router/Routes"
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
+
+const router = createBrowserRouter(routes, {
+    future: { v7_startTransition: true } as any
+})
 
 function Main() {
     // Register the service worker
@@ -15,12 +19,10 @@ function Main() {
     return (
         <React.StrictMode>
             <ThemeProvider theme={theme}>
-                <CssBaseline /> {/* Normalize CSS and apply theme background color */}
-                <BrowserRouter>
+                <CssBaseline />
                     <AuthProvider>
-                        <App />
+                        <RouterProvider router={router} />
                     </AuthProvider>
-                </BrowserRouter>
             </ThemeProvider>
         </React.StrictMode>
     )

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { ROUTES } from "../router/routes"
+import { ROUTES } from "@/router/"
 
 export const useNavigation = () => {
     const navigate = useNavigate()

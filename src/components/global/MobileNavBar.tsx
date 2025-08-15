@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
 import { Groups, Dashboard, ShoppingCart, Person, Home } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
-import { ROUTES } from "@/router/routes.ts"
+import { ROUTES } from "@/router"
 
 export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()

@@ -19,7 +19,7 @@ import StudyGroupCard from "@/components/groupContent/StudyGroupCard.tsx"
 import type { Post, User } from "@/types" // Fixed import path for types
 import { useNavigation } from "@/hooks/useNavigation.ts"
 import {useNavigate} from "react-router-dom";
-import {ROUTES} from "@/router/routes.ts";
+import {ROUTES} from "@/router";
 
 const StudyGroupsContent: React.FC = () => {
     const theme = useTheme()

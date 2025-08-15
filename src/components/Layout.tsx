@@ -3,9 +3,10 @@
 import type React from "react"
 import { Box, Fab } from "@mui/material"
 import { Download } from "@mui/icons-material"
-import { Header } from "./global/Header.tsx"
+import { Header } from "@/components/global/Header.tsx"
 import { MobileNavBar } from "./global/MobileNavBar.tsx"
-import { usePWA } from "../hooks/usePWA"
+import { usePWA } from "@/hooks/usePWA"
+import { useLocation } from "react-router-dom"
 
 interface LayoutProps {
     children: React.ReactNode
@@ -13,10 +14,13 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { isInstallable, installPWA } = usePWA()
+    const location = useLocation()
+
+    const hideHeader = location.pathname === "/login"
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-            <Header />
+            {!hideHeader && <Header />}
             <Box component="main" sx={{ flexGrow: 1, pt: { xs: "56px", sm: "64px" } }}>
                 {children}
             </Box>

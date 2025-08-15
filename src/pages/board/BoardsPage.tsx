@@ -119,8 +119,8 @@ const BoardsPage: React.FC = () => {
                         variant="standard"
                         aria-label="게시판 카테고리 탭"
                         sx={{
-                            width: isMobile ? "auto" : "100%",
-                            maxWidth: isMobile ? "none" : "600px",
+                            width: "100%",
+                            maxWidth: "100%",
                             "& .MuiTab-root": {
                                 fontWeight: 600,
                                 textTransform: "none",

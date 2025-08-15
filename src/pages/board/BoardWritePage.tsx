@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { AddPhotoAlternate, AttachFile, ArrowBack } from "@mui/icons-material"
+import { ArrowBack, CameraAlt} from "@mui/icons-material"
 import {
     Box,
     Container,
@@ -241,11 +241,8 @@ const BoardWritePage: React.FC = () => {
                 />
 
                 <Stack direction="row" spacing={2} mt={2}>
-                    <Button variant="outlined" startIcon={<AddPhotoAlternate />} sx={{ borderRadius: theme.shape.borderRadius }}>
+                    <Button variant="outlined" startIcon={<CameraAlt />} sx={{ borderRadius: theme.shape.borderRadius }}>
                         사진 첨부
-                    </Button>
-                    <Button variant="outlined" startIcon={<AttachFile />} sx={{ borderRadius: theme.shape.borderRadius }}>
-                        파일 첨부
                     </Button>
                 </Stack>
 

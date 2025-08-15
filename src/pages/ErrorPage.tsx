@@ -4,7 +4,7 @@ import type React from "react"
 import { Box, Typography, Button, Container, useTheme } from "@mui/material"
 import { Home } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
-import { ROUTES } from "../router/routes"
+import { ROUTES } from "@/router"
 
 const ErrorPage: React.FC = () => {
     const theme = useTheme()

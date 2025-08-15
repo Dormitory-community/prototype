@@ -8,7 +8,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'), // 이게 꼭 있어야 함
+      '@': path.resolve(__dirname, 'src'),
+      '#': path.resolve(__dirname, 'public'),
     },
   },
 })
