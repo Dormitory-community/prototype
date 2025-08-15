@@ -18,6 +18,7 @@ import { Search, Add } from "@mui/icons-material"
 import PostCard from "./PostCard.tsx"
 import type { Post, User } from "@/types"
 import { useNavigation } from "@/hooks/useNavigation.ts"
+import profileImage from "#/default-profile.webp"
 
 const FreeBoardContent: React.FC = () => {
     const theme = useTheme()
@@ -41,7 +42,7 @@ const FreeBoardContent: React.FC = () => {
         studentId: "202254321",
     }
 
-    // Mock Posts Data
+    // Mock Posts Data with sample images
     const mockPosts: Post[] = [
         {
             id: "1",
@@ -65,6 +66,7 @@ const FreeBoardContent: React.FC = () => {
             ],
             tags: ["꿀팁", "생활정보", "기숙사"],
             views: 150,
+            images: [profileImage],
         },
         {
             id: "2",
@@ -86,6 +88,12 @@ const FreeBoardContent: React.FC = () => {
             ],
             tags: ["점심", "맛집", "추천"],
             views: 100,
+            images: [
+                // Added multiple sample images
+                profileImage,
+                profileImage,
+                profileImage
+            ],
         },
         {
             id: "3",
@@ -108,6 +116,7 @@ const FreeBoardContent: React.FC = () => {
             ],
             tags: ["시험", "스트레스", "꿀팁"],
             views: 200,
+            images: [],
         },
         {
             id: "4",
@@ -122,6 +131,7 @@ const FreeBoardContent: React.FC = () => {
             comments: [],
             tags: ["주말", "나들이", "추천"],
             views: 80,
+            images: [],
         },
         {
             id: "5",
@@ -136,6 +146,7 @@ const FreeBoardContent: React.FC = () => {
             comments: [],
             tags: ["동아리", "추천", "학교생활"],
             views: 130,
+            images: [],
         },
     ]
 
@@ -149,7 +160,7 @@ const FreeBoardContent: React.FC = () => {
         return matchesCategory && matchesSearch
     })
 
-    const postsPerPage = 6
+    const postsPerPage = 20
     const totalPages = Math.ceil(filteredPosts.length / postsPerPage)
     const paginatedPosts = filteredPosts.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage)
 

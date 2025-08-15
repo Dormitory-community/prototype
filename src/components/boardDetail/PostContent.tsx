@@ -1,21 +1,15 @@
 "use client"
 
-import React from "react"
-import {
-    Box,
-    Typography,
-    Avatar,
-    Stack,
-    Chip,
-    Divider,
-    useTheme,
-} from "@mui/material"
+import type React from "react"
+
+import { Box, Typography, Avatar, Stack, Chip, Divider } from "@mui/material"
 import {
     FavoriteBorderOutlined,
     ChatBubbleOutlineOutlined,
     PersonOutlineOutlined,
 } from "@mui/icons-material"
 import type { Post } from "@/types"
+import {theme} from "@/theme/theme.ts";
 
 interface PostContentProps {
     post: Post
@@ -23,7 +17,6 @@ interface PostContentProps {
 }
 
 const PostContent: React.FC<PostContentProps> = ({ post, totalCommentCount }) => {
-    const theme = useTheme()
 
     return (
         <>
@@ -72,6 +65,45 @@ const PostContent: React.FC<PostContentProps> = ({ post, totalCommentCount }) =>
             <Typography variant="body1" sx={{ color: "text.primary", lineHeight: 1.8, mb: 4 }}>
                 {post.content}
             </Typography>
+
+            {post.images && post.images.length > 0 && (
+                <Box sx={{ mb: 4 }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            overflowX: "auto",
+                            gap: 0.5,
+                            px: 1,
+                            py: 1,
+                        }}
+                    >
+                        {post.images.map((img, index) => (
+                            <Box
+                                key={index}
+                                sx={{
+                                    flex: "0 0 auto",
+                                    width: 100,
+                                    height: 100,
+                                    borderRadius: 2,
+                                    overflow: "hidden",
+                                    bgcolor: theme.palette.grey[100],
+                                }}
+                            >
+                                <img
+                                    src={img || "/placeholder.svg"}
+                                    alt={`게시글 이미지 ${index + 1}`}
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                    }}
+                                />
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>
+            )}
+
 
             {post.tags && post.tags.length > 0 && (
                 <Stack direction="row" flexWrap="wrap" spacing={1} mb={4}>

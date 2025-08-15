@@ -17,7 +17,7 @@ import {
     PersonOutlineOutlined,
     Reply,
     MoreVert,
-    ReportOutlined,
+    ReportOutlined, ForumRounded,
 } from "@mui/icons-material"
 import type { Post } from "@/types"
 
@@ -217,7 +217,7 @@ const CommentList: React.FC<CommentListProps> = ({
                     신고하기
                 </MenuItem>
                 <MenuItem onClick={handleNote} sx={{ color: 'text.secondary' }}>
-                    <PersonOutlineOutlined sx={{ fontSize: 16, mr: 1 }} />
+                    <ForumRounded sx={{ fontSize: 16, mr: 1 }} />
                     쪽지 보내기
                 </MenuItem>
             </Menu>

@@ -31,6 +31,7 @@ export interface Post {
   isAnonymous?: boolean
   tags?: string[]
   views?: number
+  images?: string[]
   deliveryInfo?: {
     targetAmount: number
     currentAmount: number

@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { ArrowBack, CameraAlt} from "@mui/icons-material"
+import { ArrowBack } from "@mui/icons-material"
 import {
     Box,
     Container,
@@ -20,6 +20,7 @@ import {
     Checkbox,
     useTheme,
 } from "@mui/material"
+import ImageUpload from "@/components/global/ImageUpload"
 
 const boardConfigs = {
     free: {
@@ -88,6 +89,7 @@ const BoardWritePage: React.FC = () => {
     const [tags, setTags] = useState<string[]>([])
     const [newTag, setNewTag] = useState("")
     const [isAnonymous, setIsAnonymous] = useState(false)
+    const [images, setImages] = useState<string[]>([]) // Added images state
 
     useEffect(() => {
         setCategory(config.defaultCategory)
@@ -106,7 +108,7 @@ const BoardWritePage: React.FC = () => {
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault()
-        console.log({ title, content, category, tags, isAnonymous, boardType })
+        console.log({ title, content, category, tags, isAnonymous, boardType, images }) // Added images to log
         // Here you would typically send this data to a backend API
         alert("게시글이 작성되었습니다!")
         // Reset form and navigate back
@@ -115,6 +117,7 @@ const BoardWritePage: React.FC = () => {
         setCategory(config.defaultCategory)
         setTags([])
         setIsAnonymous(false)
+        setImages([]) // Reset images
         navigate("/boards")
     }
 
@@ -203,6 +206,8 @@ const BoardWritePage: React.FC = () => {
                     sx={{ "& .MuiOutlinedInput-root": { borderRadius: theme.shape.borderRadius } }}
                 />
 
+                <ImageUpload images={images} onImagesChange={setImages} maxImages={5} />
+
                 <Box>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
                         태그 추가
@@ -239,12 +244,6 @@ const BoardWritePage: React.FC = () => {
                     }
                     label="익명으로 작성"
                 />
-
-                <Stack direction="row" spacing={2} mt={2}>
-                    <Button variant="outlined" startIcon={<CameraAlt />} sx={{ borderRadius: theme.shape.borderRadius }}>
-                        사진 첨부
-                    </Button>
-                </Stack>
 
                 <Button
                     type="submit"

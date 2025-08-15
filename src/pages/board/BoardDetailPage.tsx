@@ -12,6 +12,7 @@ import PostHeader from "@/components/boardDetail/PostHeader"
 import PostContent from "@/components/boardDetail/PostContent"
 import CommentList from "@/components/boardDetail/CommentList"
 import CommentForm from "@/components/boardDetail/CommentForm"
+import profileImage from "#/default-profile.webp";
 
 const BoardDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>()
@@ -53,6 +54,7 @@ const BoardDetailPage: React.FC = () => {
             updatedAt: new Date("2024-07-20T10:00:00"),
             category: "고민상담",
             likes: 12,
+            images: [profileImage, profileImage, profileImage, profileImage, profileImage, profileImage],
             comments: [
                 {
                     id: "c1",
