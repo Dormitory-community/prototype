@@ -43,6 +43,22 @@ export interface Post {
   }
 }
 
+export interface PostList {
+  id: string
+  title: string
+  content: string
+  author: User
+  createdAt: Date
+  updatedAt: Date
+  category: string
+  likes: number
+  isAnonymous?: boolean
+  tags?: string[]
+  views?: number
+  images?: string
+  commentNumber?: number
+}
+
 export interface Notice {
   id: string
   title: string

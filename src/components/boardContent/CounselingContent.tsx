@@ -16,7 +16,7 @@ import {
 } from "@mui/material"
 import { Search, Add } from "@mui/icons-material"
 import PostCard from "./PostCard.tsx"
-import type { Post, User } from "@/types"
+import type { PostList, User} from "@/types"
 import { useNavigation } from "@/hooks/useNavigation.ts" // NEW
 
 const CounselingContent: React.FC = () => {
@@ -26,7 +26,7 @@ const CounselingContent: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState("전체")
     const [currentPage, setCurrentPage] = useState(1)
 
-    const { goToBoardWrite } = useNavigation() // NEW
+    const { goToBoardWrite, goToBoardDetail } = useNavigation() // NEW
 
     // Mock User Data
     const mockUser1: User = {
@@ -43,7 +43,7 @@ const CounselingContent: React.FC = () => {
     }
 
     // Mock Posts Data
-    const mockPosts: Post[] = [
+    const mockPosts: PostList[] = [
         {
             id: "1",
             title: "새 학기 적응이 어려워요",
@@ -52,21 +52,12 @@ const CounselingContent: React.FC = () => {
             author: mockUser1,
             createdAt: new Date("2024-07-20T10:00:00"),
             updatedAt: new Date("2024-07-20T10:00:00"),
-            category: "고민상담",
+            category: "인간관계",
             likes: 12,
-            comments: [
-                {
-                    id: "c1",
-                    content: "저도 처음엔 그랬어요. 시간이 지나면 괜찮아질 거예요! 동아리에 가입해보는 건 어떨까요?",
-                    author: mockUser2,
-                    createdAt: new Date("2024-07-20T10:30:00"),
-                    likes: 3,
-                    isAnonymous: true,
-                },
-            ],
             isAnonymous: true,
             tags: ["새학기", "적응", "룸메이트"],
             views: 80,
+            commentNumber: 30
         },
         {
             id: "2",
@@ -78,15 +69,7 @@ const CounselingContent: React.FC = () => {
             updatedAt: new Date("2024-07-18T14:00:00"),
             category: "인간관계",
             likes: 8,
-            comments: [
-                {
-                    id: "c2",
-                    content: "솔직한 대화가 가장 중요한 것 같아요. 감정을 숨기면 오히려 더 큰 오해가 생길 수 있어요.",
-                    author: mockUser1,
-                    createdAt: new Date("2024-07-18T14:30:00"),
-                    likes: 5,
-                },
-            ],
+            commentNumber: 30,
             isAnonymous: false,
             tags: ["친구", "관계", "고민"],
             views: 60,
@@ -101,7 +84,7 @@ const CounselingContent: React.FC = () => {
             updatedAt: new Date("2024-07-15T09:00:00"),
             category: "진로",
             likes: 15,
-            comments: [],
+            commentNumber: 30,
             isAnonymous: true,
             tags: ["진로", "취업", "고민"],
             views: 100,
@@ -116,7 +99,7 @@ const CounselingContent: React.FC = () => {
             updatedAt: new Date("2024-07-12T11:00:00"),
             category: "가족",
             likes: 7,
-            comments: [],
+            commentNumber: 30,
             isAnonymous: false,
             tags: ["가족", "갈등", "대화"],
             views: 50,
@@ -131,7 +114,7 @@ const CounselingContent: React.FC = () => {
             updatedAt: new Date("2024-07-10T16:00:00"),
             category: "연애",
             likes: 10,
-            comments: [],
+            commentNumber: 30,
             isAnonymous: true,
             tags: ["연애", "썸", "고백"],
             views: 70,
@@ -250,7 +233,7 @@ const CounselingContent: React.FC = () => {
                         <PostCard
                             key={post.id}
                             post={post}
-                            onClick={() => console.log("Navigate to post:", post.id)}
+                            onClick={() => goToBoardDetail(post.id)}
                             showCategory={true}
                         />
                     ))

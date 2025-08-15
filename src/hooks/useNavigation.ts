@@ -13,7 +13,7 @@ export const useNavigation = () => {
 
     // You can add more specific navigation functions as needed
     const goToDeliveryDetail = (id: string) => navigate(ROUTES.DELIVERY_DETAIL.replace(":id", id))
-    const goToFreeBoardDetail = (id: string) => navigate(ROUTES.FREE_BOARD_DETAIL.replace(":id", id))
+    const goToBoardDetail = (id: string) => navigate(ROUTES.BOARD_DETAIL.replace(":id", id))
     const goToGroupWrite = () => navigate(ROUTES.GROUP_WRITE)
     const goToDeliveryWrite = () => navigate(ROUTES.DELIVERY_WRITE)
     const goToBoardWrite = (type: "free" | "info" | "counseling" | "study" = "free") =>
@@ -26,7 +26,7 @@ export const useNavigation = () => {
         goToDelivery,
         goToErrorPage,
         goToDeliveryDetail,
-        goToFreeBoardDetail,
+        goToBoardDetail,
         goToGroupWrite,
         goToDeliveryWrite,
         goToBoardWrite,

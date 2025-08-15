@@ -7,7 +7,7 @@ export const ROUTES = {
         GROUP_WRITE: "/groups/write",
         COUNSELING_DETAIL: "/counseling/:id",
         BOARD_WRITE: "/write/:type",
-        FREE_BOARD_DETAIL: "/board/:id",
+        BOARD_DETAIL: "/board/:id",
         DELIVERY: "/delivery",
         DELIVERY_WRITE: "/delivery/write",
         DELIVERY_DETAIL: "/delivery/:id",

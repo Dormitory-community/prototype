@@ -14,7 +14,7 @@ export const MobileNavBar: React.FC = () => {
     const hiddenRoutes = [
         ROUTES.LOGIN,
         '/register',
-        ROUTES.FREE_BOARD_DETAIL,
+        ROUTES.BOARD_DETAIL,
         ROUTES.DELIVERY_DETAIL,
     ]
 

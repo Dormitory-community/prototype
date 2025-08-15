@@ -8,10 +8,10 @@ import {
     AccessTimeOutlined,
     PersonOutlineOutlined,
 } from "@mui/icons-material"
-import type { Post } from "@/types"
+import type { PostList } from "@/types"
 
 interface PostCardProps {
-    post: Post
+    post: PostList
     onClick?: () => void
     showCategory?: boolean
 }
@@ -203,7 +203,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
                     </Stack>
                     <Stack direction="row" alignItems="center" spacing={0.5}>
                         <ChatBubbleOutlineOutlined sx={{ fontSize: 18 }} />
-                        <Typography variant="body2">{post.comments.length}</Typography>
+                        <Typography variant="body2">{post.commentNumber}</Typography>
                     </Stack>
 
                 </Stack>

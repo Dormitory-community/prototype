@@ -16,7 +16,8 @@ import {
 } from "@mui/material"
 import { Search, Add } from "@mui/icons-material"
 import PostCard from "./PostCard.tsx"
-import type { Post, User } from "@/types"
+import type { PostList, User} from "@/types"
+import {useNavigation} from "@/hooks/useNavigation.ts";
 
 const InfoSharingContent: React.FC = () => {
     const theme = useTheme()
@@ -24,6 +25,8 @@ const InfoSharingContent: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedCategory, setSelectedCategory] = useState("전체")
     const [currentPage, setCurrentPage] = useState(1)
+    const { goToBoardWrite, goToBoardDetail } = useNavigation()
+
 
     // Mock User Data
     const mockUser: User = {
@@ -34,7 +37,7 @@ const InfoSharingContent: React.FC = () => {
     }
 
     // Mock Posts Data
-    const mockPosts: Post[] = [
+    const mockPosts: PostList[] = [
         {
             id: "1",
             title: "학교 주변 맛집 리스트 (업데이트)",
@@ -45,7 +48,7 @@ const InfoSharingContent: React.FC = () => {
             updatedAt: new Date("2024-07-20T10:00:00"),
             category: "생활정보",
             likes: 35,
-            comments: [{ id: "c1", content: "정보 감사합니다!", author: mockUser, createdAt: new Date(), likes: 1 }],
+            commentNumber: 30,
             tags: ["맛집", "학교생활", "생활정보"],
             views: 120,
         },
@@ -113,6 +116,7 @@ const InfoSharingContent: React.FC = () => {
                     variant="contained"
                     color="primary"
                     startIcon={<Add />}
+                    onClick={() => goToBoardWrite("info")}
                     sx={{
                         height: "56px",
                         borderRadius: theme.shape.borderRadius,
@@ -154,7 +158,7 @@ const InfoSharingContent: React.FC = () => {
                         <PostCard
                             key={post.id}
                             post={post}
-                            onClick={() => console.log("Navigate to post:", post.id)}
+                            onClick={() => goToBoardDetail(post.id)}
                             showCategory={true}
                         />
                     ))

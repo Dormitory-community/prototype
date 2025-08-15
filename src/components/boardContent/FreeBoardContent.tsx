@@ -16,7 +16,7 @@ import {
 } from "@mui/material"
 import { Search, Add } from "@mui/icons-material"
 import PostCard from "./PostCard.tsx"
-import type { Post, User } from "@/types"
+import type { PostList, User} from "@/types"
 import { useNavigation } from "@/hooks/useNavigation.ts"
 import profileImage from "#/default-profile.webp"
 
@@ -26,7 +26,7 @@ const FreeBoardContent: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedCategory, setSelectedCategory] = useState("전체")
     const [currentPage, setCurrentPage] = useState(1)
-    const { goToBoardWrite, goToFreeBoardDetail } = useNavigation()
+    const { goToBoardWrite, goToBoardDetail } = useNavigation()
 
     // Mock User Data
     const mockUser1: User = {
@@ -43,7 +43,7 @@ const FreeBoardContent: React.FC = () => {
     }
 
     // Mock Posts Data with sample images
-    const mockPosts: Post[] = [
+    const mockPosts: PostList[] = [
         {
             id: "1",
             title: "기숙사 생활 꿀팁 공유해요!",
@@ -54,19 +54,10 @@ const FreeBoardContent: React.FC = () => {
             updatedAt: new Date("2024-07-20T10:00:00"),
             category: "자유게시판",
             likes: 24,
-            comments: [
-                {
-                    id: "c1",
-                    content: "정말 유용한 정보네요! 감사합니다",
-                    author: mockUser2,
-                    createdAt: new Date("2024-07-20T10:30:00"),
-                    likes: 3,
-                    isAnonymous: true,
-                },
-            ],
             tags: ["꿀팁", "생활정보", "기숙사"],
             views: 150,
-            images: [profileImage],
+            images: profileImage,
+            commentNumber: 3,
         },
         {
             id: "2",
@@ -77,23 +68,11 @@ const FreeBoardContent: React.FC = () => {
             updatedAt: new Date("2024-07-19T12:00:00"),
             category: "자유게시판",
             likes: 18,
-            comments: [
-                {
-                    id: "c2",
-                    content: "학식 어떠세요? 오늘 메뉴 괜찮던데요!",
-                    author: mockUser1,
-                    createdAt: new Date("2024-07-19T12:15:00"),
-                    likes: 2,
-                },
-            ],
+
             tags: ["점심", "맛집", "추천"],
             views: 100,
-            images: [
-                // Added multiple sample images
-                profileImage,
-                profileImage,
-                profileImage
-            ],
+            images: profileImage,
+            commentNumber: 4,
         },
         {
             id: "3",
@@ -105,18 +84,9 @@ const FreeBoardContent: React.FC = () => {
             updatedAt: new Date("2024-07-17T15:00:00"),
             category: "자유게시판",
             likes: 30,
-            comments: [
-                {
-                    id: "c3",
-                    content: "저는 친구들이랑 수다 떨면서 풀어요!",
-                    author: mockUser2,
-                    createdAt: new Date("2024-07-17T15:30:00"),
-                    likes: 5,
-                },
-            ],
             tags: ["시험", "스트레스", "꿀팁"],
             views: 200,
-            images: [],
+            commentNumber: 2
         },
         {
             id: "4",
@@ -128,10 +98,10 @@ const FreeBoardContent: React.FC = () => {
             updatedAt: new Date("2024-07-15T11:00:00"),
             category: "자유게시판",
             likes: 10,
-            comments: [],
             tags: ["주말", "나들이", "추천"],
             views: 80,
-            images: [],
+            commentNumber: 2
+
         },
         {
             id: "5",
@@ -143,10 +113,10 @@ const FreeBoardContent: React.FC = () => {
             updatedAt: new Date("2024-07-12T09:30:00"),
             category: "자유게시판",
             likes: 22,
-            comments: [],
             tags: ["동아리", "추천", "학교생활"],
             views: 130,
-            images: [],
+            commentNumber: 2
+
         },
     ]
 
@@ -259,7 +229,10 @@ const FreeBoardContent: React.FC = () => {
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 3, mb: 6 }}>
                 {paginatedPosts.length > 0 ? (
                     paginatedPosts.map((post) => (
-                        <PostCard key={post.id} post={post} onClick={() => goToFreeBoardDetail(post.id)} showCategory={true} />
+                        <PostCard key={post.id}
+                                  post={post}
+                                  onClick={() => goToBoardDetail(post.id)}
+                                  showCategory={true} />
                     ))
                 ) : (
                     <Box sx={{ textAlign: "center", py: 8, gridColumn: "1 / -1" }}>
