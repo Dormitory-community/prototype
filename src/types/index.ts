@@ -4,7 +4,6 @@ export interface User {
   name: string
   email: string
   studentId: string
-  avatar?: string
 }
 
 export interface Comment {

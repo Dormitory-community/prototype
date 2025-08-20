@@ -15,13 +15,13 @@ import {
     useMediaQuery
 } from "@mui/material"
 import { ArrowBack } from "@mui/icons-material"
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 import { useNavigate } from "react-router-dom"
 import KakaoLoginButton from "@/components/login/KakaoLoginButton"
+import {supabase} from "@/lib/supabase.ts";
+import {useUser} from "@supabase/auth-helpers-react";
 
 const LoginPage: React.FC = () => {
     const theme = useTheme()
-    const supabase = useSupabaseClient()
     const user = useUser()
     const navigate = useNavigate()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))

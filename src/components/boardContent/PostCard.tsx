@@ -1,12 +1,11 @@
 "use client"
 
 import type React from "react"
-import { Box, Card, CardContent, Typography, Avatar, Chip, Stack, useTheme } from "@mui/material"
+import { Box, Card, CardContent, Typography, Chip, Stack, useTheme } from "@mui/material"
 import {
     FavoriteBorderOutlined,
     ChatBubbleOutlineOutlined,
     AccessTimeOutlined,
-    PersonOutlineOutlined,
 } from "@mui/icons-material"
 import type { PostList } from "@/types"
 
@@ -91,23 +90,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
             <CardContent sx={{ p: 3 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
                     <Stack direction="row" alignItems="center" spacing={1.5}>
-                        {post.isAnonymous ? (
-                            <Avatar sx={{ bgcolor: theme.palette.grey[300], width: 32, height: 32 }}>
-                                <PersonOutlineOutlined sx={{ fontSize: 18, color: theme.palette.grey[600] }} />
-                            </Avatar>
-                        ) : (
-                            <Avatar
-                                sx={{
-                                    background: "linear-gradient(45deg, #2563eb 30%, #10b981 90%)",
-                                    width: 32,
-                                    height: 32,
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                }}
-                            >
-                                {post.author.name.charAt(0)}
-                            </Avatar>
-                        )}
                         <Box>
                             <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                                 {post.isAnonymous ? "익명" : post.author.name}
@@ -167,7 +149,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
                             }}
                         >
                             <img
-                                src={post.images[0] || "/placeholder.svg"}
+                                src={post.images || "/placeholder.svg"}
                                 alt="게시글 이미지"
                                 style={{
                                     width: "100%",

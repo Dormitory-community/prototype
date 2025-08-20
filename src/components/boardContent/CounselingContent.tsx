@@ -17,7 +17,8 @@ import {
 import { Search, Add } from "@mui/icons-material"
 import PostCard from "./PostCard.tsx"
 import type { PostList, User} from "@/types"
-import { useNavigation } from "@/hooks/useNavigation.ts" // NEW
+import { useNavigation } from "@/hooks/useNavigation.ts"
+import profileImage from "#/default-profile.webp"; // NEW
 
 const CounselingContent: React.FC = () => {
     const theme = useTheme()
@@ -57,7 +58,8 @@ const CounselingContent: React.FC = () => {
             isAnonymous: true,
             tags: ["새학기", "적응", "룸메이트"],
             views: 80,
-            commentNumber: 30
+            commentNumber: 30,
+            images: profileImage
         },
         {
             id: "2",
