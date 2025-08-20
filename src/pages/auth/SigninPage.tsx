@@ -12,26 +12,23 @@ import {
     Divider,
     useTheme,
     IconButton,
-    useMediaQuery
+    useMediaQuery,
+    Alert
 } from "@mui/material"
 import { ArrowBack } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
-import KakaoLoginButton from "@/components/login/KakaoLoginButton"
-import {supabase} from "@/lib/supabase.ts"
-import {useUser} from "@supabase/auth-helpers-react"
-import {useNavigation} from "@/hooks/useNavigation"
+import { useAuth } from "@/contexts/AuthContext"
 
 const SigninPage: React.FC = () => {
     const theme = useTheme()
-    const user = useUser()
     const navigate = useNavigate()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+    const { user, signInWithEmail, signInWithKakao, loading } = useAuth()
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
-    const [loading, setLoading] = useState(false)
-    const {goToSignUp} = useNavigation()
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     // 이미 로그인된 경우 리다이렉트
     useEffect(() => {
@@ -49,52 +46,59 @@ const SigninPage: React.FC = () => {
         }
     }
 
-    // 일반 로그인 처리
-    const handleLogin = async () => {
+    // 이메일 로그인 처리
+    const handleEmailLogin = async () => {
         if (!email || !password) {
             setError("이메일과 비밀번호를 모두 입력해주세요.")
             return
         }
 
-        setLoading(true)
+        setIsSubmitting(true)
         setError("")
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            })
+            const { error } = await signInWithEmail(email, password)
 
             if (error) {
-                setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.")
+                if (error.message.includes("Invalid login credentials")) {
+                    setError("이메일 또는 비밀번호가 올바르지 않습니다.")
+                } else if (error.message.includes("Email not confirmed")) {
+                    setError("이메일 인증이 완료되지 않았습니다. 이메일을 확인해주세요.")
+                } else {
+                    setError("로그인에 실패했습니다. 다시 시도해주세요.")
+                }
                 console.error('Login error:', error)
             } else {
-                console.log('Login successful:', data)
-                navigate("/")
+                // 성공 시 자동으로 리다이렉트됨 (useEffect에서 처리)
+                console.log('Login successful')
             }
         } catch (error) {
             console.error('Login error:', error)
             setError("로그인 중 오류가 발생했습니다.")
         } finally {
-            setLoading(false)
+            setIsSubmitting(false)
         }
     }
 
-    // 카카오 로그인 성공 처리
-    const handleKakaoSuccess = () => {
-        console.log("카카오 로그인 요청 완료")
-        // OAuth 리다이렉트가 진행되므로 별도 처리 불필요
-    }
-
-    // 카카오 로그인 에러 처리
-    const handleKakaoError = (error: any) => {
-        console.error("카카오 로그인 실패:", error)
-        setError("카카오 로그인에 실패했습니다. 다시 시도해주세요.")
+    // 카카오 로그인 처리
+    const handleKakaoLogin = async () => {
+        setError("")
+        try {
+            const { error } = await signInWithKakao()
+            if (error) {
+                setError("카카오 로그인에 실패했습니다. 다시 시도해주세요.")
+                console.error('Kakao login error:', error)
+            }
+            // 성공 시 OAuth 리다이렉트가 자동으로 처리됨
+        } catch (error) {
+            console.error('Kakao login error:', error)
+            setError("카카오 로그인 중 오류가 발생했습니다.")
+        }
     }
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !loading) {
-            handleLogin()
+        if (e.key === "Enter" && !isSubmitting && !loading) {
+            handleEmailLogin()
         }
     }
 
@@ -178,9 +182,22 @@ const SigninPage: React.FC = () => {
                         })
                     }}
                 >
+                    {/* 에러 메시지 */}
+                    {error && (
+                        <Alert
+                            severity="error"
+                            sx={{
+                                mb: 2.5,
+                                fontSize: isMobile ? '0.8rem' : '0.875rem',
+                            }}
+                        >
+                            {error}
+                        </Alert>
+                    )}
+
                     {/* 이메일 입력 */}
                     <TextField
-                        autoFocus={!isMobile} // 모바일에서는 자동포커스 비활성화
+                        autoFocus={!isMobile}
                         margin="dense"
                         label="이메일"
                         type="email"
@@ -189,17 +206,17 @@ const SigninPage: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        disabled={loading}
+                        disabled={isSubmitting || loading}
                         sx={{
                             mb: 2.5,
                             "& .MuiOutlinedInput-root": {
                                 borderRadius: theme.shape.borderRadius,
-                                fontSize: isMobile ? '16px' : '14px', // 모바일에서 줌 방지
+                                fontSize: isMobile ? '16px' : '14px',
                             }
                         }}
                         inputProps={{
                             autoComplete: "email",
-                            ...(isMobile && { style: { fontSize: '16px' } }) // iOS 줌 방지
+                            ...(isMobile && { style: { fontSize: '16px' } })
                         }}
                     />
 
@@ -213,7 +230,7 @@ const SigninPage: React.FC = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        disabled={loading}
+                        disabled={isSubmitting || loading}
                         sx={{
                             mb: 2.5,
                             "& .MuiOutlinedInput-root": {
@@ -227,29 +244,14 @@ const SigninPage: React.FC = () => {
                         }}
                     />
 
-                    {/* 에러 메시지 */}
-                    {error && (
-                        <Typography
-                            color="error"
-                            variant="body2"
-                            sx={{
-                                mb: 2.5,
-                                fontSize: isMobile ? '0.8rem' : '0.875rem',
-                                textAlign: 'center'
-                            }}
-                        >
-                            {error}
-                        </Typography>
-                    )}
-
                     {/* 로그인 버튼 */}
                     <Button
-                        onClick={handleLogin}
+                        onClick={handleEmailLogin}
                         variant="contained"
                         color="primary"
                         fullWidth
                         size={isMobile ? "large" : "large"}
-                        disabled={loading}
+                        disabled={isSubmitting || loading}
                         sx={{
                             mb: 2.5,
                             borderRadius: theme.shape.borderRadius,
@@ -258,7 +260,7 @@ const SigninPage: React.FC = () => {
                             fontWeight: 600,
                         }}
                     >
-                        {loading ? "로그인 중..." : "로그인"}
+                        {isSubmitting ? "로그인 중..." : "로그인"}
                     </Button>
 
                     {/* 회원가입 링크 */}
@@ -270,7 +272,7 @@ const SigninPage: React.FC = () => {
                         >
                             계정이 없으신가요?{" "}
                             <Button
-                                onClick={goToSignUp}
+                                onClick={() => navigate("/sign-up")}
                                 variant="text"
                                 sx={{
                                     textTransform: "none",
@@ -297,11 +299,30 @@ const SigninPage: React.FC = () => {
                     </Divider>
 
                     {/* 카카오 로그인 버튼 */}
-                    <KakaoLoginButton
-                        onSuccess={handleKakaoSuccess}
-                        onError={handleKakaoError}
-                        disabled={loading}
-                    />
+                    <Button
+                        onClick={handleKakaoLogin}
+                        variant="contained"
+                        fullWidth
+                        size={isMobile ? "large" : "large"}
+                        disabled={isSubmitting || loading}
+                        sx={{
+                            backgroundColor: '#FEE500',
+                            color: '#000',
+                            borderRadius: theme.shape.borderRadius,
+                            py: isMobile ? 1.5 : 1.25,
+                            fontSize: isMobile ? '1rem' : '0.875rem',
+                            fontWeight: 600,
+                            '&:hover': {
+                                backgroundColor: '#FFDB00',
+                            },
+                            '&:disabled': {
+                                backgroundColor: '#FEE50080',
+                                color: '#00000060',
+                            }
+                        }}
+                    >
+                        카카오로 로그인
+                    </Button>
                 </Paper>
             </Box>
 
