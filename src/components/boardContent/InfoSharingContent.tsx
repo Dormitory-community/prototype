@@ -5,14 +5,14 @@ import { useState } from "react"
 import {
     Box,
     Typography,
-    TextField,
     InputAdornment,
     Button,
     Chip,
     Stack,
     Pagination,
     useTheme,
-    useMediaQuery,
+    useMediaQuery, FormControl,
+    OutlinedInput,
 } from "@mui/material"
 import { Search, Add } from "@mui/icons-material"
 import PostCard from "./PostCard.tsx"
@@ -91,27 +91,24 @@ const InfoSharingContent: React.FC = () => {
                 alignItems={{ xs: "stretch", sm: "center" }}
                 justifyContent="space-between"
             >
-                <TextField
-                    variant="outlined"
-                    placeholder="게시글 검색..."
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    sx={{
-                        flexGrow: 1,
-                        maxWidth: { sm: "400px" },
-                        "& .MuiOutlinedInput-root": {
+                <FormControl sx={{ flexGrow: 1, maxWidth: { sm: "400px" } }}>
+                    <OutlinedInput
+                        placeholder="게시글 검색..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        // 이 줄을 추가하여 multiline 속성을 명시적으로 false로 설정합니다.
+                        multiline={false}
+                        sx={{
                             borderRadius: theme.shape.borderRadius,
                             backgroundColor: theme.palette.background.paper,
-                        },
-                    }}
-                    InputProps={{
-                        startAdornment: (
+                        }}
+                        startAdornment={
                             <InputAdornment position="start">
                                 <Search sx={{ color: "action.active" }} />
                             </InputAdornment>
-                        ),
-                    }}
-                />
+                        }
+                    />
+                </FormControl>
                 <Button
                     variant="contained"
                     color="primary"
