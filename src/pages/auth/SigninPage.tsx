@@ -17,10 +17,11 @@ import {
 import { ArrowBack } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
 import KakaoLoginButton from "@/components/login/KakaoLoginButton"
-import {supabase} from "@/lib/supabase.ts";
-import {useUser} from "@supabase/auth-helpers-react";
+import {supabase} from "@/lib/supabase.ts"
+import {useUser} from "@supabase/auth-helpers-react"
+import {useNavigation} from "@/hooks/useNavigation"
 
-const LoginPage: React.FC = () => {
+const SigninPage: React.FC = () => {
     const theme = useTheme()
     const user = useUser()
     const navigate = useNavigate()
@@ -30,6 +31,7 @@ const LoginPage: React.FC = () => {
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+    const {goToSignUp} = useNavigation()
 
     // 이미 로그인된 경우 리다이렉트
     useEffect(() => {
@@ -268,6 +270,7 @@ const LoginPage: React.FC = () => {
                         >
                             계정이 없으신가요?{" "}
                             <Button
+                                onClick={goToSignUp}
                                 variant="text"
                                 sx={{
                                     textTransform: "none",
@@ -308,4 +311,4 @@ const LoginPage: React.FC = () => {
     )
 }
 
-export default LoginPage
+export default SigninPage

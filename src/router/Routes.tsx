@@ -8,16 +8,18 @@ import DeliveryPage from "@/pages/delivery/DeliveryPage.tsx"
 import DeliveryDetailPage from "@/pages/delivery/DeliveryDetailPage.tsx"
 import DeliveryWritePage from "@/pages/delivery/DeliveryWritePage.tsx"
 import NoticesPage from "@/pages/notice/NoticesPage.tsx"
-import LoginPage from "@/pages/login/LoginPage.tsx"
+import SignInPage from "@/pages/auth/SigninPage.tsx"
 import GroupsPage from "@/pages/group/GroupsPage.tsx"
 import GroupDetailPage from "@/pages/group/GroupDetailPage.tsx"
 import GroupWritePage from "@/pages/group/GroupWritePage.tsx"
 import ErrorPage from "@/pages/ErrorPage"
 import {Layout} from "@/components/Layout.tsx";
+import SignupPage from "@/pages/auth/SignupPage.tsx";
 
 export const routes: RouteObject[] = [
     { path: "/", element: <Layout><LandingPage /></Layout> },
-    { path: "/login", element: <Layout><LoginPage /></Layout> },
+    { path: "/sign-in", element: <Layout><SignInPage /></Layout> },
+    { path: "/sign-up", element: <Layout><SignupPage /></Layout>},
     { path: "/my-page", element: <Layout><MyPage /></Layout> },
     { path: "/boards", element: <Layout><BoardsPage /></Layout> },
     { path: "/board/:id", element: <Layout><BoardDetailPage /></Layout> },

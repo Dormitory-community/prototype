@@ -16,8 +16,8 @@ import {
     useTheme,
 } from "@mui/material"
 import {Add, Search} from "@mui/icons-material"
-import DeliveryOrderCard from "../../components/deliveryContent/DeliveryOrderCard.tsx"
-import {useNavigation} from "../../hooks/useNavigation.ts" // NEW
+import DeliveryOrderCard from "@/components/deliveryContent/DeliveryOrderCard.tsx"
+import {useNavigation} from "@/hooks/useNavigation.ts" // NEW
 
 const DeliveryPage: React.FC = () => {
     const theme = useTheme()

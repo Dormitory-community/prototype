@@ -16,6 +16,7 @@ export const MobileNavBar: React.FC = () => {
         '/register',
         ROUTES.BOARD_DETAIL,
         ROUTES.DELIVERY_DETAIL,
+        ROUTES.SIGNUP,
     ]
 
     const getActiveTab = (pathname: string): number => {

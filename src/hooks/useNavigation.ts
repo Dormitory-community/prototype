@@ -18,6 +18,7 @@ export const useNavigation = () => {
     const goToDeliveryWrite = () => navigate(ROUTES.DELIVERY_WRITE)
     const goToBoardWrite = (type: "free" | "info" | "counseling" | "study" = "free") =>
         navigate(ROUTES.BOARD_WRITE.replace(":type", type))
+    const goToSignUp = () => navigate(ROUTES.SIGNUP)
 
     return {
         goToHome,
@@ -30,6 +31,6 @@ export const useNavigation = () => {
         goToGroupWrite,
         goToDeliveryWrite,
         goToBoardWrite,
-
+        goToSignUp,
     }
 }

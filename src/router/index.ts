@@ -12,6 +12,7 @@ export const ROUTES = {
         DELIVERY_WRITE: "/delivery/write",
         DELIVERY_DETAIL: "/delivery/:id",
         NOTICES: "/notices",
-        LOGIN: "/login",
+        LOGIN: "/sign-in",
+        SIGNUP: "/sign-up",
         ERROR: "/404",
 } as const
