@@ -5,7 +5,6 @@ import { Box, Card, CardContent, Typography, Chip, Stack, useTheme } from "@mui/
 import {
     FavoriteBorderOutlined,
     ChatBubbleOutlineOutlined,
-    AccessTimeOutlined,
 } from "@mui/icons-material"
 import type { PostList } from "@/types"
 
@@ -78,45 +77,27 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
             onClick={onClick}
             sx={{
                 cursor: "pointer",
-                borderRadius: 4,
-                boxShadow: theme.shadows[1],
-                transition: "all 0.2s ease-in-out",
+                borderRadius: 2,
+                boxShadow: "none",
+                border: `1px solid ${theme.palette.grey[200]}`,
                 "&:hover": {
-                    boxShadow: theme.shadows[3],
-                    transform: "translateY(-4px)",
+                    backgroundColor: theme.palette.grey[50],
                 },
             }}
         >
-            <CardContent sx={{ p: 3 }}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-                    <Stack direction="row" alignItems="center" spacing={1.5}>
-                        <Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                {post.isAnonymous ? "익명" : post.author.name}
-                            </Typography>
-                            <Stack direction="row" spacing={0.5} sx={{ color: "text.secondary", fontSize: 12 }}>
-                                <AccessTimeOutlined sx={{ fontSize: 14 }} />
-                                <Typography variant="caption">{formatDate(post.createdAt)}</Typography>
-                            </Stack>
-                        </Box>
-                    </Stack>
-                    {showCategory && (
-                        <Chip label={post.category} size="small" sx={{ ...categoryStyle, fontWeight: 500, fontSize: 11, height: 24 }} />
-                    )}
-                </Stack>
-                <Stack direction="row" spacing={2} alignItems="flex-start">
-                    {/* 왼쪽: 텍스트 */}
+            <CardContent sx={{ p: 2 }}>
+                <Stack direction="row" spacing={1.5} alignItems="flex-start">
                     <Box sx={{ flex: 1 }}>
                         <Typography
-                            variant="subtitle1"
+                            variant="subtitle2"
                             sx={{
                                 fontWeight: 600,
                                 color: "text.primary",
-                                mb: 1,
+                                mb: 0.5,
                                 display: "-webkit-box",
                                 overflow: "hidden",
                                 WebkitBoxOrient: "vertical",
-                                WebkitLineClamp: 2,
+                                WebkitLineClamp: 1,
                             }}
                         >
                             {post.title}
@@ -126,26 +107,26 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
                             variant="body2"
                             sx={{
                                 color: "text.secondary",
-                                mb: 2,
+                                mb: 1,
                                 display: "-webkit-box",
                                 overflow: "hidden",
                                 WebkitBoxOrient: "vertical",
-                                WebkitLineClamp: 3,
-                                lineHeight: 1.5,
+                                WebkitLineClamp: 2,
+                                lineHeight: 1.4,
                             }}
                         >
                             {post.content}
                         </Typography>
-
                     </Box>
+
                     {post.images && post.images.length > 0 && (
                         <Box
                             sx={{
-                                width: 100,
-                                height: 100,
-                                borderRadius: 2,
+                                width: 72,
+                                height: 72,
+                                borderRadius: 1.5,
                                 overflow: "hidden",
-                                flexShrink: 0, // 이미지 크기 고정
+                                flexShrink: 0,
                             }}
                         >
                             <img
@@ -160,37 +141,38 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
                         </Box>
                     )}
                 </Stack>
-                {post.tags && post.tags.length > 0 && (
-                    <Stack direction="row" flexWrap="wrap" spacing={1} mb={2}>
-                        {post.tags.map((tag, index) => (
-                            <Chip
-                                key={index}
-                                label={`#${tag}`}
-                                size="small"
-                                sx={{
-                                    bgcolor: theme.palette.grey[100],
-                                    color: theme.palette.grey[700],
-                                    fontSize: 11,
-                                    fontWeight: 500,
-                                    borderRadius: 1.5,
-                                }}
-                            />
-                        ))}
-                    </Stack>
-                )}
-                <Stack direction="row" alignItems="center" spacing={2} sx={{ color: "text.secondary", fontSize: 14 }}>
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <FavoriteBorderOutlined sx={{ fontSize: 18 }} />
-                        <Typography variant="body2">{post.likes}</Typography>
-                    </Stack>
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <ChatBubbleOutlineOutlined sx={{ fontSize: 18 }} />
-                        <Typography variant="body2">{post.commentNumber}</Typography>
-                    </Stack>
 
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={1.5}
+                    sx={{ color: "text.secondary", fontSize: 13, mt: 0.5 }}
+                >
+                    <FavoriteBorderOutlined sx={{ fontSize: 16 }} />
+                    <Typography variant="caption">{post.likes}</Typography>
+                    <ChatBubbleOutlineOutlined sx={{ fontSize: 16 }} />
+                    <Typography variant="caption">{post.commentNumber}</Typography>
+                    <Typography variant="caption" sx={{ ml: 1 }}>
+                        {formatDate(post.createdAt)}
+                    </Typography>
+
+                    {showCategory && (
+                        <Chip
+                            label={post.category}
+                            size="small"
+                            sx={{
+                                ...categoryStyle,
+                                ml: "auto",
+                                fontWeight: 500,
+                                fontSize: 10,
+                                height: 20,
+                            }}
+                        />
+                    )}
                 </Stack>
             </CardContent>
         </Card>
+
     )
 }
 

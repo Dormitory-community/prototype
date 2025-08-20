@@ -15,4 +15,5 @@ export const ROUTES = {
         LOGIN: "/sign-in",
         SIGNUP: "/sign-up",
         ERROR: "/404",
+        AUTH_CALLBACK: "/auth/callback",
 } as const

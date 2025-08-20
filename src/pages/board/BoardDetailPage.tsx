@@ -84,6 +84,7 @@ const BoardDetailPage: React.FC = () => {
                     replies: []
                 },
             ],
+            commentsCount: 3,
             isAnonymous: true,
             tags: ["새학기", "적응", "룸메이트"],
             views: 80,
@@ -100,13 +101,6 @@ const BoardDetailPage: React.FC = () => {
                 </Typography>
             </Container>
         )
-    }
-
-    // 총 댓글 수 계산 (댓글 + 대댓글)
-    const getTotalCommentCount = () => {
-        return post.comments.reduce((total, comment) => {
-            return total + 1 + (comment.replies ? comment.replies.length : 0)
-        }, 0)
     }
 
     const handleCommentSubmit = () => {
@@ -168,7 +162,8 @@ const BoardDetailPage: React.FC = () => {
 
                 <PostContent
                     post={post}
-                    totalCommentCount={getTotalCommentCount()}
+                    totalLikeCount={post.likes}
+                    totalCommentCount={post.commentsCount}
                 />
 
                 <CommentList

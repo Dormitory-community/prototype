@@ -17,9 +17,9 @@ import {
     useTheme,
     useMediaQuery,
 } from "@mui/material"
-import { Person, Article, Comment, Settings, Edit } from "@mui/icons-material"
+import {Person, Article, Comment, Settings, Edit, Bookmark} from "@mui/icons-material"
 import PostCard from "@/components/boardContent/PostCard.tsx"
-import type { Post, Comment as CommentType, User } from "@/types"
+import type {Comment as CommentType, User, PostList} from "@/types"
 
 interface TabPanelProps {
     children?: React.ReactNode
@@ -65,7 +65,7 @@ const MyPage: React.FC = () => {
     }
 
     // Mock Posts Data (from FreeBoardPage and CounselingPage)
-    const myPosts: Post[] = [
+    const myPosts: PostList[] = [
         {
             id: "1",
             title: "기숙사 생활 꿀팁 공유해요!",
@@ -76,16 +76,7 @@ const MyPage: React.FC = () => {
             updatedAt: new Date("2024-01-15T10:00:00"),
             category: "자유게시판",
             likes: 24,
-            comments: [
-                {
-                    id: "1",
-                    content: "정말 유용한 정보네요! 감사합니다",
-                    author: { id: "2", name: "익명", email: "", studentId: "" },
-                    createdAt: new Date("2024-01-15T10:30:00"),
-                    likes: 3,
-                    isAnonymous: true,
-                },
-            ],
+            commentNumber: 1,
             tags: ["꿀팁", "생활정보", "기숙사"],
         },
         {
@@ -98,16 +89,7 @@ const MyPage: React.FC = () => {
             updatedAt: new Date("2024-01-14T14:00:00"),
             category: "고민상담",
             likes: 12,
-            comments: [
-                {
-                    id: "1",
-                    content: "저도 처음엔 그랬어요. 시간이 지나면 괜찮아질 거예요! 동아리에 가입해보는 건 어떨까요?",
-                    author: { id: "2", name: "익명", email: "", studentId: "" },
-                    createdAt: new Date("2024-01-15T10:30:00"),
-                    likes: 3,
-                    isAnonymous: true,
-                },
-            ],
+            commentNumber: 1,
             isAnonymous: true,
             tags: ["새학기", "적응", "룸메이트"],
         },
@@ -257,9 +239,6 @@ const MyPage: React.FC = () => {
                     <Typography variant="body1" sx={{ color: "text.secondary", mb: 0.5 }}>
                         {currentUser.email}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                        학번: {currentUser.studentId}
-                    </Typography>
                 </Box>
             </Box>
             <Button variant="outlined" startIcon={<Edit />} sx={{ borderRadius: 3 }}>
@@ -276,6 +255,31 @@ const MyPage: React.FC = () => {
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 설정 기능은 준비중입니다.
             </Typography>
+        </Box>
+    )
+
+    const renderBookmark = () => (
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 3 }}>
+            {myPosts.length > 0 ? (
+                myPosts.map((post) => (
+                    <PostCard
+                        key={post.id}
+                        post={post}
+                        onClick={() => console.log("Navigate to post:", post.id)}
+                        showCategory={true}
+                    />
+                ))
+            ) : (
+                <Box sx={{ textAlign: "center", py: 8, gridColumn: "1 / -1" }}>
+                    <Article sx={{ fontSize: 64, color: "grey.300", mb: 2 }} />
+                    <Typography variant="h6" sx={{ color: "text.primary", mb: 1 }}>
+                        스크랩한 게시글이 없습니다
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                        게시글을 스크랩 해보세요.
+                    </Typography>
+                </Box>
+            )}
         </Box>
     )
 
@@ -391,16 +395,22 @@ const MyPage: React.FC = () => {
                             {...a11yProps(1)}
                         />
                         <Tab
+                            label="스크랩"
+                            icon={<Bookmark />}
+                            iconPosition={isMobile ? "start" : "top"}
+                            {...a11yProps(2)}
+                        />
+                        <Tab
                             label="내 정보"
                             icon={<Person />}
                             iconPosition={isMobile ? "start" : "top"}
-                            {...a11yProps(2)}
+                            {...a11yProps(3)}
                         />
                         <Tab
                             label="설정"
                             icon={<Settings />}
                             iconPosition={isMobile ? "start" : "top"}
-                            {...a11yProps(3)}
+                            {...a11yProps(4)}
                         />
                     </Tabs>
                 </Box>
@@ -422,12 +432,17 @@ const MyPage: React.FC = () => {
                             {renderMyComments()}
                         </Box>
                     </CustomTabPanel>
-                    <CustomTabPanel value={selectedTab} index={2}>
+                    <CustomTabPanel index={2} value={selectedTab}>
+                        <Box sx={{ p: { xs: 2, md: 4 } }}>
+                            {renderBookmark()}
+                        </Box>
+                    </CustomTabPanel>
+                    <CustomTabPanel value={selectedTab} index={3}>
                         <Box sx={{ p: { xs: 2, md: 4 } }}>
                             {renderMyProfile()}
                         </Box>
                     </CustomTabPanel>
-                    <CustomTabPanel value={selectedTab} index={3}>
+                    <CustomTabPanel value={selectedTab} index={4}>
                         <Box sx={{ p: { xs: 2, md: 4 } }}>
                             {renderSettings()}
                         </Box>

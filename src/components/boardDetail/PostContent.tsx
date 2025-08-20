@@ -1,25 +1,36 @@
 "use client"
 
-import type React from "react"
+import React, { useState } from "react"
 
-import { Box, Typography, Avatar, Stack, Chip, Divider } from "@mui/material"
+import { Box, Typography, Avatar, Stack, Chip, Divider, Button } from "@mui/material"
 import {
     FavoriteBorderOutlined,
     ChatBubbleOutlineOutlined,
     PersonOutlineOutlined,
+    BookmarksOutlined,
+    BookmarkAddedOutlined,
+    Favorite,
 } from "@mui/icons-material"
 import type { Post } from "@/types"
-import {theme} from "@/theme/theme.ts";
+import { theme } from "@/theme/theme.ts"
 
 interface PostContentProps {
     post: Post
+    totalLikeCount: number
     totalCommentCount: number
 }
 
-const PostContent: React.FC<PostContentProps> = ({ post, totalCommentCount }) => {
+const PostContent: React.FC<PostContentProps> = ({
+                                                     post,
+                                                     totalLikeCount,
+                                                     totalCommentCount,
+                                                 }) => {
+    const [liked, setLiked] = useState(false)
+    const [bookmarked, setBookmarked] = useState(false)
 
     return (
         <>
+            {/* 제목 */}
             <Typography
                 variant="h4"
                 sx={{
@@ -32,6 +43,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, totalCommentCount }) =>
                 {post.title}
             </Typography>
 
+            {/* 작성자 */}
             <Stack direction="row" alignItems="center" spacing={1.5} mb={4}>
                 {post.isAnonymous ? (
                     <Avatar sx={{ bgcolor: theme.palette.grey[300], width: 40, height: 40 }}>
@@ -47,25 +59,24 @@ const PostContent: React.FC<PostContentProps> = ({ post, totalCommentCount }) =>
                             fontWeight: 600,
                         }}
                     >
-                        {post.author.name.charAt(0)}
+                        {post.author.avatar}
                     </Avatar>
                 )}
                 <Box>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "text.primary" }}>
                         {post.isAnonymous ? "익명" : post.author.name}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                        {post.author.studentId}
-                    </Typography>
                 </Box>
             </Stack>
 
             <Divider sx={{ mb: 4 }} />
 
+            {/* 본문 */}
             <Typography variant="body1" sx={{ color: "text.primary", lineHeight: 1.8, mb: 4 }}>
                 {post.content}
             </Typography>
 
+            {/* 이미지 */}
             {post.images && post.images.length > 0 && (
                 <Box sx={{ mb: 4 }}>
                     <Box
@@ -104,7 +115,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, totalCommentCount }) =>
                 </Box>
             )}
 
-
+            {/* 태그 */}
             {post.tags && post.tags.length > 0 && (
                 <Stack direction="row" flexWrap="wrap" spacing={1} mb={4}>
                     {post.tags.map((tag, index) => (
@@ -124,15 +135,56 @@ const PostContent: React.FC<PostContentProps> = ({ post, totalCommentCount }) =>
                 </Stack>
             )}
 
-            <Stack direction="row" alignItems="center" spacing={3} sx={{ color: "text.secondary", fontSize: 16, mb: 4 }}>
+            {/* 📊 카운트 영역 */}
+            <Stack
+                direction="row"
+                alignItems="center"
+                spacing={3}
+                sx={{ color: "text.secondary", fontSize: 16, mb: 2 }}
+            >
+                {/* 좋아요 개수 */}
                 <Stack direction="row" alignItems="center" spacing={0.5}>
-                    <FavoriteBorderOutlined sx={{ fontSize: 20 }} />
-                    <Typography variant="body1">{post.likes}</Typography>
+                    <FavoriteBorderOutlined sx={{ fontSize: 15 }} />
+                    <Typography variant="body1">{totalLikeCount}</Typography>
                 </Stack>
+
+                {/* 댓글 개수 */}
                 <Stack direction="row" alignItems="center" spacing={0.5}>
-                    <ChatBubbleOutlineOutlined sx={{ fontSize: 20 }} />
+                    <ChatBubbleOutlineOutlined sx={{ fontSize: 15 }} />
                     <Typography variant="body1">{totalCommentCount}</Typography>
                 </Stack>
+            </Stack>
+
+            {/* 🎛 버튼 영역 (색상 토글만) */}
+            <Stack
+                direction="row"
+                alignItems="center"
+                spacing={3}
+                sx={{ color: "text.secondary", fontSize: 16, mb: 4 }}
+            >
+                {/* 좋아요 버튼 */}
+                <Button
+                    onClick={() => setLiked(!liked)}
+                    sx={{ minWidth: "auto", color: liked ? "error.main" : "text.secondary" }}
+                >
+                    {liked ? (
+                        <Favorite sx={{ fontSize: 22, color: "error.main" }} />
+                    ) : (
+                        <FavoriteBorderOutlined sx={{ fontSize: 22 }} />
+                    )}
+                </Button>
+
+                {/* 북마크 버튼 */}
+                <Button
+                    onClick={() => setBookmarked(!bookmarked)}
+                    sx={{ minWidth: "auto", color: bookmarked ? "warning.main" : "text.secondary" }}
+                >
+                    {bookmarked ? (
+                        <BookmarkAddedOutlined sx={{ fontSize: 22, color: "warning.main" }} />
+                    ) : (
+                        <BookmarksOutlined sx={{ fontSize: 22 }} />
+                    )}
+                </Button>
             </Stack>
 
             <Divider sx={{ mb: 4 }} />

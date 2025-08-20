@@ -28,6 +28,7 @@ export interface Post {
   category: string
   likes: number
   comments: Comment[]
+  commentsCount: number
   isAnonymous?: boolean
   tags?: string[]
   views?: number
@@ -84,11 +85,6 @@ export interface DeliveryOrder {
   createdAt: Date
 }
 
-export interface NavLink {
-  path: string
-  label: string
-  icon: React.ElementType
-}
 
 export interface FeatureItem {
   icon: React.ElementType

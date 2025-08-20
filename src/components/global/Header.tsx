@@ -18,10 +18,11 @@ import { useAuth } from "../../contexts/AuthContext.tsx"
 import { useNavigate, Link as RouterLink } from "react-router-dom"
 import { ROUTES } from "@/router"
 import logo from "#/logo.png"
+import profileImage from "#/default-profile.webp";
 
 export const Header: React.FC = () => {
     const theme = useTheme()
-    const { user, logout } = useAuth()
+    const { user, signOut } = useAuth()
     const navigate = useNavigate()
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -36,7 +37,7 @@ export const Header: React.FC = () => {
     }
 
     const handleLogout = () => {
-        logout()
+        signOut()
         handleClose()
         navigate(ROUTES.LANDING)
     }
@@ -108,8 +109,8 @@ export const Header: React.FC = () => {
                                         fontWeight: 600,
                                         color: "white",
                                     }}
+                                    src={profileImage}
                                 >
-                                    {user.name.charAt(0)}
                                 </Avatar>
                             </IconButton>
                             <Menu

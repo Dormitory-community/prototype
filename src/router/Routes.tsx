@@ -15,11 +15,13 @@ import GroupWritePage from "@/pages/group/GroupWritePage.tsx"
 import ErrorPage from "@/pages/ErrorPage"
 import {Layout} from "@/components/Layout.tsx";
 import SignupPage from "@/pages/auth/SignupPage.tsx";
+import AuthCallback from "@/pages/auth/AuthCallback.tsx";
 
 export const routes: RouteObject[] = [
     { path: "/", element: <Layout><LandingPage /></Layout> },
     { path: "/sign-in", element: <Layout><SignInPage /></Layout> },
     { path: "/sign-up", element: <Layout><SignupPage /></Layout>},
+    { path: "/auth/callback", element: <Layout><AuthCallback /></Layout>},
     { path: "/my-page", element: <Layout><MyPage /></Layout> },
     { path: "/boards", element: <Layout><BoardsPage /></Layout> },
     { path: "/board/:id", element: <Layout><BoardDetailPage /></Layout> },
