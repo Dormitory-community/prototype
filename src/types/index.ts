@@ -60,6 +60,19 @@ export interface PostList {
   commentNumber?: number
 }
 
+export interface Group {
+  id: string
+  title: string
+  content: string
+  author: string
+  createdAt: Date
+  updatedAt: Date
+  category: string
+  likes: number
+  tags?: string[]
+  views?: number
+}
+
 export interface Notice {
   id: string
   title: string

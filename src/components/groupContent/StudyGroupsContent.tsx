@@ -16,7 +16,6 @@ import {
 } from "@mui/material"
 import { Search, Add } from "@mui/icons-material"
 import StudyGroupCard from "@/components/groupContent/StudyGroupCard.tsx"
-import type { Post, User } from "@/types" // Fixed import path for types
 import { useNavigation } from "@/hooks/useNavigation.ts"
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "@/router";
@@ -29,93 +28,6 @@ const StudyGroupsContent: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState("전체")
     const [currentPage, setCurrentPage] = useState(1)
 
-    // Mock User Data
-    const mockUser1: User = {
-        id: "user-1",
-        name: "김영희",
-        email: "younghee.kim@example.com",
-        studentId: "202300001",
-    }
-    const mockUser2: User = {
-        id: "user-2",
-        name: "박철수",
-        email: "chulsoo.park@example.com",
-        studentId: "202200002",
-    }
-
-    // Mock Posts Data
-    const mockPosts: Post[] = [
-        {
-            id: "1",
-            title: "토익 900점 목표 스터디원 모집!",
-            content:
-                "이번 방학에 토익 900점 이상 목표로 하시는 분들 함께 스터디해요! 주 3회 온라인으로 진행하며, 실전 문제 풀이 위주로 진행할 예정입니다. 열정 있는 분들 환영합니다!",
-            author: mockUser1,
-            createdAt: new Date("2024-07-26T10:00:00"),
-            updatedAt: new Date("2024-07-26T10:00:00"),
-            category: "어학",
-            likes: 8,
-            comments: [{ id: "c1", content: "저도 참여하고 싶어요!", author: mockUser2, createdAt: new Date(), likes: 1 }],
-            tags: ["토익", "어학", "스터디"],
-            views: 50,
-        },
-        {
-            id: "2",
-            title: "웹 개발 초보 스터디 (HTML/CSS/JS)",
-            content:
-                "웹 개발에 관심 있는 초보자분들 모여서 함께 공부해요! HTML, CSS, JavaScript 기본부터 시작해서 간단한 프로젝트까지 만들어볼 예정입니다. 매주 토요일 오프라인 모임.",
-            author: mockUser2,
-            createdAt: new Date("2024-07-24T14:00:00"),
-            updatedAt: new Date("2024-07-24T14:00:00"),
-            category: "IT/코딩",
-            likes: 12,
-            comments: [],
-            tags: ["웹개발", "코딩", "스터디"],
-            views: 70,
-        },
-        {
-            id: "3",
-            title: "공모전 아이디어 같이 낼 팀원 구해요!",
-            content:
-                "이번 학기 공모전 준비하려고 하는데, 아이디어 같이 내고 기획부터 실행까지 함께 할 팀원 구합니다. 분야는 자유롭게 논의해요. 열정만 있다면 누구든 환영!",
-            author: mockUser1,
-            createdAt: new Date("2024-07-22T11:00:00"),
-            updatedAt: new Date("2024-07-22T11:00:00"),
-            category: "공모전",
-            likes: 10,
-            comments: [],
-            tags: ["공모전", "팀원", "아이디어"],
-            views: 60,
-        },
-        {
-            id: "4",
-            title: "운동 메이트 구합니다 (헬스/러닝)",
-            content:
-                "기숙사 근처 헬스장에서 같이 운동할 메이트 구해요! 주로 저녁 시간대에 운동하고, 주말에는 같이 러닝도 할 수 있으면 좋겠습니다. 초보자도 환영!",
-            author: mockUser2,
-            createdAt: new Date("2024-07-20T18:00:00"),
-            updatedAt: new Date("2024-07-20T18:00:00"),
-            category: "운동/취미",
-            likes: 5,
-            comments: [],
-            tags: ["운동", "헬스", "러닝"],
-            views: 40,
-        },
-        {
-            id: "5",
-            title: "자격증 스터디 (컴퓨터활용능력 1급)",
-            content:
-                "컴퓨터활용능력 1급 필기/실기 스터디원 모집합니다. 인강 들으면서 같이 진도 나가고, 모르는 부분은 서로 알려주면 공부해요. 카톡으로 질문하고 주 1회 온라인 모임.",
-            author: mockUser1,
-            createdAt: new Date("2024-07-18T09:30:00"),
-            updatedAt: new Date("2024-07-18T09:30:00"),
-            category: "자격증",
-            likes: 7,
-            comments: [],
-            tags: ["자격증", "컴활", "스터디"],
-            views: 48,
-        },
-    ]
 
     interface StudyGroup {
         id: string
@@ -189,13 +101,14 @@ const StudyGroupsContent: React.FC = () => {
 
     const categories = ["전체", "학습", "어학", "취미", "운동"]
 
-    const filteredPosts = mockPosts.filter((post) => {
-        const matchesCategory = selectedCategory === "전체" || post.category === selectedCategory
-        const matchesSearch =
-            post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            post.content.toLowerCase().includes(searchTerm.toLowerCase())
-        return matchesCategory && matchesSearch
-    })
+    // 이 부분은 사용되지 않으므로 제거
+    // const filteredPosts = mockPosts.filter((post) => {
+    //     const matchesCategory = selectedCategory === "전체" || post.category === selectedCategory
+    //     const matchesSearch =
+    //         post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //         post.content.toLowerCase().includes(searchTerm.toLowerCase())
+    //     return matchesCategory && matchesSearch
+    // })
 
     const filteredStudyGroups = mockStudyGroups.filter((group) => {
         const matchesCategory = selectedCategory === "전체" || group.category === selectedCategory
@@ -205,10 +118,9 @@ const StudyGroupsContent: React.FC = () => {
         return matchesCategory && matchesSearch
     })
 
-    const postsPerPage = 6
-    const totalPages = Math.ceil(filteredPosts.length / postsPerPage)
-
+    // totalPages 계산을 filteredStudyGroups.length로 수정
     const groupsPerPage = 6
+    const totalPages = Math.ceil(filteredStudyGroups.length / groupsPerPage)
     const paginatedGroups = filteredStudyGroups.slice((currentPage - 1) * groupsPerPage, currentPage * groupsPerPage)
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -224,7 +136,6 @@ const StudyGroupsContent: React.FC = () => {
     const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
         setCurrentPage(value)
     }
-
 
     const {goToGroupWrite} = useNavigation()
 
@@ -244,12 +155,14 @@ const StudyGroupsContent: React.FC = () => {
                             backgroundColor: theme.palette.background.paper,
                         },
                     }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <Search sx={{ color: "action.active" }} />
-                            </InputAdornment>
-                        ),
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Search sx={{ color: "action.active" }} />
+                                </InputAdornment>
+                            ),
+                        },
                     }}
                 />
                 <Button

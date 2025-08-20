@@ -33,14 +33,12 @@ const SignupPage: React.FC = () => {
     const [success, setSuccess] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    // 이미 로그인된 경우 리다이렉트
     useEffect(() => {
         if (user) {
             navigate("/")
         }
     }, [user, navigate])
 
-    // 뒤로가기 처리
     const handleGoBack = () => {
         if (window.history.length > 1) {
             navigate(-1)
@@ -49,7 +47,6 @@ const SignupPage: React.FC = () => {
         }
     }
 
-    // 입력 유효성 검증
     const validateForm = () => {
         setError("")
         setSuccess("")
@@ -82,7 +79,6 @@ const SignupPage: React.FC = () => {
         return true
     }
 
-    // 이메일 회원가입 처리
     const handleEmailSignup = async () => {
         if (!validateForm()) {
             return
@@ -106,7 +102,6 @@ const SignupPage: React.FC = () => {
                 console.error('Signup error:', error)
             } else {
                 setSuccess("회원가입이 완료되었습니다! 이메일을 확인하여 계정을 인증해주세요.")
-                // 3초 후 로그인 페이지로 이동
                 setTimeout(() => {
                     navigate("/sign-in")
                 }, 3000)
@@ -119,7 +114,6 @@ const SignupPage: React.FC = () => {
         }
     }
 
-    // 카카오 회원가입 처리
     const handleKakaoSignup = async () => {
         setError("")
         try {
@@ -128,16 +122,15 @@ const SignupPage: React.FC = () => {
                 setError("카카오 회원가입에 실패했습니다. 다시 시도해주세요.")
                 console.error('Kakao signup error:', error)
             }
-            // 성공 시 OAuth 리다이렉트가 자동으로 처리됨
         } catch (error) {
             console.error('Kakao signup error:', error)
             setError("카카오 회원가입 중 오류가 발생했습니다.")
         }
     }
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
+    const handleKeyDown = async (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !isSubmitting && !loading) {
-            handleEmailSignup()
+            await handleEmailSignup()
         }
     }
 
@@ -152,7 +145,6 @@ const SignupPage: React.FC = () => {
                 py: isMobile ? 1 : 3,
             }}
         >
-            {/* 상단 헤더 - 뒤로가기 버튼 */}
             <Box
                 sx={{
                     display: "flex",
@@ -182,7 +174,6 @@ const SignupPage: React.FC = () => {
                 </Typography>
             </Box>
 
-            {/* 메인 콘텐츠 */}
             <Box
                 sx={{
                     flex: 1,
@@ -191,7 +182,6 @@ const SignupPage: React.FC = () => {
                     justifyContent: "center",
                 }}
             >
-                {/* 타이틀 섹션 */}
                 <Box sx={{ mb: isMobile ? 3 : 4, textAlign: "center" }}>
                     <Typography
                         variant={isMobile ? "h5" : "h4"}
@@ -209,7 +199,6 @@ const SignupPage: React.FC = () => {
                     </Typography>
                 </Box>
 
-                {/* 회원가입 폼 */}
                 <Paper
                     elevation={isMobile ? 0 : 1}
                     sx={{
@@ -221,7 +210,6 @@ const SignupPage: React.FC = () => {
                         })
                     }}
                 >
-                    {/* 성공 메시지 */}
                     {success && (
                         <Alert
                             severity="success"
@@ -234,7 +222,6 @@ const SignupPage: React.FC = () => {
                         </Alert>
                     )}
 
-                    {/* 에러 메시지 */}
                     {error && (
                         <Alert
                             severity="error"
@@ -247,7 +234,6 @@ const SignupPage: React.FC = () => {
                         </Alert>
                     )}
 
-                    {/* 이름 입력 */}
                     <TextField
                         autoFocus={!isMobile}
                         margin="dense"
@@ -257,7 +243,7 @@ const SignupPage: React.FC = () => {
                         variant="outlined"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        onKeyPress={handleKeyPress}
+                        onKeyDown={handleKeyDown}
                         disabled={isSubmitting || loading}
                         sx={{
                             mb: 2.5,
@@ -266,13 +252,15 @@ const SignupPage: React.FC = () => {
                                 fontSize: isMobile ? '16px' : '14px',
                             }
                         }}
-                        inputProps={{
-                            autoComplete: "name",
-                            ...(isMobile && { style: { fontSize: '16px' } })
+                        // inputProps를 slotProps로 변경
+                        slotProps={{
+                            input: {
+                                autoComplete: "name",
+                                style: isMobile ? { fontSize: '16px' } : undefined
+                            }
                         }}
                     />
 
-                    {/* 이메일 입력 */}
                     <TextField
                         margin="dense"
                         label="이메일"
@@ -281,7 +269,7 @@ const SignupPage: React.FC = () => {
                         variant="outlined"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        onKeyPress={handleKeyPress}
+                        onKeyDown={handleKeyDown}
                         disabled={isSubmitting || loading}
                         sx={{
                             mb: 2.5,
@@ -290,13 +278,15 @@ const SignupPage: React.FC = () => {
                                 fontSize: isMobile ? '16px' : '14px',
                             }
                         }}
-                        inputProps={{
-                            autoComplete: "email",
-                            ...(isMobile && { style: { fontSize: '16px' } })
+                        // inputProps를 slotProps로 변경
+                        slotProps={{
+                            input: {
+                                autoComplete: "email",
+                                style: isMobile ? { fontSize: '16px' } : undefined
+                            }
                         }}
                     />
 
-                    {/* 비밀번호 입력 */}
                     <TextField
                         margin="dense"
                         label="비밀번호"
@@ -305,7 +295,7 @@ const SignupPage: React.FC = () => {
                         variant="outlined"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        onKeyPress={handleKeyPress}
+                        onKeyDown={handleKeyDown}
                         disabled={isSubmitting || loading}
                         sx={{
                             mb: 2.5,
@@ -314,14 +304,16 @@ const SignupPage: React.FC = () => {
                                 fontSize: isMobile ? '16px' : '14px',
                             }
                         }}
-                        inputProps={{
-                            autoComplete: "new-password",
-                            ...(isMobile && { style: { fontSize: '16px' } })
+                        // inputProps를 slotProps로 변경
+                        slotProps={{
+                            input: {
+                                autoComplete: "new-password",
+                                style: isMobile ? { fontSize: '16px' } : undefined
+                            }
                         }}
                         helperText="비밀번호는 6자 이상이어야 합니다"
                     />
 
-                    {/* 비밀번호 확인 입력 */}
                     <TextField
                         margin="dense"
                         label="비밀번호 확인"
@@ -330,7 +322,7 @@ const SignupPage: React.FC = () => {
                         variant="outlined"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        onKeyPress={handleKeyPress}
+                        onKeyDown={handleKeyDown}
                         disabled={isSubmitting || loading}
                         sx={{
                             mb: 2.5,
@@ -339,13 +331,15 @@ const SignupPage: React.FC = () => {
                                 fontSize: isMobile ? '16px' : '14px',
                             }
                         }}
-                        inputProps={{
-                            autoComplete: "new-password",
-                            ...(isMobile && { style: { fontSize: '16px' } })
+                        // inputProps를 slotProps로 변경
+                        slotProps={{
+                            input: {
+                                autoComplete: "new-password",
+                                style: isMobile ? { fontSize: '16px' } : undefined
+                            }
                         }}
                     />
 
-                    {/* 회원가입 버튼 */}
                     <Button
                         onClick={handleEmailSignup}
                         variant="contained"
@@ -364,7 +358,6 @@ const SignupPage: React.FC = () => {
                         {isSubmitting ? "가입 중..." : "회원가입"}
                     </Button>
 
-                    {/* 로그인 링크 */}
                     <Box sx={{ textAlign: "center", mb: 2.5 }}>
                         <Typography
                             variant="body2"
@@ -388,7 +381,6 @@ const SignupPage: React.FC = () => {
                         </Typography>
                     </Box>
 
-                    {/* 구분선 */}
                     <Divider sx={{ my: 2.5 }}>
                         <Typography
                             variant="body2"
@@ -399,7 +391,6 @@ const SignupPage: React.FC = () => {
                         </Typography>
                     </Divider>
 
-                    {/* 카카오 회원가입 버튼 */}
                     <Button
                         onClick={handleKakaoSignup}
                         variant="contained"
@@ -427,7 +418,6 @@ const SignupPage: React.FC = () => {
                 </Paper>
             </Box>
 
-            {/* 하단 여백 */}
             {isMobile && <Box sx={{ height: 20 }} />}
         </Container>
     )

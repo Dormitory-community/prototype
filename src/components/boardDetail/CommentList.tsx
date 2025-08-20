@@ -208,8 +208,10 @@ const CommentList: React.FC<CommentListProps> = ({
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
-                PaperProps={{
-                    sx: { minWidth: 120 }
+                sx={{
+                    '& .MuiPaper-root': {
+                        minWidth: 120,
+                    },
                 }}
             >
                 <MenuItem onClick={handleReport} sx={{ color: 'error.main' }}>

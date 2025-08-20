@@ -96,9 +96,10 @@ const SigninPage: React.FC = () => {
         }
     }
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
+    // handleKeyPress 함수를 onKeyDown으로 변경
+    const handleKeyDown = async (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !isSubmitting && !loading) {
-            handleEmailLogin()
+            await handleEmailLogin()
         }
     }
 
@@ -205,7 +206,7 @@ const SigninPage: React.FC = () => {
                         variant="outlined"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        onKeyPress={handleKeyPress}
+                        onKeyDown={handleKeyDown} // onKeyPress -> onKeyDown으로 변경
                         disabled={isSubmitting || loading}
                         sx={{
                             mb: 2.5,
@@ -214,9 +215,11 @@ const SigninPage: React.FC = () => {
                                 fontSize: isMobile ? '16px' : '14px',
                             }
                         }}
-                        inputProps={{
-                            autoComplete: "email",
-                            ...(isMobile && { style: { fontSize: '16px' } })
+                        slotProps={{
+                            input: {
+                                autoComplete: "email",
+                                style: isMobile ? { fontSize: '16px' } : undefined
+                            }
                         }}
                     />
 
@@ -229,7 +232,7 @@ const SigninPage: React.FC = () => {
                         variant="outlined"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        onKeyPress={handleKeyPress}
+                        onKeyDown={handleKeyDown} // onKeyPress -> onKeyDown으로 변경
                         disabled={isSubmitting || loading}
                         sx={{
                             mb: 2.5,
@@ -238,9 +241,11 @@ const SigninPage: React.FC = () => {
                                 fontSize: isMobile ? '16px' : '14px',
                             }
                         }}
-                        inputProps={{
-                            autoComplete: "current-password",
-                            ...(isMobile && { style: { fontSize: '16px' } })
+                        slotProps={{
+                            input: {
+                                autoComplete: "email",
+                                style: isMobile ? { fontSize: '16px' } : undefined
+                            }
                         }}
                     />
 

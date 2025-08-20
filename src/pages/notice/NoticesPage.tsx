@@ -48,6 +48,8 @@ const NoticesPage: React.FC = () => {
             comments: [],
             tags: ["성적", "이의신청", "학사"],
             views: 300,
+            commentsCount:10
+
         },
         {
             id: "2",
@@ -62,6 +64,7 @@ const NoticesPage: React.FC = () => {
             comments: [],
             tags: ["계절학기", "수강신청", "학사"],
             views: 250,
+            commentsCount:10
         },
         {
             id: "3",
@@ -76,6 +79,8 @@ const NoticesPage: React.FC = () => {
             comments: [],
             tags: ["도서관", "시스템", "점검"],
             views: 180,
+            commentsCount:10
+
         },
         {
             id: "4",
@@ -90,6 +95,8 @@ const NoticesPage: React.FC = () => {
             comments: [],
             tags: ["학생회관", "시설", "이용"],
             views: 150,
+            commentsCount:10
+
         },
         {
             id: "5",
@@ -104,6 +111,8 @@ const NoticesPage: React.FC = () => {
             comments: [],
             tags: ["장학금", "신청", "학사"],
             views: 280,
+            commentsCount:10
+
         },
     ]
 

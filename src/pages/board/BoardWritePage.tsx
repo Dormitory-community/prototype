@@ -89,7 +89,7 @@ const BoardWritePage: React.FC = () => {
     const [tags, setTags] = useState<string[]>([])
     const [newTag, setNewTag] = useState("")
     const [isAnonymous, setIsAnonymous] = useState(false)
-    const [images, setImages] = useState<string[]>([]) // Added images state
+    const [images, setImages] = useState<string[]>([])
 
     useEffect(() => {
         setCategory(config.defaultCategory)
@@ -108,16 +108,14 @@ const BoardWritePage: React.FC = () => {
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault()
-        console.log({ title, content, category, tags, isAnonymous, boardType, images }) // Added images to log
-        // Here you would typically send this data to a backend API
+        console.log({ title, content, category, tags, isAnonymous, boardType, images })
         alert("게시글이 작성되었습니다!")
-        // Reset form and navigate back
         setTitle("")
         setContent("")
         setCategory(config.defaultCategory)
         setTags([])
         setIsAnonymous(false)
-        setImages([]) // Reset images
+        setImages([])
         navigate("/boards")
     }
 
@@ -228,7 +226,7 @@ const BoardWritePage: React.FC = () => {
                         fullWidth
                         value={newTag}
                         onChange={(e) => setNewTag(e.target.value)}
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => { // onKeyPress -> onKeyDown으로 변경
                             if (e.key === "Enter") {
                                 e.preventDefault()
                                 handleAddTag()

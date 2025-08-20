@@ -22,7 +22,6 @@ export const usePWA = () => {
 
   const installPWA = () => {
     if (deferredPrompt) {
-      // Show the install prompt
       ;(deferredPrompt as any).prompt()
 
       // Wait for the user to respond to the prompt

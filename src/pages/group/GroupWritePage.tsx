@@ -58,14 +58,12 @@ const GroupWritePage: React.FC = () => {
             ...formData,
             tags,
         })
-        // Here you would typically send this data to a backend API
         alert("모임이 생성되었습니다!")
         navigate(ROUTES.GROUPS)
     }
 
     return (
         <Container maxWidth="md" sx={{ py: 8 }}>
-            {/* Back button */}
             <Button
                 onClick={() => navigate(ROUTES.GROUPS)}
                 startIcon={<ArrowBack />}
@@ -79,7 +77,6 @@ const GroupWritePage: React.FC = () => {
                 그룹 모집 목록으로 돌아가기
             </Button>
 
-            {/* Header */}
             <Box
                 sx={{ background: "linear-gradient(45deg, #8b5cf6 30%, #3b82f6 90%)", borderRadius: "16px 16px 0 0", p: 2.5 }}
             >
@@ -108,7 +105,6 @@ const GroupWritePage: React.FC = () => {
                 </Stack>
             </Box>
 
-            {/* Form */}
             <Box
                 component="form"
                 onSubmit={handleSubmit}
@@ -185,7 +181,7 @@ const GroupWritePage: React.FC = () => {
                         fullWidth
                         value={newTag}
                         onChange={(e) => setNewTag(e.target.value)}
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => { // onKeyPress -> onKeyDown으로 변경
                             if (e.key === "Enter") {
                                 e.preventDefault()
                                 handleAddTag()
