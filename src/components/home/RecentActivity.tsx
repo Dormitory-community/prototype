@@ -18,32 +18,26 @@ export function RecentActivity() {
         {
             id: 1,
             type: "post",
-            title: "React 18의 새로운 기능들에 대해 알아보자",
-            category: "그룹 모집",
-        },
-        {
-            id: 2,
-            type: "post",
             title: "효율적인 알고리즘 스터디 방법 공유",
             category: "자유게시판",
         },
         {
-            id: 3,
+            id: 2,
             type: "post",
             title: "사이드 프로젝트 팀원 모집합니다",
             category: "그룹 모집",
         },
         {
-            id: 4,
+            id: 3,
             type: "post",
             title: "개발자 취업 면접 후기 및 팁",
             category: "정보 공유",
         },
         {
-            id: 5,
+            id: 4,
             type: "post",
             title: "개발 환경 설정 완벽 가이드",
-            category: "고민 상",
+            category: "고민 상담",
         },
     ]
 

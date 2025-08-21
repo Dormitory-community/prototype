@@ -34,9 +34,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
                 return { bgcolor: theme.palette.secondary.light, color: theme.palette.secondary.contrastText }
             case "모임/스터디":
                 return { bgcolor: theme.palette.info.light, color: theme.palette.info.contrastText }
-            case "배달주문":
+            case "질문":
                 return { bgcolor: theme.palette.warning.light, color: theme.palette.warning.contrastText }
-            case "자유게시판":
+            case "일상":
                 return { bgcolor: theme.palette.success.light, color: theme.palette.success.contrastText }
             case "정보공유":
                 return { bgcolor: theme.palette.primary.light, color: theme.palette.primary.contrastText }
@@ -82,6 +82,19 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
             <CardContent sx={{ p: 2 }}>
                 <Stack direction="row" spacing={1.5} alignItems="flex-start">
                     <Box sx={{ flex: 1 }}>
+                            {showCategory && (
+                                <Chip
+                                    label={post.category}
+                                    size="small"
+                                    sx={{
+                                        ...categoryStyle,
+                                        mb: 1,
+                                        fontWeight: 500,
+                                        fontSize: 10,
+                                        height: 20,
+                                    }}
+                                />
+                            )}
                         <Typography
                             variant="subtitle2"
                             sx={{
@@ -155,19 +168,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
                         {formatDate(post.createdAt)}
                     </Typography>
 
-                    {showCategory && (
-                        <Chip
-                            label={post.category}
-                            size="small"
-                            sx={{
-                                ...categoryStyle,
-                                ml: "auto",
-                                fontWeight: 500,
-                                fontSize: 10,
-                                height: 20,
-                            }}
-                        />
-                    )}
+
                 </Stack>
             </CardContent>
         </Card>

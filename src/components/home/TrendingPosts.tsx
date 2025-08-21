@@ -3,7 +3,7 @@
 import { TrendingUp } from "lucide-react"
 import {
     Box,
-    Card,
+    Card, CardContent,
     CardHeader,
     Typography,
 } from "@mui/material"
@@ -15,7 +15,7 @@ import {useNavigation} from "@/hooks/useNavigation.ts";
 
 export function TrendingPosts() {
     const {goToBoardDetail} = useNavigation()
-// Mock User Data
+
     const mockUser1: User = {
         id: "user-1",
         name: "김철수",
@@ -39,7 +39,7 @@ export function TrendingPosts() {
             author: mockUser1,
             createdAt: new Date("2024-07-20T10:00:00"),
             updatedAt: new Date("2024-07-20T10:00:00"),
-            category: "자유게시판",
+            category: "일상",
             likes: 24,
             tags: ["꿀팁", "생활정보", "기숙사"],
             views: 150,
@@ -53,7 +53,7 @@ export function TrendingPosts() {
             author: mockUser2,
             createdAt: new Date("2024-07-19T12:00:00"),
             updatedAt: new Date("2024-07-19T12:00:00"),
-            category: "자유게시판",
+            category: "일상",
             likes: 18,
 
             tags: ["점심", "맛집", "추천"],
@@ -76,13 +76,15 @@ export function TrendingPosts() {
                 sx={{ pb: 2 }}
             />
 
-            {mockPosts.map(post =>
-                <PostCard
-                key={post.id}
-                post={post}
-                onClick={() => goToBoardDetail(post.id)}
-                showCategory={true}/>
+            <CardContent>
+                {mockPosts.map(post =>
+                    <PostCard
+                        key={post.id}
+                        post={post}
+                        onClick={() => goToBoardDetail(post.id)}
+                        showCategory={true}/>
                 )}
+            </CardContent>
         </Card>
     )
 }
