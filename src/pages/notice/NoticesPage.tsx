@@ -16,7 +16,7 @@ import {
 } from "@mui/material"
 import { Search } from "@mui/icons-material"
 import PostCard from "../../components/boardContent/PostCard.tsx"
-import type { Post, User } from "@/types"
+import type { PostList, User} from "@/types"
 
 const NoticesPage: React.FC = () => {
     const theme = useTheme()
@@ -34,7 +34,7 @@ const NoticesPage: React.FC = () => {
     }
 
     // Mock Posts Data
-    const mockPosts: Post[] = [
+    const mockPosts: PostList[] = [
         {
             id: "1",
             title: "2024학년도 1학기 성적 이의신청 기간 안내",
@@ -45,10 +45,9 @@ const NoticesPage: React.FC = () => {
             updatedAt: new Date("2024-07-25T09:00:00"),
             category: "공지사항",
             likes: 15,
-            comments: [],
             tags: ["성적", "이의신청", "학사"],
             views: 300,
-            commentsCount:10
+            commentNumber:10
 
         },
         {
@@ -61,10 +60,9 @@ const NoticesPage: React.FC = () => {
             updatedAt: new Date("2024-07-20T14:00:00"),
             category: "공지사항",
             likes: 20,
-            comments: [],
             tags: ["계절학기", "수강신청", "학사"],
             views: 250,
-            commentsCount:10
+            commentNumber:10
         },
         {
             id: "3",
@@ -76,10 +74,9 @@ const NoticesPage: React.FC = () => {
             updatedAt: new Date("2024-07-18T10:00:00"),
             category: "공지사항",
             likes: 10,
-            comments: [],
             tags: ["도서관", "시스템", "점검"],
             views: 180,
-            commentsCount:10
+            commentNumber:10
 
         },
         {
@@ -92,10 +89,9 @@ const NoticesPage: React.FC = () => {
             updatedAt: new Date("2024-07-15T11:30:00"),
             category: "공지사항",
             likes: 8,
-            comments: [],
             tags: ["학생회관", "시설", "이용"],
             views: 150,
-            commentsCount:10
+            commentNumber:10
 
         },
         {
@@ -108,10 +104,9 @@ const NoticesPage: React.FC = () => {
             updatedAt: new Date("2024-07-10T16:00:00"),
             category: "공지사항",
             likes: 25,
-            comments: [],
             tags: ["장학금", "신청", "학사"],
             views: 280,
-            commentsCount:10
+            commentNumber:10
 
         },
     ]
@@ -132,12 +127,12 @@ const NoticesPage: React.FC = () => {
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value)
-        setCurrentPage(1) // Reset to first page on search
+        setCurrentPage(1)
     }
 
     const handleCategoryClick = (category: string) => {
         setSelectedCategory(category)
-        setCurrentPage(1) // Reset to first page on category change
+        setCurrentPage(1)
     }
 
     const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
@@ -183,12 +178,14 @@ const NoticesPage: React.FC = () => {
                             backgroundColor: theme.palette.background.paper,
                         },
                     }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <Search sx={{ color: "action.active" }} />
-                            </InputAdornment>
-                        ),
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Search sx={{ color: "action.active" }} />
+                                </InputAdornment>
+                            ),
+                        },
                     }}
                 />
                 {/* No "새 게시글 작성" button for notices page */}
