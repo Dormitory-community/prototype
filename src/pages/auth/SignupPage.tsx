@@ -23,7 +23,7 @@ const SignupPage: React.FC = () => {
     const theme = useTheme()
     const navigate = useNavigate()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-    const { user, signUpWithEmail, signInWithKakao, loading } = useAuth()
+    const { user, signUp, signInWithKakao, loading } = useAuth()
 
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
@@ -89,8 +89,9 @@ const SignupPage: React.FC = () => {
         setSuccess("")
 
         try {
-            const { error } = await signUpWithEmail(email, password, name)
-
+            const {data, error } = await signUp(email, password, name)
+            console.log(data, "데이터")
+            console.log(error, "에러")
             if (error) {
                 if (error.message.includes("User already registered")) {
                     setError("이미 등록된 이메일입니다.")
@@ -117,11 +118,7 @@ const SignupPage: React.FC = () => {
     const handleKakaoSignup = async () => {
         setError("")
         try {
-            const { error } = await signInWithKakao()
-            if (error) {
-                setError("카카오 회원가입에 실패했습니다. 다시 시도해주세요.")
-                console.error('Kakao signup error:', error)
-            }
+            await signInWithKakao()
         } catch (error) {
             console.error('Kakao signup error:', error)
             setError("카카오 회원가입 중 오류가 발생했습니다.")

@@ -19,11 +19,14 @@ import { useNavigate, Link as RouterLink } from "react-router-dom"
 import { ROUTES } from "@/router"
 import logo from "#/logo.png"
 import profileImage from "#/default-profile.webp";
+import { Search } from "@mui/icons-material"
+import {useNavigation} from "@/hooks/useNavigation.ts";
 
 export const Header: React.FC = () => {
     const theme = useTheme()
     const { user, signOut } = useAuth()
     const navigate = useNavigate()
+    const {goToSearch} = useNavigation()
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const open = Boolean(anchorEl)
@@ -86,6 +89,10 @@ export const Header: React.FC = () => {
                 </Box>
 
 
+                <Search
+                    onClick={   goToSearch}
+                    sx={{ cursor: "pointer", mx: 2 , color: "text.secondary"}}>
+                </Search>
 
                 <Box sx={{ flexGrow: 0 }}>
                     {user ? (

@@ -21,7 +21,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
             {!hideHeader && <Header />}
-            <Box component="main" sx={{ flexGrow: 1, pt: { xs: "56px", sm: "64px" } }}>
+            <Box
+                component="main"
+                sx={{
+                    flexGrow: 1,
+                    pt: { xs: "56px", sm: "64px" },
+                    // pb: { xs: 9, sm: 3 },
+                    // 또는 안전 영역 고려:
+                    pb: { xs: `calc(env(safe-area-inset-bottom) + 56px)`, sm: 3 }
+                }}
+            >
                 {children}
             </Box>
             {/* PWA Install Button */}

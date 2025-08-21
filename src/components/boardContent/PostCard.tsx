@@ -2,11 +2,8 @@
 
 import type React from "react"
 import { Box, Card, CardContent, Typography, Chip, Stack, useTheme } from "@mui/material"
-import {
-    FavoriteBorderOutlined,
-    ChatBubbleOutlineOutlined,
-} from "@mui/icons-material"
 import type { PostList } from "@/types"
+import {MessageCircle, ThumbsUp} from "lucide-react";
 
 interface PostCardProps {
     post: PostList
@@ -148,10 +145,15 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
                     spacing={1.5}
                     sx={{ color: "text.secondary", fontSize: 13, mt: 0.5 }}
                 >
-                    <FavoriteBorderOutlined sx={{ fontSize: 16 }} />
-                    <Typography variant="caption">{post.likes}</Typography>
-                    <ChatBubbleOutlineOutlined sx={{ fontSize: 16 }} />
-                    <Typography variant="caption">{post.commentNumber}</Typography>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <ThumbsUp size={ 16 } />
+                        <Typography variant="caption">{post.likes}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <MessageCircle size={16} />
+                        <Typography variant="caption">{post.commentNumber}</Typography>
+                    </Box>
                     <Typography variant="caption" sx={{ ml: 1 }}>
                         {formatDate(post.createdAt)}
                     </Typography>

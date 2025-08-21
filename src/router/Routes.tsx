@@ -16,6 +16,7 @@ import ErrorPage from "@/pages/ErrorPage"
 import {Layout} from "@/components/Layout.tsx";
 import SignupPage from "@/pages/auth/SignupPage.tsx";
 import AuthCallback from "@/pages/auth/AuthCallback.tsx";
+import SearchPage from "@/pages/SearchPage.tsx";
 
 export const routes: RouteObject[] = [
     { path: "/", element: <Layout><LandingPage /></Layout> },
@@ -34,5 +35,6 @@ export const routes: RouteObject[] = [
     { path: "/delivery/:id", element: <Layout><DeliveryDetailPage /></Layout> },
     { path: "/delivery/write", element: <Layout><DeliveryWritePage /></Layout> },
     { path: "/notices", element: <Layout><NoticesPage /></Layout> },
+    { path: "/search", element: <Layout><SearchPage /></Layout> },
     { path: "*", element: <Layout><ErrorPage /></Layout> },
 ]

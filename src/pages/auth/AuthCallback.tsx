@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase.ts";
 import { CircularProgress, Box, Typography, Paper, Avatar } from "@mui/material";
-import LoginIcon from "@mui/icons-material/Login"; // 원하는 아이콘으로 교체 가능
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 
 const AuthCallback: React.FC = () => {
     const navigate = useNavigate();
@@ -40,18 +40,18 @@ const AuthCallback: React.FC = () => {
 
                 if (error) {
                     console.error("Auth callback error:", error);
-                    navigate("/login");
+                    navigate("/sign-in");
                     return;
                 }
 
                 if (data.session) {
                     navigate("/");
                 } else {
-                    navigate("/login");
+                    navigate("/sign-in");
                 }
             } catch (err) {
                 console.error("Callback handling error:", err);
-                navigate("/login");
+                navigate("/sign-in");
             }
         };
 
@@ -85,7 +85,7 @@ const AuthCallback: React.FC = () => {
                         mb: 2,
                     }}
                 >
-                    <LoginIcon sx={{ fontSize: 32 }} />
+                    <HourglassBottomIcon sx={{ fontSize: 32 }} />
                 </Avatar>
                 <CircularProgress
                     size={32}

@@ -23,7 +23,7 @@ const SigninPage: React.FC = () => {
     const theme = useTheme()
     const navigate = useNavigate()
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-    const { user, signInWithEmail, signInWithKakao, loading } = useAuth()
+    const { user, signIn,  signInWithKakao, loading } = useAuth()
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -57,7 +57,7 @@ const SigninPage: React.FC = () => {
         setError("")
 
         try {
-            const { error } = await signInWithEmail(email, password)
+            const { error } = await signIn(email, password)
 
             if (error) {
                 if (error.message.includes("Invalid login credentials")) {
@@ -84,12 +84,7 @@ const SigninPage: React.FC = () => {
     const handleKakaoLogin = async () => {
         setError("")
         try {
-            const { error } = await signInWithKakao()
-            if (error) {
-                setError("카카오 로그인에 실패했습니다. 다시 시도해주세요.")
-                console.error('Kakao login error:', error)
-            }
-            // 성공 시 OAuth 리다이렉트가 자동으로 처리됨
+            await signInWithKakao();
         } catch (error) {
             console.error('Kakao login error:', error)
             setError("카카오 로그인 중 오류가 발생했습니다.")

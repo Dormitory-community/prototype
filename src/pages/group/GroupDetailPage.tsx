@@ -147,9 +147,6 @@ const GroupDetailPage: React.FC = () => {
                             <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
                                 {group.title}
                             </Typography>
-                            <Typography variant="body1" sx={{ color: "text.secondary", mb: 2 }}>
-                                {group.description}
-                            </Typography>
                             <Stack direction="row" spacing={1} flexWrap="wrap">
                                 <Chip label={group.category} size="small" sx={{ bgcolor: "#8b5cf6", color: "white" }} />
                                 {group.tags.map((tag) => (

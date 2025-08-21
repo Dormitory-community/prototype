@@ -19,6 +19,7 @@ export const useNavigation = () => {
     const goToBoardWrite = (type: "free" | "info" | "counseling" | "study" = "free") =>
         navigate(ROUTES.BOARD_WRITE.replace(":type", type))
     const goToSignUp = () => navigate(ROUTES.SIGNUP)
+    const goToSearch = () => navigate(ROUTES.SEARCH)
 
     return {
         goToHome,
@@ -32,5 +33,6 @@ export const useNavigation = () => {
         goToDeliveryWrite,
         goToBoardWrite,
         goToSignUp,
+        goToSearch
     }
 }

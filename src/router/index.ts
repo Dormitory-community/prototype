@@ -16,4 +16,5 @@ export const ROUTES = {
         SIGNUP: "/sign-up",
         ERROR: "/404",
         AUTH_CALLBACK: "/auth/callback",
+        SEARCH: "/search",
 } as const
