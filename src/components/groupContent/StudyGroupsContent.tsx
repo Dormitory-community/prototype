@@ -14,7 +14,7 @@ import {
     useTheme,
     useMediaQuery,
 } from "@mui/material"
-import { Search, Add } from "@mui/icons-material"
+import {Search, Add, Edit} from "@mui/icons-material"
 import StudyGroupCard from "@/components/groupContent/StudyGroupCard.tsx"
 import { useNavigation } from "@/hooks/useNavigation.ts"
 import {useNavigate} from "react-router-dom";
@@ -264,7 +264,38 @@ const StudyGroupsContent: React.FC = () => {
                     />
                 </Stack>
             )}
-            
+            {isMobile && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        bottom: 72,
+                        left: 0,
+                        right: 0,
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    <Button
+                        onClick={goToGroupWrite}
+                        sx={{
+                            width: 75,   // 크기 줄임 (기본 FAB 사이즈 정도)
+                            height: 44,
+                            borderRadius: "22px",
+                            bgcolor: "#8b5cf6",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "0.75rem",
+                            gap: 1,
+                        }}
+                    >
+                        <Edit sx={{fontSize: 16}}/>  글쓰기
+                    </Button>
+                </Box>
+
+            )}
+
         </Box>
     )
 }

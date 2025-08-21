@@ -15,7 +15,8 @@ import {
     IconButton,
     Divider,
 } from "@mui/material"
-import { ArrowBack, Groups, Schedule, LocationOn, Person, Favorite, Share } from "@mui/icons-material"
+import { ArrowBack, Groups, Schedule, LocationOn, Person } from "@mui/icons-material"
+import ShareMenu from "@/components/groupContent/ShareMenu.tsx";
 
 // 샘플 그룹 데이터
 const sampleGroups = {
@@ -116,13 +117,11 @@ const GroupDetailPage: React.FC = () => {
                 <Typography variant="h5" sx={{ fontWeight: 700, flexGrow: 1 }}>
                     그룹 상세보기
                 </Typography>
-                <IconButton aria-label="좋아요">
-                    <Favorite />
-                </IconButton>
-                <IconButton aria-label="공유하기">
-                    <Share />
-                </IconButton>
-            </Stack>
+                <ShareMenu
+                    url={window.location.href}
+                    title={`${group.title} - 함께해요!`}
+                    description={`${group.category} | ${group.schedule} | ${group.location}`}
+                />            </Stack>
 
             {/* 메인 카드 */}
             <Card sx={{ mb: 3, borderRadius: 3, boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
@@ -200,7 +199,6 @@ const GroupDetailPage: React.FC = () => {
                     <Typography
                         variant="body1"
                         sx={{
-                            color: "text.secondary",
                             lineHeight: 1.8,
                             whiteSpace: "pre-line",
                             mb: 4,
@@ -209,7 +207,6 @@ const GroupDetailPage: React.FC = () => {
                         {group.fullDescription}
                     </Typography>
 
-                    {/* 액션 버튼 */}
                     <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center">
                         <Button
                             variant="contained"

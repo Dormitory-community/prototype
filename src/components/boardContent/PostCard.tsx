@@ -77,9 +77,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick, showCategory = true 
                 borderRadius: 2,
                 boxShadow: "none",
                 border: `1px solid ${theme.palette.grey[200]}`,
-                "&:hover": {
-                    backgroundColor: theme.palette.grey[50],
-                },
             }}
         >
             <CardContent sx={{ p: 2 }}>
