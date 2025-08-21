@@ -56,7 +56,7 @@ export const MobileNavBar: React.FC = () => {
                 position: "fixed",
                 left: 0,
                 right: 0,
-                bottom: `calc(var(--safe-bottom))`,
+                bottom: 0,
                 zIndex: 1100,
             }}
             elevation={3}
@@ -66,9 +66,14 @@ export const MobileNavBar: React.FC = () => {
                 onChange={handleChange}
                 showLabels
                 sx={{
-                    height: "56px", // 네비 UI 높이 고정
-                    // 내부 요소가 너무 아래로 붙지 않게 필요하면 paddingBottom 소량 추가
-                    paddingBottom: "4px",
+                    // 내부 아이콘 영역은 56px, safe-area 만큼 추가 높이 확보
+                    height: `calc(56px + var(--safe-bottom, env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px))))`,
+                    // 아이콘/레이블이 safe-area 위로 올라오도록 패딩 적용
+                    paddingBottom: `var(--safe-bottom, env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px)))`,
+                    // 시각적 보정(선택)
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                 }}
             >
                 <BottomNavigationAction label="홈" icon={<Home />} />
