@@ -6,6 +6,7 @@ import "./index.css"
 import { AuthProvider } from "./contexts/AuthContext.tsx"
 import { routes } from "@/router/Routes"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { usePWA } from "./hooks/usePWA"
 
 const router = createBrowserRouter(routes, {
     future: { v7_startTransition: true } as any
@@ -13,7 +14,20 @@ const router = createBrowserRouter(routes, {
 
 function Main() {
     // Register the service worker
-    // usePWA()
+    usePWA()
+
+    // Register service worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+    }
 
     return (
         <React.StrictMode>

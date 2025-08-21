@@ -8,7 +8,7 @@ const urlsToCache = [
     "/src/main.tsx",
     "/src/App.tsx",
     "/src/index.css",
-    "/vite.svg",
+    "/public/logo.png",
     // Add other assets you want to cache
 ]
 
