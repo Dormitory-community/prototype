@@ -1,31 +1,42 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>고양시 한국장학재단 연합기숙사 커뮤니티</title>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <!-- viewport-fit=cover 추가 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>고양시 한국장학재단 연합기숙사 커뮤니티</title>
 
-    <!-- PWA meta tags -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#000000" />
+  <!-- PWA meta tags -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#000000" />
 
-    <!-- iOS specific meta tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="apple-mobile-web-app-title" content="고양시 한국장학재단 연합기숙사 커뮤니티" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+  <!-- iOS specific meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="고양시 한국장학재단 연합기숙사 커뮤니티" />
+  <link rel="apple-touch-icon" href="/logo.png" />
 
-    <!-- Open Graph tags -->
-    <meta property="og:title" content="고양시 한국장학재단 연합기숙사 커뮤니티" />
-    <meta property="og:description" content="연합기숙사 학생들을 위한 소통과 정보 공유 커뮤니티" />
-    <meta property="og:image" content="/logo.png" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://yourwebsite.com" />
-    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  <!-- Open Graph tags -->
+  <meta property="og:title" content="고양시 한국장학재단 연합기숙사 커뮤니티" />
+  <meta property="og:description" content="연합기숙사 학생들을 위한 소통과 정보 공유 커뮤니티" />
+  <meta property="og:image" content="/logo.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://yourwebsite.com" />
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
+
+  <!-- 안전영역(fallback 포함) 전역 변수: 편리하게 사용 -->
+  <style>
+    :root{
+      --safe-bottom: env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px));
+    }
+    html,body,#root{height:100%; margin:0;}
+    /* 필요하면 바디에 최소 패딩을 줄 수 있음(선택) */
+    /* body { padding-bottom: var(--safe-bottom); } */
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
+</body>
 </html>
