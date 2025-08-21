@@ -185,16 +185,6 @@ const MyPage: React.FC = () => {
                 myComments.map((comment, index) => (
                     <React.Fragment key={comment.id}>
                         <ListItem alignItems="flex-start" sx={{ py: 2 }}>
-                            <Avatar
-                                sx={{
-                                    width: 32,
-                                    height: 32,
-                                    background: "linear-gradient(45deg, #2563eb 30%, #10b981 90%)",
-                                    mr: 2,
-                                }}
-                            >
-                                {comment.author.name.charAt(0)}
-                            </Avatar>
                             <ListItemText
                                 primary={
                                     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "text.primary" }}>

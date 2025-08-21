@@ -160,6 +160,7 @@ const InfoSharingContent: React.FC = () => {
                             post={post}
                             onClick={() => goToBoardDetail(post.id)}
                             showCategory={true}
+                            dense={true}
                         />
                     ))
                 ) : (

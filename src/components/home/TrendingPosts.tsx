@@ -82,7 +82,9 @@ export function TrendingPosts() {
                         key={post.id}
                         post={post}
                         onClick={() => goToBoardDetail(post.id)}
-                        showCategory={true}/>
+                        showCategory={true}
+                        dense={true}
+                    />
                 )}
             </CardContent>
         </Card>

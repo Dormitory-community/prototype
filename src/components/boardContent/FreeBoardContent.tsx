@@ -233,7 +233,9 @@ const FreeBoardContent: React.FC = () => {
                         <PostCard key={post.id}
                                   post={post}
                                   onClick={() => goToBoardDetail(post.id)}
-                                  showCategory={true} />
+                                  showCategory={true}
+                                  dense={true}
+                        />
                     ))
                 ) : (
                     <Box sx={{ textAlign: "center", py: 8, gridColumn: "1 / -1" }}>
