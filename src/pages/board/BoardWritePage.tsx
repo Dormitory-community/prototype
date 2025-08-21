@@ -216,7 +216,17 @@ const BoardWritePage: React.FC = () => {
                                 key={index}
                                 label={tag}
                                 onDelete={() => handleDeleteTag(tag)}
-                                sx={{ borderRadius: 2, bgcolor: theme.palette.grey[200] }}
+                                sx={(theme) => ({
+                                    borderRadius: 2,
+                                    bgcolor:
+                                        theme.palette.mode === "dark"
+                                            ? theme.palette.grey[800]
+                                            : theme.palette.grey[200],
+                                    color:
+                                        theme.palette.mode === "dark"
+                                            ? theme.palette.grey[100]
+                                            : theme.palette.text.primary,
+                                })}
                             />
                         ))}
                     </Stack>

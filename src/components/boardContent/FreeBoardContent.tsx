@@ -175,19 +175,23 @@ const FreeBoardContent: React.FC = () => {
                         }
                     />
                 </FormControl>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<Add />}
-                    onClick={() => goToBoardWrite("free")} // Pass 'free' type parameter
-                    sx={{
-                        height: "56px", // Match TextField height
-                        borderRadius: theme.shape.borderRadius,
-                        px: 3,
-                    }}
-                >
-                    새 게시글 작성
-                </Button>
+
+                {/* Desktop Write Button - Hidden on mobile */}
+                {!isMobile && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<Add />}
+                        onClick={() => goToBoardWrite("free")}
+                        sx={{
+                            height: "56px",
+                            borderRadius: theme.shape.borderRadius,
+                            px: 3,
+                        }}
+                    >
+                        새 게시글 작성
+                    </Button>
+                )}
             </Stack>
 
             <Stack
@@ -263,6 +267,8 @@ const FreeBoardContent: React.FC = () => {
                     />
                 </Stack>
             )}
+            
+
         </Box>
     )
 }

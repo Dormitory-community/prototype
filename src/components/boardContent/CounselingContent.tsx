@@ -11,10 +11,12 @@ import {
     Stack,
     Pagination,
     useTheme,
-    useMediaQuery, FormControl,
+    useMediaQuery,
+    FormControl,
     OutlinedInput,
+
 } from "@mui/material"
-import { Search, Add } from "@mui/icons-material"
+import {Search, Add, Edit} from "@mui/icons-material"
 import PostCard from "./PostCard.tsx"
 import type { PostList, User} from "@/types"
 import { useNavigation } from "@/hooks/useNavigation.ts"
@@ -95,7 +97,7 @@ const CounselingContent: React.FC = () => {
             id: "4",
             title: "가족과의 갈등, 어떻게 풀어야 할까요?",
             content:
-                "부모님과 의견 차이가 커서 자주 다 퉈요. 서로 이해하고 싶은데 대화가 잘 안 통하네요. 가족 갈등을 현명하게 해결하는 방법이 있을까요?",
+                "부모님과 의견 차이가 커서 자주 다툼요. 서로 이해하고 싶은데 대화가 잘 안 통하네요. 가족 갈등을 현명하게 해결하는 방법이 있을까요?",
             author: mockUser2,
             createdAt: new Date("2024-07-12T11:00:00"),
             updatedAt: new Date("2024-07-12T11:00:00"),
@@ -110,7 +112,7 @@ const CounselingContent: React.FC = () => {
             id: "5",
             title: "연애 고민, 조언 부탁드립니다",
             content:
-                "썸 타는 사람이 있는데, 어떻게 해야 관계가 발전할 수 있을지 모르겠어요. 고백 타이밍이나 상대방의 마음을 확인하는 방법 등 연애 조언 부탁드립니다.",
+                "인턴 사람이 있는데, 어떻게 해야 관계가 발전할 수 있을지 모르겠어요. 고백 타이밍이나 상대방의 마음을 확인하는 방법 등 연애 조언 부탁드립니다.",
             author: mockUser1,
             createdAt: new Date("2024-07-10T16:00:00"),
             updatedAt: new Date("2024-07-10T16:00:00"),
@@ -118,7 +120,7 @@ const CounselingContent: React.FC = () => {
             likes: 10,
             commentNumber: 30,
             isAnonymous: true,
-            tags: ["연애", "썸", "고백"],
+            tags: ["연애", "인", "고백"],
             views: 70,
         },
     ]
@@ -152,7 +154,7 @@ const CounselingContent: React.FC = () => {
     }
 
     return (
-        <Box sx={{ px: { xs: 2, md: 4 } }}>
+        <Box sx={{ px: { xs: 2, md: 4 }, pb: { xs: 10, md: 4 } }}>
             <Stack
                 direction={{ xs: "column", sm: "row" }}
                 spacing={2}
@@ -165,7 +167,6 @@ const CounselingContent: React.FC = () => {
                         placeholder="게시글 검색..."
                         value={searchTerm}
                         onChange={handleSearchChange}
-                        // 이 줄을 추가하여 multiline 속성을 명시적으로 false로 설정합니다.
                         multiline={false}
                         sx={{
                             borderRadius: theme.shape.borderRadius,
@@ -178,19 +179,23 @@ const CounselingContent: React.FC = () => {
                         }
                     />
                 </FormControl>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<Add />}
-                    onClick={() => goToBoardWrite("counseling")} // UPDATED
-                    sx={{
-                        height: "56px", // Match TextField height
-                        borderRadius: theme.shape.borderRadius,
-                        px: 3,
-                    }}
-                >
-                    새 게시글 작성
-                </Button>
+
+                {/* Desktop Write Button - Hidden on mobile */}
+                {!isMobile && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<Add />}
+                        onClick={() => goToBoardWrite("counseling")}
+                        sx={{
+                            height: "56px",
+                            borderRadius: theme.shape.borderRadius,
+                            px: 3,
+                        }}
+                    >
+                        새 게시글 작성
+                    </Button>
+                )}
             </Stack>
 
             <Stack
@@ -268,6 +273,40 @@ const CounselingContent: React.FC = () => {
                     />
                 </Stack>
             )}
+
+            {isMobile && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        bottom: 72,
+                        left: 0,
+                        right: 0,
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    <Button
+                        onClick={() => goToBoardWrite("counseling")}
+                        sx={{
+                            width: 75,   // 크기 줄임 (기본 FAB 사이즈 정도)
+                            height: 44,
+                            borderRadius: "22px",
+                            bgcolor: "primary.main",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "0.75rem",
+                            gap: 1,
+                        }}
+                    >
+                        <Edit sx={{fontSize: 16}}/>  글쓰기
+                    </Button>
+                </Box>
+
+            )}
+
+
         </Box>
     )
 }

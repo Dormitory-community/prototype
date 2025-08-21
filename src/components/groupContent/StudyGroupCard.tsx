@@ -144,9 +144,15 @@ const StudyGroupCard: React.FC<StudyGroupCardProps> = ({ studyGroup, onClick }) 
                             key={index}
                             label={`#${tag}`}
                             size="small"
-                            sx={{
-                                bgcolor: theme.palette.grey[100],
-                                color: theme.palette.grey[700],
+                            sx={(theme) => ({
+                                bgcolor:
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.grey[700]
+                                        : theme.palette.grey[100],
+                                color:
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.grey[100]
+                                        : theme.palette.grey[700],
                                 fontSize: "0.7rem",
                                 fontWeight: 500,
                                 height: 20,
@@ -154,7 +160,7 @@ const StudyGroupCard: React.FC<StudyGroupCardProps> = ({ studyGroup, onClick }) 
                                 "& .MuiChip-label": {
                                     px: 1,
                                 },
-                            }}
+                            })}
                         />
                     ))}
                 </Stack>

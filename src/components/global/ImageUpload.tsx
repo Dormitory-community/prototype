@@ -2,8 +2,9 @@
 
 import type React from "react"
 import { useRef } from "react"
-import { Box, Button, IconButton, Stack, Typography, useTheme } from "@mui/material"
-import { CameraAlt, Delete, Image as ImageIcon } from "@mui/icons-material"
+import { Box, Button, IconButton, Stack, Typography  } from "@mui/material"
+import { CameraAlt, Delete } from "@mui/icons-material"
+import { theme } from "@/theme/theme"
 
 interface ImageUploadProps {
     images: string[]
@@ -12,7 +13,6 @@ interface ImageUploadProps {
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ images, onImagesChange, maxImages = 5 }) => {
-    const theme = useTheme()
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,28 +124,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onImagesChange, maxIm
                 >
                     사진 추가 ({maxImages - images.length}장 더 가능)
                 </Button>
-            )}
-
-            {images.length === 0 && (
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        height: 120,
-                        border: `2px dashed ${theme.palette.divider}`,
-                        borderRadius: 2,
-                        bgcolor: theme.palette.grey[50],
-                        cursor: "pointer",
-                    }}
-                    onClick={handleUploadClick}
-                >
-                    <ImageIcon sx={{ fontSize: 40, color: theme.palette.grey[400], mb: 1 }} />
-                    <Typography variant="body2" color="text.secondary">
-                        클릭하여 사진을 추가하세요
-                    </Typography>
-                </Box>
             )}
         </Box>
     )
