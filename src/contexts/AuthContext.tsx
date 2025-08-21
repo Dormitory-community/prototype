@@ -87,8 +87,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       email,
       password,
     });
-    sessionStorage.setItem("testMode", "false")
-    sessionStorage.setItem("bypassLocationCheck", "false")
     return { data, error };
   };
 
@@ -129,6 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
+      console.log(`${window.location.origin}/auth/callback`)
     } catch (error) {
       console.error("Kakao login error:", error);
       throw error;
@@ -140,8 +139,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     clearSessionCookies();
-    sessionStorage.setItem("testMode", "false")
-    sessionStorage.setItem("bypassLocationCheck", "false");
     if (error) throw error;
   };
 
