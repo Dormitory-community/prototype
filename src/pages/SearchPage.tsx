@@ -9,8 +9,8 @@ const SearchPage = () => {
     return (
         <Box
             sx={{
-                bgcolor: theme.palette.background.default,
-                color: theme.palette.text.primary,
+                bgcolor: "background.default",
+                color: "text.primary",
                 height: "100vh",
                 px: 2,
                 pt: 6,
@@ -28,7 +28,7 @@ const SearchPage = () => {
                         ml: 1,
                         flex: 1,
                         color: "inherit",
-                        bgcolor: theme.palette.background.paper,
+                        bgcolor: "background.default",
                         borderRadius: 1,
                         px: 2,
                         py: 1,

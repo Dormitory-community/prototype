@@ -15,7 +15,6 @@ export const MobileNavBar: React.FC = () => {
         ROUTES.LOGIN,
         ROUTES.SIGNUP,
         ROUTES.BOARD_DETAIL,
-        ROUTES.DELIVERY_DETAIL,
         ROUTES.SIGNUP,
     ]
 
