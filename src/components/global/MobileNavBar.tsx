@@ -51,14 +51,14 @@ export const MobileNavBar: React.FC = () => {
     }
 
     return (
-        <Paper
-            sx={{ position: "fixed", bottom: 0, left: 0, right: 0 ,
-            pb: `env(safe-area-inset-bottom)`,
-            paddingBottom: `env(safe-area-inset-bottom)`,
-        }}
-        elevation={3}
-        >
-            <BottomNavigation value={value} onChange={handleChange} showLabels>
+        <Paper sx={{ position: "fixed", bottom: 0, left: 0, right: 0 ,
+        }} elevation={3}>
+            <BottomNavigation value={value} onChange={handleChange} showLabels
+
+            sx={{
+                paddingBottom: `env(safe-area-inset-bottom)`,
+                height: `calc(56px + env(safe-area-inset-bottom))`,
+            }}>
                 <BottomNavigationAction label="홈" icon={<Home />} />
                 <BottomNavigationAction label="게시판" icon={<Dashboard />} />
                 <BottomNavigationAction label="그룹 모집" icon={<Groups />} />
