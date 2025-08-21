@@ -106,7 +106,7 @@ const BoardsPage: React.FC = () => {
                     sx={{
                         borderBottom: 1,
                         borderColor: "divider",
-                        bgcolor: { xs: "grey.50", sm: "transparent" },
+                        bgcolor: { xs: "background.paper", sm: "transparent" },
                         p: { xs: 2, sm: 3 },
                         display: "flex",
                         justifyContent: { xs: "flex-start", sm: "center" },
@@ -138,21 +138,7 @@ const BoardsPage: React.FC = () => {
                                     bgcolor: "action.hover",
                                 },
                             },
-                            "& .MuiTabs-indicator": {
-                                ...(isMobile
-                                    ? {
-                                        width: 3,
-                                        borderRadius: "4px 0 0 4px",
-                                        background: "linear-gradient(45deg, #2563eb 30%, #10b981 90%)",
-                                        left: 0,
-                                    }
-                                    : {
-                                        height: 3,
-                                        borderRadius: "4px 4px 0 0",
-                                        background: "linear-gradient(45deg, #2563eb 30%, #10b981 90%)",
-                                        bottom: 0,
-                                    }),
-                            },
+
                             "& .MuiTabs-flexContainer": {
                                 gap: { xs: 0.5, sm: 1 },
                                 justifyContent: isMobile ? "flex-start" : "center",

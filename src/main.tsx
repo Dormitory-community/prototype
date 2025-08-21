@@ -1,8 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import { ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
-import { theme } from "./theme/theme"
+import { CustomThemeProvider } from "@/contexts/ThemeContext"
 import "./index.css"
 import { AuthProvider } from "./contexts/AuthContext.tsx"
 import { routes } from "@/router/Routes"
@@ -18,12 +17,15 @@ function Main() {
 
     return (
         <React.StrictMode>
-            <ThemeProvider theme={theme}>
+            {/*<ThemeProvider theme={theme}>*/}
+            <CustomThemeProvider>
+
                 <CssBaseline />
                     <AuthProvider>
                         <RouterProvider router={router} />
                     </AuthProvider>
-            </ThemeProvider>
+             </ CustomThemeProvider>
+
         </React.StrictMode>
     )
 }

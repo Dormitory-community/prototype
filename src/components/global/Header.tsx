@@ -12,18 +12,19 @@ import {
     Menu,
     MenuItem,
     Avatar,
-    useTheme,
 } from "@mui/material"
 import { useAuth } from "../../contexts/AuthContext.tsx"
+import { useThemeContext } from "@/contexts/ThemeContext"
 import { useNavigate, Link as RouterLink } from "react-router-dom"
 import { ROUTES } from "@/router"
 import logo from "#/logo.png"
 import profileImage from "#/default-profile.webp";
-import { Search } from "@mui/icons-material"
+import {BrightnessLow, DarkMode, Search} from "@mui/icons-material"
 import {useNavigation} from "@/hooks/useNavigation.ts";
+import {theme} from "@/theme/theme.ts";
 
 export const Header: React.FC = () => {
-    const theme = useTheme()
+    const { toggleTheme, mode } = useThemeContext()
     const { user, signOut } = useAuth()
     const navigate = useNavigate()
     const {goToSearch} = useNavigation()
@@ -89,8 +90,11 @@ export const Header: React.FC = () => {
                 </Box>
 
 
+                <IconButton onClick={toggleTheme} sx={{ mx: 1, color: "text.secondary" }}>
+                    {mode === "light" ? <BrightnessLow /> : <DarkMode />}
+                </IconButton>
                 <Search
-                    onClick={   goToSearch}
+                    onClick={goToSearch}
                     sx={{ cursor: "pointer", mx: 2 , color: "text.secondary"}}>
                 </Search>
 
