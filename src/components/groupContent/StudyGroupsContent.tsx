@@ -268,11 +268,15 @@ const StudyGroupsContent: React.FC = () => {
                 <Box
                     sx={{
                         position: "fixed",
-                        bottom: 72,
+                        bottom: {
+                            xs: `calc(56px + var(--safe-bottom, env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px))) + 16px)`,
+                            sm: 4,
+                        },
                         left: 0,
                         right: 0,
                         display: "flex",
                         justifyContent: "center",
+                        zIndex: 1200,
                     }}
                 >
                     <Button
