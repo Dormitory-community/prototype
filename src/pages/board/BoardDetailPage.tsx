@@ -144,46 +144,56 @@ const BoardDetailPage: React.FC = () => {
     }
 
     return (
-        <Container maxWidth="md" sx={{ py: 8 }}>
-            <Paper
+        <>
+            {/* 메인 컨텐츠 - CommentForm을 위한 하단 공간 확보 */}
+            <Container
+                maxWidth="md"
                 sx={{
-                    p: { xs: 3, md: 5 },
-                    borderRadius: 4,
-                    border: "1px solid",
-                    borderColor: "divider",
-                    backgroundColor: "background.paper",
+                    py: { xs: 2, md: 4 }, // 상하 패딩 줄임
+                    pb: { xs: 10, md: 4 }, // 모바일에서 CommentForm을 위한 하단 공간 확보
                 }}
             >
-                <PostHeader
-                    category={post.category}
-                    createdAt={post.createdAt}
-                    onGoBack={handleGoBack}
-                />
+                <Paper
+                    sx={{
+                        p: { xs: 3, md: 5 },
+                        borderRadius: 4,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        backgroundColor: "background.paper",
+                    }}
+                >
+                    <PostHeader
+                        category={post.category}
+                        createdAt={post.createdAt}
+                        onGoBack={handleGoBack}
+                    />
 
-                <PostContent
-                    post={post}
-                    totalLikeCount={post.likes}
-                    totalCommentCount={post.commentsCount}
-                />
+                    <PostContent
+                        post={post}
+                        totalLikeCount={post.likes}
+                        totalCommentCount={post.commentsCount}
+                    />
 
-                <CommentList
-                    comments={post.comments}
-                    onReplyClick={handleReplyClick}
-                    replyToComment={replyToComment}
-                />
+                    <CommentList
+                        comments={post.comments}
+                        onReplyClick={handleReplyClick}
+                        replyToComment={replyToComment}
+                    />
+                </Paper>
+            </Container>
 
-                <CommentForm
-                    value={newComment}
-                    onChange={setNewComment}
-                    isAnonymous={isAnonymousComment}
-                    onAnonymousChange={setIsAnonymousComment}
-                    onSubmit={handleCommentSubmit}
-                    isReplyMode={replyToComment !== null}
-                    replyToCommentAuthor={replyToComment ? post.comments.find(c => c.id === replyToComment)?.author.name || '익명' : undefined}
-                    onCancelReply={() => setReplyToComment(null)}
-                />
-            </Paper>
-        </Container>
+            {/* CommentForm - 화면 하단 고정 */}
+            <CommentForm
+                value={newComment}
+                onChange={setNewComment}
+                isAnonymous={isAnonymousComment}
+                onAnonymousChange={setIsAnonymousComment}
+                onSubmit={handleCommentSubmit}
+                isReplyMode={replyToComment !== null}
+                replyToCommentAuthor={replyToComment ? post.comments.find(c => c.id === replyToComment)?.author.name || '익명' : undefined}
+                onCancelReply={() => setReplyToComment(null)}
+            />
+        </>
     )
 }
 

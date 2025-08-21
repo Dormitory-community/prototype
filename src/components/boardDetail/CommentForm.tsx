@@ -58,6 +58,8 @@ const CommentForm: React.FC<CommentFormProps> = ({
                 bgcolor: containerBg,
                 px: 0,
                 py: 1,
+                // safe-area 고려
+                paddingBottom: `calc(8px + env(safe-area-inset-bottom))`,
             }}
         >
             {/* 대댓글 모드 헤더 */}
@@ -105,11 +107,11 @@ const CommentForm: React.FC<CommentFormProps> = ({
                         minRows={1}
                         maxRows={6}
                         aria-label="comment input"
-                        // 스타일 조정
+                        // 줌 방지를 위한 스타일 조정
                         sx={{
                             bgcolor: inputBg,
                             borderRadius: 1.25,
-                            pr: 0.5, // endAdornment 공간
+                            pr: 0.5,
                             "& .MuiOutlinedInput-notchedOutline": {
                                 borderColor: inputBorder,
                             },
@@ -120,20 +122,21 @@ const CommentForm: React.FC<CommentFormProps> = ({
                                 borderColor: theme.palette.primary.main,
                                 borderWidth: 1.5,
                             },
-                            // 내부 입력(멀티라인) 패딩/타이포 조정
+                            // 줌 방지: 16px 이상 필수
                             "& .MuiInputBase-inputMultiline": {
                                 padding: "8px 10px",
                                 lineHeight: 1.4,
-                                fontSize: 14,
+                                fontSize: 16, // 줌 방지를 위해 16px 이상
                                 color: theme.palette.text.primary,
                             },
                             "& .MuiInputBase-input": {
                                 color: theme.palette.text.primary,
                             },
-                            // 플레이스홀더 색상
+                            // 플레이스홀더도 16px 이상
                             "& .MuiInputBase-input::placeholder, & .MuiInputBase-inputMultiline::placeholder": {
                                 color: placeholderColor,
                                 opacity: 1,
+                                fontSize: 16, // 줌 방지
                             },
                         }}
                         startAdornment={
@@ -160,7 +163,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                                         }}
                                         inputProps={{ "aria-label": "익명 체크" }}
                                     />
-                                    <Typography fontSize={11} sx={{ color: theme.palette.text.secondary }}>
+                                    <Typography fontSize={12} sx={{ color: theme.palette.text.secondary }}>
                                         익명
                                     </Typography>
                                 </Stack>
