@@ -165,27 +165,29 @@ const StudyGroupsContent: React.FC = () => {
                         },
                     }}
                 />
-                <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() => goToGroupWrite()}
-                    sx={{
-                        height: "56px", // Match TextField height
-                        borderRadius: 2,
-                        px: 3,
-                        bgcolor: "#8b5cf6",
-                        color: "white",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        minWidth: { xs: "120px", md: "140px" },
-                        alignSelf: { xs: "stretch", sm: "flex-end" },
-                        "&:hover": {
-                            bgcolor: "#7c3aed",
-                        },
-                    }}
-                >
-                    모임 만들기
-                </Button>
+                { !isMobile && (
+                    <Button
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => goToGroupWrite()}
+                        sx={{
+                            height: "56px", // Match TextField height
+                            borderRadius: 2,
+                            px: 3,
+                            bgcolor: "#8b5cf6",
+                            color: "white",
+                            fontWeight: 600,
+                            textTransform: "none",
+                            minWidth: { xs: "120px", md: "140px" },
+                            alignSelf: { xs: "stretch", sm: "flex-end" },
+                            "&:hover": {
+                                bgcolor: "#7c3aed",
+                            },
+                        }}
+                    >
+                        모임 만들기
+                    </Button>
+                )}
             </Stack>
 
             {/* Category filters */}
@@ -262,6 +264,7 @@ const StudyGroupsContent: React.FC = () => {
                     />
                 </Stack>
             )}
+            
         </Box>
     )
 }

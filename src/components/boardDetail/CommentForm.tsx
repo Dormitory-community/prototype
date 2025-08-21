@@ -1,13 +1,16 @@
+"use client"
+
 import React from "react"
 import {
-    OutlinedInput, // TextField 대신 OutlinedInput 사용
+    OutlinedInput,
     IconButton,
     Stack,
     Checkbox,
     Box,
     Typography,
     InputAdornment,
-    FormControl // FormControl 추가
+    FormControl,
+    useTheme,
 } from "@mui/material"
 import { Send, Close } from "@mui/icons-material"
 
@@ -34,14 +37,25 @@ const CommentForm: React.FC<CommentFormProps> = ({
                                                      replyToCommentAuthor,
                                                      onCancelReply
                                                  }) => {
+    const theme = useTheme()
+    const isDark = theme.palette.mode === "dark"
+
+    // 색상 변수
+    const containerBg = isDark ? theme.palette.background.paper : "#FFFFFF"
+    const borderTopColor = isDark ? theme.palette.divider : "#e0e0e0"
+    const inputBg = isDark ? theme.palette.background.default : theme.palette.background.paper
+    const inputBorder = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"
+    const placeholderColor = isDark ? theme.palette.text.secondary : "#9ca3af"
+    const checkboxCheckedColor = "red"
+
     return (
         <Box
             sx={{
-                position: 'sticky',
+                position: "sticky",
                 bottom: 0,
-                borderTop: '1px solid #e0e0e0',
+                borderTop: `1px solid ${borderTopColor}`,
                 zIndex: 100,
-                bgcolor: '#FFFFFF',
+                bgcolor: containerBg,
                 px: 0,
                 py: 1,
             }}
@@ -50,13 +64,20 @@ const CommentForm: React.FC<CommentFormProps> = ({
             {isReplyMode && (
                 <Box sx={{ mb: 1, px: 1 }}>
                     <Stack direction="row" alignItems="center" justifyContent="space-between">
-                        <Typography variant="caption" sx={{ fontSize: 12 }}>
-                            <Box component="span" fontWeight="bold">@{replyToCommentAuthor}</Box> 님에게 답글
+                        <Typography variant="caption" sx={{ fontSize: 12, color: theme.palette.text.secondary }}>
+                            <Box component="span" fontWeight="bold" sx={{ mr: 0.5 }}>
+                                @{replyToCommentAuthor}
+                            </Box>
+                            님에게 답글
                         </Typography>
                         <IconButton
                             size="small"
                             onClick={onCancelReply}
-                            sx={{ color: '#999', p: 0.5 }}
+                            sx={{
+                                color: theme.palette.text.secondary,
+                                p: 0.5,
+                            }}
+                            aria-label="cancel reply"
                         >
                             <Close sx={{ fontSize: 16 }} />
                         </IconButton>
@@ -64,61 +85,102 @@ const CommentForm: React.FC<CommentFormProps> = ({
                 </Box>
             )}
 
-            <Stack direction="row"
-                   alignItems="flex-end"
-                   spacing={1}
-                   sx={{ width: '100%', maxWidth: 900, mx: 'auto' }}
+            <Stack
+                direction="row"
+                alignItems="flex-end"
+                spacing={1}
+                sx={{
+                    width: "100%",
+                    maxWidth: 900,
+                    mx: "auto",
+                    px: 1,
+                }}
             >
-                {/* FormControl로 OutlinedInput 감싸기 */}
                 <FormControl variant="outlined" fullWidth>
                     <OutlinedInput
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
                         placeholder={placeholder}
-                        size="small" // OutlinedInput에는 size prop이 없으므로 sx로 조절해야 할 수 있습니다.
                         multiline
                         minRows={1}
                         maxRows={6}
+                        aria-label="comment input"
+                        // 스타일 조정
                         sx={{
-                            // OutlinedInput의 스타일을 여기에 직접 적용
-                            '& .MuiInputBase-inputMultiline': {
-                                padding: '8px 10px',
+                            bgcolor: inputBg,
+                            borderRadius: 1.25,
+                            pr: 0.5, // endAdornment 공간
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                borderColor: inputBorder,
+                            },
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: theme.palette.action.focus || theme.palette.primary.main,
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                borderColor: theme.palette.primary.main,
+                                borderWidth: 1.5,
+                            },
+                            // 내부 입력(멀티라인) 패딩/타이포 조정
+                            "& .MuiInputBase-inputMultiline": {
+                                padding: "8px 10px",
                                 lineHeight: 1.4,
                                 fontSize: 14,
+                                color: theme.palette.text.primary,
+                            },
+                            "& .MuiInputBase-input": {
+                                color: theme.palette.text.primary,
+                            },
+                            // 플레이스홀더 색상
+                            "& .MuiInputBase-input::placeholder, & .MuiInputBase-inputMultiline::placeholder": {
+                                color: placeholderColor,
+                                opacity: 1,
                             },
                         }}
-                        // startAdornment와 endAdornment를 InputProps 없이 바로 전달
                         startAdornment={
                             <InputAdornment
                                 position="start"
                                 sx={{
                                     mr: 0,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    '& .adornmentContent': { display: 'flex', alignItems: 'center', gap: 0.5 }
+                                    display: "flex",
+                                    alignItems: "center",
                                 }}
                             >
-                                <Box className="adornmentContent">
+                                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ pl: 0.5 }}>
                                     <Checkbox
                                         checked={isAnonymous}
                                         onChange={(e) => onAnonymousChange(e.target.checked)}
                                         size="small"
                                         sx={{
                                             p: 0,
-                                            '&.Mui-checked': { color: '#ff6b6b' },
-                                            '& .MuiSvgIcon-root': { fontSize: 18 },
+                                            mr: 0.3,
+                                            "&.Mui-checked": {
+                                                color: checkboxCheckedColor,
+                                            },
+                                            "& .MuiSvgIcon-root": { fontSize: 18 },
                                         }}
+                                        inputProps={{ "aria-label": "익명 체크" }}
                                     />
-                                    <Typography fontSize={11}>익명</Typography>
-                                </Box>
+                                    <Typography fontSize={11} sx={{ color: theme.palette.text.secondary }}>
+                                        익명
+                                    </Typography>
+                                </Stack>
                             </InputAdornment>
                         }
                         endAdornment={
-                            <InputAdornment position="end" sx={{ mr: 0, display: 'flex', alignItems: 'center' }}>
+                            <InputAdornment position="end" sx={{ mr: 0, display: "flex", alignItems: "center" }}>
                                 <IconButton
                                     onClick={onSubmit}
                                     disabled={!value.trim()}
-                                    sx={{ width: 28, height: 28 }}
+                                    sx={{
+                                        width: 32,
+                                        height: 32,
+                                        ml: 0.5,
+                                        "&.Mui-disabled": {
+                                            opacity: 0.5,
+                                            cursor: "default",
+                                        },
+                                    }}
+                                    aria-label="send comment"
                                 >
                                     <Send sx={{ fontSize: 16 }} />
                                 </IconButton>

@@ -14,7 +14,7 @@ import {
     useMediaQuery,
     FormControl, OutlinedInput,
 } from "@mui/material"
-import { Search, Add } from "@mui/icons-material"
+import {Search, Add, Edit} from "@mui/icons-material"
 import PostCard from "./PostCard.tsx"
 import type { PostList, User} from "@/types"
 import { useNavigation } from "@/hooks/useNavigation.ts"
@@ -267,7 +267,39 @@ const FreeBoardContent: React.FC = () => {
                     />
                 </Stack>
             )}
-            
+            {
+                isMobile && (
+                    <Box
+                        sx={{
+                            position: "fixed",
+                            bottom: 72,
+                            left: 0,
+                            right: 0,
+                            display: "flex",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Button
+                            onClick={() => goToBoardWrite("counseling")}
+                            sx={{
+                                width: 75,   // 크기 줄임 (기본 FAB 사이즈 정도)
+                                height: 44,
+                                borderRadius: "22px",
+                                bgcolor: "primary.main",
+                                color: "white",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: "0.75rem",
+                                gap: 1,
+                            }}
+                        >
+                            <Edit sx={{fontSize: 16}}/>  글쓰기
+                        </Button>
+                    </Box>
+
+                )
+            }
 
         </Box>
     )

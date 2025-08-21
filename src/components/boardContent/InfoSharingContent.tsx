@@ -14,7 +14,7 @@ import {
     useMediaQuery, FormControl,
     OutlinedInput,
 } from "@mui/material"
-import { Search, Add } from "@mui/icons-material"
+import {Search, Add, Edit} from "@mui/icons-material"
 import PostCard from "./PostCard.tsx"
 import type { PostList, User} from "@/types"
 import {useNavigation} from "@/hooks/useNavigation.ts";
@@ -109,19 +109,22 @@ const InfoSharingContent: React.FC = () => {
                         }
                     />
                 </FormControl>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<Add />}
-                    onClick={() => goToBoardWrite("info")}
-                    sx={{
-                        height: "56px",
-                        borderRadius: theme.shape.borderRadius,
-                        px: 3,
-                    }}
-                >
-                    새 게시글 작성
-                </Button>
+                { !isMobile && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<Add />}
+                        onClick={() => goToBoardWrite("info")}
+                        sx={{
+                            height: "56px",
+                            borderRadius: theme.shape.borderRadius,
+                            px: 3,
+                        }}
+                    >
+                        새 게시글 작성
+                    </Button>
+                )}
+
             </Stack>
 
             <Stack
@@ -181,6 +184,37 @@ const InfoSharingContent: React.FC = () => {
                         size={isMobile ? "small" : "medium"}
                     />
                 </Stack>
+            )}
+            {
+                isMobile && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        bottom: 72,
+                        left: 0,
+                        right: 0,
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    <Button
+                        onClick={() => goToBoardWrite("counseling")}
+                        sx={{
+                            width: 75,   // 크기 줄임 (기본 FAB 사이즈 정도)
+                            height: 44,
+                            borderRadius: "22px",
+                            bgcolor: "primary.main",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "0.75rem",
+                            gap: 1,
+                        }}
+                    >
+                        <Edit sx={{fontSize: 16}}/>  글쓰기
+                    </Button>
+                </Box>
             )}
         </Box>
     )
