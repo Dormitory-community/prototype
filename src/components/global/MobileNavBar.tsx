@@ -51,14 +51,26 @@ export const MobileNavBar: React.FC = () => {
     }
 
     return (
-        <Paper sx={{ position: "fixed", bottom: 0, left: 0, right: 0 ,
-        }} elevation={3}>
-            <BottomNavigation value={value} onChange={handleChange} showLabels
-
+        <Paper
             sx={{
-                paddingBottom: `env(safe-area-inset-bottom)`,
-                height: `calc(56px + env(safe-area-inset-bottom))`,
-            }}>
+                position: "fixed",
+                left: 0,
+                right: 0,
+                bottom: `calc(var(--safe-bottom))`,
+                zIndex: 1100,
+            }}
+            elevation={3}
+        >
+            <BottomNavigation
+                value={value}
+                onChange={handleChange}
+                showLabels
+                sx={{
+                    height: "56px", // 네비 UI 높이 고정
+                    // 내부 요소가 너무 아래로 붙지 않게 필요하면 paddingBottom 소량 추가
+                    paddingBottom: "4px",
+                }}
+            >
                 <BottomNavigationAction label="홈" icon={<Home />} />
                 <BottomNavigationAction label="게시판" icon={<Dashboard />} />
                 <BottomNavigationAction label="그룹 모집" icon={<Groups />} />
