@@ -127,7 +127,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      console.log(`${window.location.origin}/auth/callback`)
     } catch (error) {
       console.error("Kakao login error:", error);
       throw error;
