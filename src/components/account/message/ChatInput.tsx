@@ -38,7 +38,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 borderTop: 1,
                 borderColor: "divider",
                 // 하단 안전 영역(safe-area)을 고려한 padding
-                paddingBottom: `calc(env(safe-area-inset-bottom, 0px) + 16px)`,
+                paddingBottom: `calc(env(safe-area-inset-bottom, 0px) + 8px)`,
                 backgroundColor: "background.paper",
             }}
         >
