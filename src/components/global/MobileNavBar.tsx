@@ -94,11 +94,13 @@ export const MobileNavBar: React.FC = () => {
                     onSend={handleSendMessage}
                     disabled={!Boolean(roomId)}
                     sx={{
-                        borderRadius: 0,
-                        boxShadow: "none",
-                        borderTop: "1px solid",
-                        borderColor: "divider",
-                        height: "100%",
+                        position: "fixed",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 1200,
+                        // 하단 안전 영역 고려
+                        paddingBottom: `env(safe-area-inset-bottom, 8px)`,
                     }}
                 />
             </Paper>
