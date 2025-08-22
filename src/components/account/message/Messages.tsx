@@ -1,8 +1,7 @@
 "use client"
 
-import type React from "react"
-import { useEffect, useRef, useState, useCallback } from "react"
-import { Box, Typography, Avatar, Paper, CircularProgress } from "@mui/material"
+import React, { useState, useEffect, useRef, useCallback } from "react"
+import { Box, Paper, Typography, Avatar, CircularProgress } from "@mui/material"
 import { theme } from "@/theme/theme.ts"
 import ChatInput from "@/components/account/message/ChatInput.tsx"
 
@@ -33,78 +32,124 @@ interface MessagesProps {
 
 const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, onLoadMoreMessages }) => {
     const messagesContainerRef = useRef<HTMLDivElement>(null)
+    const chatInputRef = useRef<HTMLDivElement>(null)
+
     const [roomData, setRoomData] = useState<ChatRoom | null>(initialRoomData || null)
     const [isLoadingMore, setIsLoadingMore] = useState(false)
     const [hasMoreMessages, setHasMoreMessages] = useState(true)
-    const [showScrollToBottom, setShowScrollToBottom] = useState(false)
+    const [newMessage, setNewMessage] = useState("")
+    const [chatInputHeight, setChatInputHeight] = useState(72)
+    const [safeAreaBottom, setSafeAreaBottom] = useState(0)
     const [isAtBottom, setIsAtBottom] = useState(true)
     const [isVisible, setIsVisible] = useState(false)
 
-    const [newMessage, setNewMessage] = useState("")
-
-    // Mock 데이터
+    // ----------------------------
+    // 1️⃣ 실제 viewport 높이 계산
+    // ----------------------------
     useEffect(() => {
-        if (!initialRoomData) {
-            const mockMessages: Message[] = [
-                { id: "msg-1", content: "안녕하세요! 이번 과제에 대해 질문이 있습니다.", timestamp: "2024-01-15 14:25", isFromMe: false },
-                { id: "msg-2", content: "네, 어떤 부분이 궁금하신가요?", timestamp: "2024-01-15 14:27", isFromMe: true },
-                { id: "msg-3", content: "과제 관련해서 질문이 있어서 연락드립니다.", timestamp: "2024-01-15 14:30", isFromMe: false, isRead: false },
-                ...Array.from({ length: 17 }, (_, i) => ({
-                    id: `msg-${i + 4}`,
-                    content: `테스트 메시지 ${i + 1}입니다. 스크롤 테스트용 메시지입니다.`,
-                    timestamp: `2024-01-15 ${14 + Math.floor(i / 4)}:${30 + ((i * 5) % 60)}`,
-                    isFromMe: i % 3 === 0,
-                    isRead: true,
-                })),
-            ]
-
-            setRoomData({
-                id: roomId || "room-1",
-                userId: "user-1",
-                userName: "이민수",
-                userAvatar: "",
-                lastMessage: "마지막 메시지입니다.",
-                lastMessageTime: "2024-01-15 18:45",
-                unreadCount: 2,
-                messages: mockMessages,
-            })
+        const setVh = () => {
+            document.documentElement.style.setProperty("--vh", `${window.innerHeight}px`)
         }
-    }, [roomId, initialRoomData])
+        setVh()
+        window.addEventListener("resize", setVh)
+        return () => window.removeEventListener("resize", setVh)
+    }, [])
 
-    // 스크롤 완전히 아래로 이동
-    const scrollToBottom = useCallback((smooth = true) => {
-        const container = messagesContainerRef.current
-        if (container) {
-            container.scrollTo({ top: container.scrollHeight, behavior: smooth ? "smooth" : "auto" })
+    // ----------------------------
+    // 2️⃣ ChatInput 높이와 safe-area 계산
+    // ----------------------------
+    useEffect(() => {
+        const updateOffsets = () => {
+            if (!chatInputRef.current) return
+            const el = chatInputRef.current
+            const style = getComputedStyle(el)
+            const paddingBottom = parseInt(style.paddingBottom) || 0
+            setChatInputHeight(el.offsetHeight)
+            setSafeAreaBottom(paddingBottom)
+        }
+
+        updateOffsets()
+        window.addEventListener("resize", updateOffsets)
+        const ro = new ResizeObserver(updateOffsets)
+        if (chatInputRef.current) ro.observe(chatInputRef.current)
+        return () => {
+            window.removeEventListener("resize", updateOffsets)
+            ro.disconnect()
         }
     }, [])
 
-    // 초기 스크롤
+    // ----------------------------
+    // 3️⃣ Mock 데이터 (없으면 생성)
+    // ----------------------------
+    useEffect(() => {
+        if (initialRoomData) return
+        const mockMessages: Message[] = [
+            { id: "msg-1", content: "안녕하세요!", timestamp: "2024-01-15 14:25", isFromMe: false },
+            { id: "msg-2", content: "네, 어떤 부분이 궁금한가요?", timestamp: "2024-01-15 14:27", isFromMe: true },
+            ...Array.from({ length: 15 }, (_, i) => ({
+                id: `msg-${i + 3}`,
+                content: `테스트 메시지 ${i + 1}`,
+                timestamp: `2024-01-15 ${14 + Math.floor(i / 4)}:${30 + ((i * 5) % 60)}`,
+                isFromMe: i % 2 === 0,
+                isRead: true,
+            })),
+        ]
+
+        setRoomData({
+            id: roomId || "room-1",
+            userId: "user-1",
+            userName: "이민수",
+            userAvatar: "",
+            lastMessage: "마지막 메시지입니다.",
+            lastMessageTime: "2024-01-15 18:45",
+            unreadCount: 2,
+            messages: mockMessages,
+        })
+    }, [initialRoomData, roomId])
+
+    // ----------------------------
+    // 4️⃣ Scroll to Bottom
+    // ----------------------------
+    const scrollToBottom = useCallback((smooth = true) => {
+        const container = messagesContainerRef.current
+        if (!container) return
+        const scrollHeight = container.scrollHeight
+        const clientHeight = container.clientHeight
+        container.scrollTo({
+            top: scrollHeight - clientHeight,
+            behavior: smooth ? "smooth" : "auto",
+        })
+    }, [])
+
+    // 초기 렌더 후 스크롤
     useEffect(() => {
         if (!roomData?.messages.length) return
-        requestAnimationFrame(() => {
+        // iOS PWA 대응: setTimeout으로 조금 늦게 호출
+        const t = setTimeout(() => {
             scrollToBottom(false)
             setIsVisible(true)
-        })
+        }, 50)
+        return () => clearTimeout(t)
     }, [roomData?.messages, scrollToBottom])
 
-    // 새 메시지
+    // 새 메시지 올 때
     useEffect(() => {
         if (isAtBottom && roomData?.messages.length) scrollToBottom(true)
     }, [roomData?.messages, isAtBottom, scrollToBottom])
 
+    // ----------------------------
+    // 5️⃣ Scroll 핸들링
+    // ----------------------------
     const handleScroll = useCallback(() => {
         const container = messagesContainerRef.current
         if (!container) return
         const { scrollTop, scrollHeight, clientHeight } = container
         const scrollBottom = scrollHeight - scrollTop - clientHeight
-        const isNearBottom = scrollBottom < 50
-        const isNearTop = scrollTop < 100
+        setIsAtBottom(scrollBottom < 50)
 
-        setIsAtBottom(isNearBottom)
-        setShowScrollToBottom(!isNearBottom)
-
-        if (isNearTop && hasMoreMessages && !isLoadingMore && onLoadMoreMessages) loadMoreMessages()
+        if (scrollTop < 100 && hasMoreMessages && !isLoadingMore && onLoadMoreMessages) {
+            loadMoreMessages()
+        }
     }, [hasMoreMessages, isLoadingMore, onLoadMoreMessages])
 
     const loadMoreMessages = useCallback(async () => {
@@ -113,38 +158,38 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         try {
             const cursor = roomData.messages[0].id
             const newMessages = await onLoadMoreMessages(cursor)
-            if (newMessages.length > 0) setRoomData(prev => prev ? { ...prev, messages: [...newMessages, ...prev.messages] } : null)
+            if (newMessages.length > 0)
+                setRoomData(prev => prev ? { ...prev, messages: [...newMessages, ...prev.messages] } : null)
             else setHasMoreMessages(false)
-        } catch (error) {
-            console.error("Failed to load more messages:", error)
-        } finally { setIsLoadingMore(false) }
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setIsLoadingMore(false)
+        }
     }, [roomData?.messages, onLoadMoreMessages])
 
-    const handleSendMessage = async () => {
-        if (!roomData) return
-        if (!newMessage.trim()) return
+    const formatTime = (ts: string) =>
+        new Date(ts).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false })
 
-        const newMsg: Message = {
-            id: `msg-${Date.now()}`,
-            content: newMessage,
-            timestamp: new Date().toISOString(),
-            isFromMe: true,
-        }
+    if (!roomData)
+        return (
+            <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <CircularProgress />
+            </Box>
+        )
 
-        // 옵티미스틱 업데이트
-        setRoomData(prev => prev ? { ...prev, messages: [...prev.messages, newMsg] } : prev)
-        setNewMessage("")
-    }
-
-    const formatMessageTime = (timestamp: string) => {
-        const date = new Date(timestamp)
-        return date.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false })
-    }
-
-    if (!roomData) return <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}><CircularProgress /></Box>
-
+    // ----------------------------
+    // 6️⃣ Render
+    // ----------------------------
     return (
-        <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", position: "relative" }}>
+        <Box
+            sx={{
+                height: "calc(var(--vh, 1vh) * 100)",
+                display: "flex",
+                flexDirection: "column",
+                position: "relative",
+            }}
+        >
             <Box
                 ref={messagesContainerRef}
                 onScroll={handleScroll}
@@ -153,29 +198,60 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     flex: 1,
                     overflowY: "auto",
                     px: 2,
-                    py: 2,
-                    pb: `calc(72px + env(safe-area-inset-bottom, 8px))`, // ChatInput 높이 + 안전 영역
+                    py: 1,
                     display: "flex",
                     flexDirection: "column",
                     "&::-webkit-scrollbar": { width: "4px" },
                     "&::-webkit-scrollbar-track": { backgroundColor: "transparent" },
-                    "&::-webkit-scrollbar-thumb": { backgroundColor: theme.palette.divider, borderRadius: "2px", "&:hover": { backgroundColor: theme.palette.text.secondary } },
+                    "&::-webkit-scrollbar-thumb": { backgroundColor: theme.palette.divider, borderRadius: "2px" },
+                    paddingBottom: chatInputHeight + safeAreaBottom + 8,
                 }}
             >
-                {isLoadingMore && <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}><CircularProgress size={24} /></Box>}
-
-                {roomData.messages.map((message, index) => {
-                    const showAvatar = !message.isFromMe && (index === 0 || roomData.messages[index - 1]?.isFromMe !== message.isFromMe)
+                {isLoadingMore && (
+                    <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                        <CircularProgress size={24} />
+                    </Box>
+                )}
+                {roomData.messages.map((msg, i) => {
+                    const showAvatar =
+                        !msg.isFromMe && (i === 0 || roomData.messages[i - 1].isFromMe !== msg.isFromMe)
                     return (
-                        <Box key={message.id} sx={{ display: "flex", justifyContent: message.isFromMe ? "flex-end" : "flex-start", mb: 1 }}>
-                            <Box sx={{ maxWidth: "70%", display: "flex", flexDirection: message.isFromMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 1 }}>
-                                {!message.isFromMe && showAvatar && <Avatar src={roomData.userAvatar} sx={{ width: 32, height: 32, backgroundColor: "primary.main" }}>{roomData.userName.charAt(0)}</Avatar>}
+                        <Box key={msg.id} sx={{ display: "flex", justifyContent: msg.isFromMe ? "flex-end" : "flex-start", mb: 1 }}>
+                            <Box
+                                sx={{
+                                    maxWidth: "70%",
+                                    display: "flex",
+                                    flexDirection: msg.isFromMe ? "row-reverse" : "row",
+                                    alignItems: "flex-end",
+                                    gap: 1,
+                                }}
+                            >
+                                {!msg.isFromMe && showAvatar && (
+                                    <Avatar sx={{ width: 32, height: 32, backgroundColor: "primary.main" }}>
+                                        {roomData.userName.charAt(0)}
+                                    </Avatar>
+                                )}
                                 <Box>
-                                    <Paper elevation={1} sx={{ px: 2, py: 1.5, backgroundColor: message.isFromMe ? theme.palette.primary.main : theme.palette.mode === "dark" ? theme.palette.background.paper : "grey.600", color: message.isFromMe ? "white" : "text.primary", borderRadius: 2, borderBottomLeftRadius: !message.isFromMe ? 0.5 : 2, borderBottomRightRadius: message.isFromMe ? 0.5 : 2 }}>
-                                        <Typography variant="body2">{message.content}</Typography>
+                                    <Paper
+                                        elevation={1}
+                                        sx={{
+                                            px: 2,
+                                            py: 1.5,
+                                            backgroundColor: msg.isFromMe
+                                                ? theme.palette.primary.main
+                                                : theme.palette.mode === "dark"
+                                                    ? theme.palette.background.paper
+                                                    : "grey.600",
+                                            color: msg.isFromMe ? "white" : "text.primary",
+                                            borderRadius: 2,
+                                            borderBottomLeftRadius: !msg.isFromMe ? 0.5 : 2,
+                                            borderBottomRightRadius: msg.isFromMe ? 0.5 : 2,
+                                        }}
+                                    >
+                                        <Typography variant="body2">{msg.content}</Typography>
                                     </Paper>
-                                    <Typography variant="caption" sx={{ display: "block", textAlign: message.isFromMe ? "right" : "left", mt: 0.5, px: 1, color: "text.secondary" }}>
-                                        {formatMessageTime(message.timestamp)}
+                                    <Typography variant="caption" sx={{ mt: 0.5, px: 1, color: "text.secondary", display: "block", textAlign: msg.isFromMe ? "right" : "left" }}>
+                                        {formatTime(msg.timestamp)}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -184,14 +260,20 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 })}
             </Box>
 
-            <ChatInput
-                value={newMessage}
-                onChange={setNewMessage}
-                onSend={handleSendMessage}
-                sx={{
-                    padding: "8px env(safe-area-inset-left, 8px)  env(safe-area-inset-bottom, 8px) env(safe-area-inset-right, 8px)",
-                }}
-            />
+            {/* ChatInput: sticky로 배치 */}
+            <Box ref={chatInputRef} sx={{ position: "sticky", bottom: 0, zIndex: 1000 }}>
+                <ChatInput
+                    value={newMessage}
+                    onChange={setNewMessage}
+                    onSend={() => {
+                        if (!newMessage.trim()) return
+                        setRoomData(prev => prev ? { ...prev, messages: [...prev.messages, { id: `${Date.now()}`, content: newMessage, timestamp: new Date().toISOString(), isFromMe: true }] } : prev)
+                        setNewMessage("")
+                        setTimeout(() => scrollToBottom(true), 50)
+                    }}
+                    sx={{ paddingBottom: "env(safe-area-inset-bottom, 8px)" }}
+                />
+            </Box>
         </Box>
     )
 }
