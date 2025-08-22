@@ -7,6 +7,7 @@ import { Header } from "@/components/global/Header.tsx"
 import { MobileNavBar } from "./global/MobileNavBar.tsx"
 import { usePWA } from "@/hooks/usePWA"
 import { useLocation } from "react-router-dom"
+import {ROUTES} from "@/router";
 
 interface LayoutProps {
     children: React.ReactNode
@@ -15,8 +16,12 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { isInstallable, installPWA } = usePWA()
     const location = useLocation()
+    const normalize = (route: string) => route.replace(/:.*$/, "")
+    const hiddenRoutes = [ROUTES.LOGIN, ROUTES.MESSAGE_DETAIL]
 
-    const hideHeader = location.pathname === "/login"
+    const hideHeader = hiddenRoutes.some(route =>
+        location.pathname.startsWith(normalize(route))
+    )
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>

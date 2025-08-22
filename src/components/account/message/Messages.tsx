@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useRef, useEffect, useState } from "react"
 import {
     Box,
     Typography,
@@ -32,9 +32,11 @@ interface ChatRoom {
 }
 
 const Messages: React.FC = () => {
-    // const messagesEndRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
-    // 목업 데이터 (임시 고정)
+    const headerRef = useRef<HTMLDivElement>(null)
+    const [headerHeight, setHeaderHeight] = useState(64)
+
+    // 목업 데이터
     const roomData: ChatRoom = {
         id: "room-1",
         userId: "user-1",
@@ -66,6 +68,12 @@ const Messages: React.FC = () => {
         ],
     }
 
+    useEffect(() => {
+        if (headerRef.current) {
+            setHeaderHeight(headerRef.current.offsetHeight)
+        }
+    }, [])
+
     const formatMessageTime = (timestamp: string) => {
         const date = new Date(timestamp)
         return date.toLocaleTimeString("ko-KR", {
@@ -77,15 +85,22 @@ const Messages: React.FC = () => {
 
     return (
         <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-            {/* 헤더 */}
+            {/* 헤더 - 고정 */}
             <Paper
+                ref={headerRef}
                 elevation={1}
                 sx={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 10,
                     px: 2,
                     py: 1.5,
                     borderRadius: 0,
                     borderBottom: 1,
                     borderColor: "divider",
+                    backgroundColor: "background.paper",
                 }}
             >
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -135,6 +150,7 @@ const Messages: React.FC = () => {
                     overflowY: "auto",
                     px: 2,
                     py: 1,
+                    mt: `${headerHeight}px`, // 헤더 높이만큼 여유
                     backgroundColor: "grey.50",
                 }}
             >
@@ -197,7 +213,6 @@ const Messages: React.FC = () => {
                         </Box>
                     </Box>
                 ))}
-                {/*<div ref={messagesEndRef} />*/}
             </Box>
         </Box>
     )
