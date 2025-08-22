@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
+import {BottomNavigation, BottomNavigationAction, Box, Paper} from "@mui/material"
 import { Groups, Dashboard, Person, Home } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
@@ -76,14 +76,27 @@ export const MobileNavBar: React.FC = () => {
     // --- 채팅 상세 화면이면 ChatInput만 렌더 ---
     if (isMessageDetail) {
         return (
-            <ChatInput
-                value={newMessage}
-                onChange={setNewMessage}
-                onSend={handleSendMessage}
-                disabled={!Boolean(roomId)} // roomId 없으면 입력 비활성화
-            />
+            <Box
+                sx={{
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 1200,
+                    borderTop: "1px solid #ddd",
+                    padding: 1,
+                }}
+            >
+                <ChatInput
+                    value={newMessage}
+                    onChange={setNewMessage}
+                    onSend={handleSendMessage}
+                    disabled={!Boolean(roomId)}
+                />
+            </Box>
         )
     }
+
 
     // 숨김 라우트이면 아무것도 렌더하지 않음
     if (shouldHideNavBar) return null
