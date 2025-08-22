@@ -1,16 +1,13 @@
 "use client"
 
-import React, { useRef, useEffect, useState } from "react"
+import React from "react"
 import {
     Box,
     Typography,
     Avatar,
-    IconButton,
     Paper,
-    Badge,
 } from "@mui/material"
-import { ArrowBack, MoreVert } from "@mui/icons-material"
-import { useNavigate } from "react-router-dom"
+import {theme} from "@/theme/theme.ts";
 
 interface Message {
     id: string
@@ -32,11 +29,8 @@ interface ChatRoom {
 }
 
 const Messages: React.FC = () => {
-    const navigate = useNavigate()
-    const headerRef = useRef<HTMLDivElement>(null)
-    const [headerHeight, setHeaderHeight] = useState(64)
 
-    // 목업 데이터
+    // Mock data
     const roomData: ChatRoom = {
         id: "room-1",
         userId: "user-1",
@@ -65,14 +59,38 @@ const Messages: React.FC = () => {
                 isFromMe: false,
                 isRead: false,
             },
+            {
+                id: "msg-4",
+                content: "메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다.",
+                timestamp: "2024-01-15 14:35",
+                isFromMe: true,
+            },
+            {
+                id: "msg-5",
+                content: "메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다.",
+                timestamp: "2024-01-15 14:40",
+                isFromMe: false,
+            },
+            {
+                id: "msg-6",
+                content: "스크롤 테스트 메시지입니다.",
+                timestamp: "2024-01-15 14:45",
+                isFromMe: true,
+            },
+            {
+                id: "msg-7",
+                content: "스크롤 테스트 메시지입니다. 스크롤 테스트 메시지입니다.",
+                timestamp: "2024-01-15 14:50",
+                isFromMe: false,
+            },
+            {
+                id: "msg-8",
+                content: "더 긴 메시지 테스트를 위한 내용입니다.",
+                timestamp: "2024-01-15 14:55",
+                isFromMe: true,
+            },
         ],
     }
-
-    useEffect(() => {
-        if (headerRef.current) {
-            setHeaderHeight(headerRef.current.offsetHeight)
-        }
-    }, [])
 
     const formatMessageTime = (timestamp: string) => {
         const date = new Date(timestamp)
@@ -84,74 +102,23 @@ const Messages: React.FC = () => {
     }
 
     return (
-        <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-            {/* 헤더 - 고정 */}
-            <Paper
-                ref={headerRef}
-                elevation={1}
-                sx={{
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 10,
-                    px: 2,
-                    py: 1.5,
-                    borderRadius: 0,
-                    borderBottom: 1,
-                    borderColor: "divider",
-                    backgroundColor: "background.paper",
-                }}
-            >
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <IconButton sx={{ mr: 1 }} onClick={() => navigate(-1)}>
-                            <ArrowBack />
-                        </IconButton>
-
-                        <Box sx={{ position: "relative", mr: 2 }}>
-                            <Badge
-                                color="success"
-                                overlap="circular"
-                                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                                sx={{
-                                    "& .MuiBadge-dot": {
-                                        width: 10,
-                                        height: 10,
-                                        borderRadius: "50%",
-                                        border: "2px solid white",
-                                    },
-                                }}
-                            >
-                                <Avatar
-                                    src={roomData.userAvatar}
-                                    sx={{ width: 40, height: 40, backgroundColor: "primary.main" }}
-                                >
-                                    {roomData.userName.charAt(0)}
-                                </Avatar>
-                            </Badge>
-                        </Box>
-
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                            {roomData.userName}
-                        </Typography>
-                    </Box>
-
-                    <IconButton>
-                        <MoreVert />
-                    </IconButton>
-                </Box>
-            </Paper>
-
-            {/* 메시지 영역 */}
+        <Box
+            sx={{
+                height: "100vh",
+                display: "flex",
+                flexDirection: "column",
+                mt: 2
+            }}
+        >
+            {/* Message Area - Scrollable */}
             <Box
                 sx={{
                     flex: 1,
                     overflowY: "auto",
                     px: 2,
                     py: 1,
-                    mt: `${headerHeight}px`, // 헤더 높이만큼 여유
-                    backgroundColor: "grey.50",
+                    display: "flex",
+                    flexDirection: "column",
                 }}
             >
                 {roomData.messages.map((message) => (
@@ -187,7 +154,11 @@ const Messages: React.FC = () => {
                                     sx={{
                                         px: 2,
                                         py: 1.5,
-                                        backgroundColor: message.isFromMe ? "primary.main" : "white",
+                                        backgroundColor: message.isFromMe
+                                            ? theme.palette.primary.main
+                                            : theme.palette.mode === "dark"
+                                                ? theme.palette.background.paper // 다크모드: 밝은 회색
+                                                : "grey[600]" ,                      // 라이트모드: 흰색,
                                         color: message.isFromMe ? "white" : "text.primary",
                                         borderRadius: 2,
                                         borderBottomLeftRadius: !message.isFromMe ? 0.5 : 2,
@@ -200,7 +171,6 @@ const Messages: React.FC = () => {
                                 <Typography
                                     variant="caption"
                                     sx={{
-                                        color: "text.secondary",
                                         display: "block",
                                         textAlign: message.isFromMe ? "right" : "left",
                                         mt: 0.5,
