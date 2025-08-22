@@ -1,13 +1,9 @@
 "use client"
 
-import React from "react"
-import {
-    Box,
-    Typography,
-    Avatar,
-    Paper,
-} from "@mui/material"
-import {theme} from "@/theme/theme.ts";
+import type React from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
+import { Box, Typography, Avatar, Paper, CircularProgress } from "@mui/material"
+import { theme } from "@/theme/theme.ts"
 
 interface Message {
     id: string
@@ -28,69 +24,137 @@ interface ChatRoom {
     messages: Message[]
 }
 
-const Messages: React.FC = () => {
+interface MessagesProps {
+    roomId?: string
+    roomData?: ChatRoom
+    onLoadMoreMessages?: (cursor: string) => Promise<Message[]>
+}
 
-    // Mock data
-    const roomData: ChatRoom = {
-        id: "room-1",
-        userId: "user-1",
-        userName: "이민수",
-        userAvatar: "",
-        lastMessage: "과제 관련해서 질문이 있어서 연락드립니다.",
-        lastMessageTime: "2024-01-15 14:30",
-        unreadCount: 2,
-        messages: [
-            {
-                id: "msg-1",
-                content: "안녕하세요! 이번 과제에 대해 질문이 있습니다.",
-                timestamp: "2024-01-15 14:25",
-                isFromMe: false,
-            },
-            {
-                id: "msg-2",
-                content: "네, 어떤 부분이 궁금하신가요?",
-                timestamp: "2024-01-15 14:27",
-                isFromMe: true,
-            },
-            {
-                id: "msg-3",
-                content: "과제 관련해서 질문이 있어서 연락드립니다.",
-                timestamp: "2024-01-15 14:30",
-                isFromMe: false,
-                isRead: false,
-            },
-            {
-                id: "msg-4",
-                content: "메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다.",
-                timestamp: "2024-01-15 14:35",
-                isFromMe: true,
-            },
-            {
-                id: "msg-5",
-                content: "메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다. 메시지 스크롤 테스트를 위한 긴 내용입니다.",
-                timestamp: "2024-01-15 14:40",
-                isFromMe: false,
-            },
-            {
-                id: "msg-6",
-                content: "스크롤 테스트 메시지입니다.",
-                timestamp: "2024-01-15 14:45",
-                isFromMe: true,
-            },
-            {
-                id: "msg-7",
-                content: "스크롤 테스트 메시지입니다. 스크롤 테스트 메시지입니다.",
-                timestamp: "2024-01-15 14:50",
-                isFromMe: false,
-            },
-            {
-                id: "msg-8",
-                content: "더 긴 메시지 테스트를 위한 내용입니다.",
-                timestamp: "2024-01-15 14:55",
-                isFromMe: true,
-            },
-        ],
-    }
+const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, onLoadMoreMessages }) => {
+    const messagesContainerRef = useRef<HTMLDivElement>(null)
+    const [roomData, setRoomData] = useState<ChatRoom | null>(initialRoomData || null)
+    const [isLoadingMore, setIsLoadingMore] = useState(false)
+    const [hasMoreMessages, setHasMoreMessages] = useState(true)
+    const [showScrollToBottom, setShowScrollToBottom] = useState(false)
+    const [isAtBottom, setIsAtBottom] = useState(true)
+    const [isVisible, setIsVisible] = useState(false) // 초기 렌더 숨김
+
+    const CHAT_INPUT_HEIGHT = 100
+    const SAFE_AREA_BOTTOM = 20
+
+    // Mock 데이터 생성
+    useEffect(() => {
+        if (!initialRoomData) {
+            const mockMessages: Message[] = [
+                {
+                    id: "msg-1",
+                    content: "안녕하세요! 이번 과제에 대해 질문이 있습니다.",
+                    timestamp: "2024-01-15 14:25",
+                    isFromMe: false,
+                },
+                {
+                    id: "msg-2",
+                    content: "네, 어떤 부분이 궁금하신가요?",
+                    timestamp: "2024-01-15 14:27",
+                    isFromMe: true,
+                },
+                {
+                    id: "msg-3",
+                    content: "과제 관련해서 질문이 있어서 연락드립니다.",
+                    timestamp: "2024-01-15 14:30",
+                    isFromMe: false,
+                    isRead: false,
+                },
+                ...Array.from({ length: 17 }, (_, i) => ({
+                    id: `msg-${i + 4}`,
+                    content: `테스트 메시지 ${i + 1}입니다. 스크롤 테스트용 메시지입니다.`,
+                    timestamp: `2024-01-15 ${14 + Math.floor(i / 4)}:${30 + ((i * 5) % 60)}`,
+                    isFromMe: i % 3 === 0,
+                    isRead: true,
+                })),
+            ]
+
+            setRoomData({
+                id: roomId || "room-1",
+                userId: "user-1",
+                userName: "이민수",
+                userAvatar: "",
+                lastMessage: "마지막 메시지입니다.",
+                lastMessageTime: "2024-01-15 18:45",
+                unreadCount: 2,
+                messages: mockMessages,
+            })
+        }
+    }, [roomId, initialRoomData])
+
+    // 스크롤 위치 계산
+    const scrollToBottom = useCallback((smooth = true) => {
+        const container = messagesContainerRef.current
+        if (container) {
+            const scrollHeight = container.scrollHeight
+            const clientHeight = container.clientHeight
+            const chatInputOffset = CHAT_INPUT_HEIGHT + SAFE_AREA_BOTTOM
+            const targetScrollTop = Math.max(0, scrollHeight - clientHeight + chatInputOffset)
+            container.scrollTo({ top: targetScrollTop, behavior: smooth ? "smooth" : "auto" })
+        }
+    }, [])
+
+    // 초기 렌더 후 스크롤 맞추고 화면 보이기
+    useEffect(() => {
+        if (!roomData?.messages.length) return
+
+        requestAnimationFrame(() => {
+            scrollToBottom(false)
+            setIsVisible(true)
+        })
+    }, [roomData?.messages, scrollToBottom])
+
+    // 새 메시지 도착 시 스크롤 처리
+    useEffect(() => {
+        if (isAtBottom && roomData?.messages.length) {
+            scrollToBottom(true)
+        }
+    }, [roomData?.messages, isAtBottom, scrollToBottom])
+
+    const handleScroll = useCallback(() => {
+        const container = messagesContainerRef.current
+        if (!container) return
+
+        const { scrollTop, scrollHeight, clientHeight } = container
+        const scrollBottom = scrollHeight - scrollTop - clientHeight
+        const isNearBottom = scrollBottom < 50
+        const isNearTop = scrollTop < 100
+
+        setIsAtBottom(isNearBottom)
+        setShowScrollToBottom(!isNearBottom)
+
+        if (isNearTop && hasMoreMessages && !isLoadingMore && onLoadMoreMessages) {
+            loadMoreMessages()
+        }
+    }, [hasMoreMessages, isLoadingMore, onLoadMoreMessages])
+
+    const loadMoreMessages = useCallback(async () => {
+        if (!roomData?.messages.length || !onLoadMoreMessages) return
+
+        setIsLoadingMore(true)
+        try {
+            const oldestMessage = roomData.messages[0]
+            const cursor = oldestMessage.id
+            const newMessages = await onLoadMoreMessages(cursor)
+
+            if (newMessages.length > 0) {
+                setRoomData((prev) =>
+                    prev ? { ...prev, messages: [...newMessages, ...prev.messages] } : null
+                )
+            } else {
+                setHasMoreMessages(false)
+            }
+        } catch (error) {
+            console.error("Failed to load more messages:", error)
+        } finally {
+            setIsLoadingMore(false)
+        }
+    }, [roomData?.messages, onLoadMoreMessages])
 
     const formatMessageTime = (timestamp: string) => {
         const date = new Date(timestamp)
@@ -101,88 +165,90 @@ const Messages: React.FC = () => {
         })
     }
 
+    if (!roomData) {
+        return (
+            <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <CircularProgress />
+            </Box>
+        )
+    }
+
     return (
-        <Box
-            sx={{
-                height: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                mt: 2
-            }}
-        >
-            {/* Message Area - Scrollable */}
+        <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", position: "relative" }}>
             <Box
+                ref={messagesContainerRef}
+                onScroll={handleScroll}
+                style={{ visibility: isVisible ? "visible" : "hidden" }} // 초기 숨김
                 sx={{
                     flex: 1,
                     overflowY: "auto",
                     px: 2,
                     py: 1,
+                    pb: `${CHAT_INPUT_HEIGHT + SAFE_AREA_BOTTOM + 10}px`,
+                    pt: 2,
                     display: "flex",
                     flexDirection: "column",
+                    "&::-webkit-scrollbar": { width: "4px" },
+                    "&::-webkit-scrollbar-track": { backgroundColor: "transparent" },
+                    "&::-webkit-scrollbar-thumb": {
+                        backgroundColor: theme.palette.divider,
+                        borderRadius: "2px",
+                        "&:hover": { backgroundColor: theme.palette.text.secondary },
+                    },
                 }}
             >
-                {roomData.messages.map((message) => (
-                    <Box
-                        key={message.id}
-                        sx={{
-                            display: "flex",
-                            justifyContent: message.isFromMe ? "flex-end" : "flex-start",
-                            mb: 1,
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                maxWidth: "70%",
-                                display: "flex",
-                                flexDirection: message.isFromMe ? "row-reverse" : "row",
-                                alignItems: "flex-end",
-                                gap: 1,
-                            }}
-                        >
-                            {!message.isFromMe && (
-                                <Avatar
-                                    src={roomData.userAvatar}
-                                    sx={{ width: 32, height: 32, backgroundColor: "primary.main" }}
-                                >
-                                    {roomData.userName.charAt(0)}
-                                </Avatar>
-                            )}
+                {isLoadingMore && (
+                    <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                        <CircularProgress size={24} />
+                    </Box>
+                )}
 
-                            <Box>
-                                <Paper
-                                    elevation={1}
-                                    sx={{
-                                        px: 2,
-                                        py: 1.5,
-                                        backgroundColor: message.isFromMe
-                                            ? theme.palette.primary.main
-                                            : theme.palette.mode === "dark"
-                                                ? theme.palette.background.paper // 다크모드: 밝은 회색
-                                                : "grey[600]" ,                      // 라이트모드: 흰색,
-                                        color: message.isFromMe ? "white" : "text.primary",
-                                        borderRadius: 2,
-                                        borderBottomLeftRadius: !message.isFromMe ? 0.5 : 2,
-                                        borderBottomRightRadius: message.isFromMe ? 0.5 : 2,
-                                    }}
-                                >
-                                    <Typography variant="body2">{message.content}</Typography>
-                                </Paper>
+                {roomData.messages.map((message, index) => {
+                    const showAvatar =
+                        !message.isFromMe && (index === 0 || roomData.messages[index - 1]?.isFromMe !== message.isFromMe)
 
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        display: "block",
-                                        textAlign: message.isFromMe ? "right" : "left",
-                                        mt: 0.5,
-                                        px: 1,
-                                    }}
-                                >
-                                    {formatMessageTime(message.timestamp)}
-                                </Typography>
+                    return (
+                        <Box key={message.id} sx={{ display: "flex", justifyContent: message.isFromMe ? "flex-end" : "flex-start", mb: 1 }}>
+                            <Box sx={{ maxWidth: "70%", display: "flex", flexDirection: message.isFromMe ? "row-reverse" : "row", alignItems: "flex-end", gap: 1 }}>
+                                {!message.isFromMe && showAvatar && (
+                                    <Avatar
+                                        src={roomData.userAvatar}
+                                        sx={{ width: 32, height: 32, backgroundColor: "primary.main" }}
+                                    >
+                                        {roomData.userName.charAt(0)}
+                                    </Avatar>
+                                )}
+
+                                <Box>
+                                    <Paper
+                                        elevation={1}
+                                        sx={{
+                                            px: 2,
+                                            py: 1.5,
+                                            backgroundColor: message.isFromMe
+                                                ? theme.palette.primary.main
+                                                : theme.palette.mode === "dark"
+                                                    ? theme.palette.background.paper
+                                                    : "grey.600",
+                                            color: message.isFromMe ? "white" : "text.primary",
+                                            borderRadius: 2,
+                                            borderBottomLeftRadius: !message.isFromMe ? 0.5 : 2,
+                                            borderBottomRightRadius: message.isFromMe ? 0.5 : 2,
+                                        }}
+                                    >
+                                        <Typography variant="body2">{message.content}</Typography>
+                                    </Paper>
+                                    <Typography
+                                        variant="caption"
+                                        sx={{ display: "block", textAlign: message.isFromMe ? "right" : "left", mt: 0.5, px: 1, color: "text.secondary" }}
+                                    >
+                                        {formatMessageTime(message.timestamp)}
+                                    </Typography>
+                                </Box>
                             </Box>
                         </Box>
-                    </Box>
-                ))}
+                    )
+                })}
             </Box>
         </Box>
     )

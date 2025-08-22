@@ -1,5 +1,7 @@
-import React from "react"
-import { Paper, TextField, InputAdornment, IconButton, SxProps, Theme } from "@mui/material"
+"use client"
+
+import type React from "react"
+import { Paper, TextField, InputAdornment, IconButton, type SxProps, type Theme } from "@mui/material"
 import { Send } from "@mui/icons-material"
 
 type ChatInputProps = {
@@ -10,7 +12,7 @@ type ChatInputProps = {
     disabled?: boolean
     maxRows?: number
     autoFocus?: boolean
-    sx?: SxProps<Theme>;
+    sx?: SxProps<Theme>
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -21,7 +23,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                                                  disabled = false,
                                                  maxRows = 4,
                                                  autoFocus = false,
-                                                 sx
+                                                 sx,
                                              }) => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         // Enter (Shift+Enter으로 줄바꿈 허용)
@@ -54,7 +56,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 variant="outlined"
                 autoFocus={autoFocus}
                 sx={{
-                    '& .MuiOutlinedInput-root': {
+                    "& .MuiOutlinedInput-root": {
                         borderRadius: 3,
                     },
                 }}
@@ -69,10 +71,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
                                     sx={{
                                         backgroundColor: value.trim() && !disabled ? "primary.main" : "transparent",
                                         color: value.trim() && !disabled ? "white" : "text.disabled",
-                                        '&:hover': {
+                                        "&:hover": {
                                             backgroundColor: value.trim() && !disabled ? "primary.dark" : "transparent",
                                         },
-                                        '&.Mui-disabled': {
+                                        "&.Mui-disabled": {
                                             backgroundColor: "transparent",
                                         },
                                     }}

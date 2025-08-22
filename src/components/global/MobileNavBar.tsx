@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import {BottomNavigation, BottomNavigationAction,  Paper} from "@mui/material"
+import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
 import { Groups, Dashboard, Person, Home } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
@@ -69,31 +69,41 @@ export const MobileNavBar: React.FC = () => {
     }
 
     // 일반적인 숨김 체크 (Message detail은 위에서 별도 처리)
-    const shouldHideNavBar = hiddenRoutes.some(route =>
-        location.pathname.startsWith(normalize(route))
-    )
+    const shouldHideNavBar = hiddenRoutes.some((route) => location.pathname.startsWith(normalize(route)))
 
     // --- 채팅 상세 화면이면 ChatInput만 렌더 ---
     if (isMessageDetail) {
         return (
+            <Paper
+                elevation={3}
+                sx={{
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 1300, // Messages 컴포넌트의 스크롤 버튼(z-index: 10)보다 높게
+                    borderRadius: 0,
+                    height: "72px",
+                    // 안전 영역 고려
+                    paddingBottom: "env(safe-area-inset-bottom, 0px)",
+                }}
+            >
                 <ChatInput
                     value={newMessage}
                     onChange={setNewMessage}
                     onSend={handleSendMessage}
                     disabled={!Boolean(roomId)}
                     sx={{
-                        position: "fixed",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        zIndex: 1200,
-                        // 하단 안전 영역 고려
-                        paddingBottom: `env(safe-area-inset-bottom, 8px)`,
+                        borderRadius: 0,
+                        boxShadow: "none",
+                        borderTop: "1px solid",
+                        borderColor: "divider",
+                        height: "100%",
                     }}
                 />
+            </Paper>
         )
     }
-
 
     // 숨김 라우트이면 아무것도 렌더하지 않음
     if (shouldHideNavBar) return null
@@ -102,11 +112,21 @@ export const MobileNavBar: React.FC = () => {
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue)
         switch (newValue) {
-            case 0: navigate(ROUTES.LANDING); break
-            case 1: navigate(ROUTES.GROUPS); break
-            case 2: navigate(ROUTES.BOARDS); break
-            case 3: navigate(ROUTES.MY_PAGE_MESSAGES); break
-            case 4: navigate(ROUTES.MY_PAGE); break
+            case 0:
+                navigate(ROUTES.LANDING)
+                break
+            case 1:
+                navigate(ROUTES.GROUPS)
+                break
+            case 2:
+                navigate(ROUTES.BOARDS)
+                break
+            case 3:
+                navigate(ROUTES.MY_PAGE_MESSAGES)
+                break
+            case 4:
+                navigate(ROUTES.MY_PAGE)
+                break
         }
     }
 
