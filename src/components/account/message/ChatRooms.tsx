@@ -204,7 +204,6 @@ const ChatRooms: React.FC = () => {
                                         <Box sx={{ position: "relative", mr: 2 }}>
                                             <Badge
                                                 color="success"
-                                                variant="dot"
                                                 overlap="circular"
                                                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                                                 sx={{

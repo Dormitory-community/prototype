@@ -1,5 +1,5 @@
 import React from "react"
-import { Paper, TextField, InputAdornment, IconButton } from "@mui/material"
+import { Paper, TextField, InputAdornment, IconButton, SxProps, Theme } from "@mui/material"
 import { Send } from "@mui/icons-material"
 
 type ChatInputProps = {
@@ -10,6 +10,7 @@ type ChatInputProps = {
     disabled?: boolean
     maxRows?: number
     autoFocus?: boolean
+    sx?: SxProps<Theme>;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -20,6 +21,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                                                  disabled = false,
                                                  maxRows = 4,
                                                  autoFocus = false,
+                                                 sx
                                              }) => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         // Enter (Shift+Enter으로 줄바꿈 허용)
@@ -31,15 +33,14 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
     return (
         <Paper
-            elevation={3}
+            elevation={0}
             sx={{
-                p: 2,
                 borderRadius: 0,
+                backgroundColor: "background.paper",
                 borderTop: 1,
                 borderColor: "divider",
-                // 하단 안전 영역(safe-area)을 고려한 padding
-                paddingBottom: `calc(env(safe-area-inset-bottom, 0px) + 8px)`,
-                backgroundColor: "background.paper",
+                p: 1,
+                ...sx,
             }}
         >
             <TextField
@@ -57,28 +58,30 @@ const ChatInput: React.FC<ChatInputProps> = ({
                         borderRadius: 3,
                     },
                 }}
-                InputProps={{
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            <IconButton
-                                color="primary"
-                                disabled={disabled || !value.trim()}
-                                onClick={onSend}
-                                sx={{
-                                    backgroundColor: value.trim() && !disabled ? "primary.main" : "transparent",
-                                    color: value.trim() && !disabled ? "white" : "text.disabled",
-                                    '&:hover': {
-                                        backgroundColor: value.trim() && !disabled ? "primary.dark" : "transparent",
-                                    },
-                                    '&.Mui-disabled': {
-                                        backgroundColor: "transparent",
-                                    },
-                                }}
-                            >
-                                <Send />
-                            </IconButton>
-                        </InputAdornment>
-                    ),
+                slotProps={{
+                    input: {
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    color="primary"
+                                    disabled={disabled || !value.trim()}
+                                    onClick={onSend}
+                                    sx={{
+                                        backgroundColor: value.trim() && !disabled ? "primary.main" : "transparent",
+                                        color: value.trim() && !disabled ? "white" : "text.disabled",
+                                        '&:hover': {
+                                            backgroundColor: value.trim() && !disabled ? "primary.dark" : "transparent",
+                                        },
+                                        '&.Mui-disabled': {
+                                            backgroundColor: "transparent",
+                                        },
+                                    }}
+                                >
+                                    <Send />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    },
                 }}
             />
         </Paper>

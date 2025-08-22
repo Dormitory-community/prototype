@@ -10,6 +10,7 @@ import {
     Badge,
 } from "@mui/material"
 import { ArrowBack, MoreVert } from "@mui/icons-material"
+import { useNavigate } from "react-router-dom"
 
 interface Message {
     id: string
@@ -32,7 +33,7 @@ interface ChatRoom {
 
 const Messages: React.FC = () => {
     // const messagesEndRef = useRef<HTMLDivElement>(null)
-
+    const navigate = useNavigate()
     // 목업 데이터 (임시 고정)
     const roomData: ChatRoom = {
         id: "room-1",
@@ -89,14 +90,13 @@ const Messages: React.FC = () => {
             >
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <IconButton sx={{ mr: 1 }}>
+                        <IconButton sx={{ mr: 1 }} onClick={() => navigate(-1)}>
                             <ArrowBack />
                         </IconButton>
 
                         <Box sx={{ position: "relative", mr: 2 }}>
                             <Badge
                                 color="success"
-                                variant="dot"
                                 overlap="circular"
                                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                                 sx={{

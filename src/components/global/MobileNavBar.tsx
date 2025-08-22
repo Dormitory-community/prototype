@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import {BottomNavigation, BottomNavigationAction, Box, Paper} from "@mui/material"
+import {BottomNavigation, BottomNavigationAction,  Paper} from "@mui/material"
 import { Groups, Dashboard, Person, Home } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
@@ -76,24 +76,21 @@ export const MobileNavBar: React.FC = () => {
     // --- 채팅 상세 화면이면 ChatInput만 렌더 ---
     if (isMessageDetail) {
         return (
-            <Box
-                sx={{
-                    position: "fixed",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 1200,
-                    borderTop: "1px solid #ddd",
-                    padding: 1,
-                }}
-            >
                 <ChatInput
                     value={newMessage}
                     onChange={setNewMessage}
                     onSend={handleSendMessage}
                     disabled={!Boolean(roomId)}
+                    sx={{
+                        position: "fixed",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 1200,
+                        // 하단 안전 영역 고려
+                        paddingBottom: `env(safe-area-inset-bottom, 8px)`,
+                    }}
                 />
-            </Box>
         )
     }
 
