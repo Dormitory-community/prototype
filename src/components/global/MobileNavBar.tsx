@@ -7,19 +7,16 @@ import { Groups, Dashboard, Person, Home } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
 import { MessageCircle } from "lucide-react"
-import ChatInput from "@/components/account/message/ChatInput"
-import { useChat } from "@/contexts/chatContext" // 확장자(.tsx) 제거
 
 export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()
     const location = useLocation()
-    const { sendMessage } = useChat()
 
     const hiddenRoutes = [
         ROUTES.LOGIN,
         ROUTES.SIGNUP,
         ROUTES.BOARD_DETAIL,
-        // ROUTES.MESSAGE_DETAIL은 여기서 제거 (별도 처리)
+        ROUTES.MESSAGE_DETAIL
     ]
 
     const getActiveTab = (pathname: string): number => {
@@ -40,72 +37,10 @@ export const MobileNavBar: React.FC = () => {
     // 헬퍼: 동적 파라미터 제거
     const normalize = (route: string) => route.replace(/:.*$/, "")
 
-    // 현재 라우트가 메시지 상세인지 판단
-    const isMessageDetail = location.pathname.startsWith(normalize(ROUTES.MESSAGE_DETAIL))
-
-    // roomId: 우선 location.state, 없으면 URL 끝부분으로
-    const roomIdFromState = location.state?.room?.id as string | undefined
-    const roomIdFromPath = location.pathname.split("/").pop()
-    const roomId = roomIdFromState ?? roomIdFromPath
-
-    // ChatInput에서 사용할 state는 컴포넌트 최상단에서 선언(결코 조건문 내부 X)
-    const [newMessage, setNewMessage] = useState<string>("")
-
-    const handleSendMessage = async () => {
-        if (!roomId) {
-            console.warn("roomId is missing — cannot send message")
-            return
-        }
-        if (!newMessage.trim()) return
-
-        try {
-            // sendMessage는 ChatContext의 함수 (옵티미스틱 업데이트 또는 API 콜 수행)
-            await sendMessage(roomId, newMessage.trim())
-            setNewMessage("")
-        } catch (err) {
-            console.error("sendMessage failed", err)
-            // 필요하면 토스트/알림으로 실패 알림
-        }
-    }
 
     // 일반적인 숨김 체크 (Message detail은 위에서 별도 처리)
     const shouldHideNavBar = hiddenRoutes.some((route) => location.pathname.startsWith(normalize(route)))
 
-    // --- 채팅 상세 화면이면 ChatInput만 렌더 ---
-    if (isMessageDetail) {
-        return (
-            <Paper
-                elevation={3}
-                sx={{
-                    position: "fixed",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 1300, // Messages 컴포넌트의 스크롤 버튼(z-index: 10)보다 높게
-                    borderRadius: 0,
-                    height: "72px",
-                    // 안전 영역 고려
-                    paddingBottom: "env(safe-area-inset-bottom, 0px)",
-                }}
-            >
-                <ChatInput
-                    value={newMessage}
-                    onChange={setNewMessage}
-                    onSend={handleSendMessage}
-                    disabled={!Boolean(roomId)}
-                    sx={{
-                        position: "fixed",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        zIndex: 1200,
-                        // 하단 안전 영역 고려
-                        paddingBottom: `env(safe-area-inset-bottom, 8px)`,
-                    }}
-                />
-            </Paper>
-        )
-    }
 
     // 숨김 라우트이면 아무것도 렌더하지 않음
     if (shouldHideNavBar) return null

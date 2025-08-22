@@ -4,6 +4,7 @@ import type React from "react"
 import { useEffect, useRef, useState, useCallback } from "react"
 import { Box, Typography, Avatar, Paper, CircularProgress } from "@mui/material"
 import { theme } from "@/theme/theme.ts"
+import ChatInput from "@/components/account/message/ChatInput.tsx"
 
 interface Message {
     id: string
@@ -28,10 +29,9 @@ interface MessagesProps {
     roomId?: string
     roomData?: ChatRoom
     onLoadMoreMessages?: (cursor: string) => Promise<Message[]>
-    chatInputRef: React.RefObject<HTMLDivElement>
 }
 
-const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, onLoadMoreMessages, chatInputRef }) => {
+const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, onLoadMoreMessages }) => {
     const messagesContainerRef = useRef<HTMLDivElement>(null)
     const [roomData, setRoomData] = useState<ChatRoom | null>(initialRoomData || null)
     const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -40,31 +40,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     const [isAtBottom, setIsAtBottom] = useState(true)
     const [isVisible, setIsVisible] = useState(false)
 
-    const [chatInputHeight, setChatInputHeight] = useState(100)
-    const [safeAreaBottom, setSafeAreaBottom] = useState(20)
-
-    // Safe area + ChatInput 높이 동적 계산
-    useEffect(() => {
-        const updateOffsets = () => {
-            if (chatInputRef?.current) {
-                const el = chatInputRef.current
-                const style = getComputedStyle(el)
-                const paddingBottom = parseInt(style.paddingBottom) || 0
-                setChatInputHeight(el.offsetHeight)
-                setSafeAreaBottom(paddingBottom)
-            }
-        }
-
-        updateOffsets()
-        window.addEventListener("resize", updateOffsets)
-        const resizeObserver = new ResizeObserver(updateOffsets)
-        if (chatInputRef?.current) resizeObserver.observe(chatInputRef.current)
-
-        return () => {
-            window.removeEventListener("resize", updateOffsets)
-            resizeObserver.disconnect()
-        }
-    }, [chatInputRef])
+    const [newMessage, setNewMessage] = useState("")
 
     // Mock 데이터
     useEffect(() => {
@@ -95,15 +71,13 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         }
     }, [roomId, initialRoomData])
 
+    // 스크롤 완전히 아래로 이동
     const scrollToBottom = useCallback((smooth = true) => {
         const container = messagesContainerRef.current
         if (container) {
-            const scrollHeight = container.scrollHeight
-            const clientHeight = container.clientHeight
-            const targetScrollTop = Math.max(0, scrollHeight - clientHeight + chatInputHeight + safeAreaBottom)
-            container.scrollTo({ top: targetScrollTop, behavior: smooth ? "smooth" : "auto" })
+            container.scrollTo({ top: container.scrollHeight, behavior: smooth ? "smooth" : "auto" })
         }
-    }, [chatInputHeight, safeAreaBottom])
+    }, [])
 
     // 초기 스크롤
     useEffect(() => {
@@ -146,6 +120,22 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         } finally { setIsLoadingMore(false) }
     }, [roomData?.messages, onLoadMoreMessages])
 
+    const handleSendMessage = async () => {
+        if (!roomData) return
+        if (!newMessage.trim()) return
+
+        const newMsg: Message = {
+            id: `msg-${Date.now()}`,
+            content: newMessage,
+            timestamp: new Date().toISOString(),
+            isFromMe: true,
+        }
+
+        // 옵티미스틱 업데이트
+        setRoomData(prev => prev ? { ...prev, messages: [...prev.messages, newMsg] } : prev)
+        setNewMessage("")
+    }
+
     const formatMessageTime = (timestamp: string) => {
         const date = new Date(timestamp)
         return date.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false })
@@ -163,9 +153,8 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     flex: 1,
                     overflowY: "auto",
                     px: 2,
-                    py: 1,
-                    pb: `${chatInputHeight + safeAreaBottom + 10}px`,
-                    pt: 2,
+                    py: 2,
+                    pb: `calc(72px + env(safe-area-inset-bottom, 8px))`, // ChatInput 높이 + 안전 영역
                     display: "flex",
                     flexDirection: "column",
                     "&::-webkit-scrollbar": { width: "4px" },
@@ -194,6 +183,15 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     )
                 })}
             </Box>
+
+            <ChatInput
+                value={newMessage}
+                onChange={setNewMessage}
+                onSend={handleSendMessage}
+                sx={{
+                    padding: "8px env(safe-area-inset-left, 8px)  env(safe-area-inset-bottom, 8px) env(safe-area-inset-right, 8px)",
+                }}
+            />
         </Box>
     )
 }
