@@ -10,6 +10,7 @@ export const useNavigation = () => {
     const goToMyComments = () => navigate(ROUTES.MY_PAGE_COMMENTS)
     const goToMyBookmarks = () => navigate(ROUTES.MY_PAGE_BOOKMARKS)
     const goToMyPrivacy = () => navigate(ROUTES.MY_PAGE_PRIVACY)
+    const goToMyMessages = () => navigate(ROUTES.MY_PAGE_MESSAGES)
     const goToNotices = () => navigate(ROUTES.NOTICES)
 
     const goToErrorPage = () => navigate("/404") // Or a specific error route
@@ -17,7 +18,7 @@ export const useNavigation = () => {
     // You can add more specific navigation functions as needed
     const goToBoardDetail = (id: string) => navigate(ROUTES.BOARD_DETAIL.replace(":id", id))
     const goToGroupWrite = () => navigate(ROUTES.GROUP_WRITE)
-    const goToBoardWrite = (type: "free" | "info" | "counseling" | "study" = "free") =>
+    const goToBoardWrite = (type: "free" | "info" | "counseling") =>
         navigate(ROUTES.BOARD_WRITE.replace(":type", type))
     const goToSignUp = () => navigate(ROUTES.SIGNUP)
     const goToSignIn = () => navigate(ROUTES.LOGIN)
@@ -30,6 +31,7 @@ export const useNavigation = () => {
         goToMyComments,
         goToMyBookmarks,
         goToMyPrivacy,
+        goToMyMessages,
         goToNotices,
         goToErrorPage,
         goToBoardDetail,

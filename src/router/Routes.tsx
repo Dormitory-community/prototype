@@ -18,25 +18,29 @@ import Posts from "@/components/account/Posts.tsx";
 import Comments from "@/components/account/Comments.tsx";
 import Bookmarks from "@/components/account/Bookmarks"
 import Privacy from "@/components/account/Privacy.tsx";
+import ChatRooms from "@/components/account/message/ChatRooms.tsx";
+import {ROUTES} from "@/router/index.ts";
+import Messages from "@/components/account/message/Messages.tsx";
 
 export const routes: RouteObject[] = [
-    { path: "/", element: <Layout><LandingPage /></Layout> },
-    { path: "/sign-in", element: <Layout><SignInPage /></Layout> },
-    { path: "/sign-up", element: <Layout><SignupPage /></Layout>},
-    { path: "/auth/callback", element: <Layout><AuthCallback /></Layout>},
-    { path: "/my-page", element: <Layout><MyPage /></Layout> },
-    { path: "/boards", element: <Layout><BoardsPage /></Layout> },
-    { path: "/board/:id", element: <Layout><BoardDetailPage /></Layout> },
-    { path: "/counseling/:id", element: <Layout><BoardDetailPage /></Layout> },
-    { path: "/write/:type", element: <Layout><BoardWritePage /></Layout> },
-    { path: "/groups", element: <Layout><GroupsPage /></Layout> },
-    { path: "/groups/:id", element: <Layout><GroupDetailPage /></Layout> },
-    { path: "/groups/write", element: <Layout><GroupWritePage /></Layout> },
-    { path: "/notices", element: <Layout><NoticesPage /></Layout> },
-    { path: "/search", element: <Layout><SearchPage /></Layout> },
-    { path: "/my-page/posts", element: <Layout><Posts/></Layout>},
-    { path: "/my-page/comments", element: <Layout><Comments/></Layout>},
-    { path: "/my-page/bookmarks", element: <Layout><Bookmarks/></Layout>},
-    { path: "/my-page/privacy", element: <Layout><Privacy/></Layout>},
+    { path: ROUTES.LANDING, element: <Layout><LandingPage /></Layout> },
+    { path: ROUTES.LOGIN, element: <Layout><SignInPage /></Layout> },
+    { path: ROUTES.SIGNUP, element: <Layout><SignupPage /></Layout>},
+    { path: ROUTES.AUTH_CALLBACK, element: <Layout><AuthCallback /></Layout>},
+    { path: ROUTES.MY_PAGE, element: <Layout><MyPage /></Layout> },
+    { path: ROUTES.BOARDS, element: <Layout><BoardsPage /></Layout> },
+    { path: ROUTES.BOARD_DETAIL, element: <Layout><BoardDetailPage /></Layout> },
+    { path: ROUTES.BOARD_WRITE, element: <Layout><BoardWritePage /></Layout> },
+    { path: ROUTES.GROUPS, element: <Layout><GroupsPage /></Layout> },
+    { path: ROUTES.GROUP_DETAIL, element: <Layout><GroupDetailPage /></Layout> },
+    { path: ROUTES.GROUP_WRITE, element: <Layout><GroupWritePage /></Layout> },
+    { path: ROUTES.NOTICES, element: <Layout><NoticesPage /></Layout> },
+    { path: ROUTES.SEARCH, element: <Layout><SearchPage /></Layout> },
+    { path: ROUTES.MY_PAGE_POSTS, element: <Layout><Posts/></Layout>},
+    { path: ROUTES.MY_PAGE_COMMENTS, element: <Layout><Comments/></Layout>},
+    { path: ROUTES.MY_PAGE_BOOKMARKS, element: <Layout><Bookmarks/></Layout>},
+    { path: ROUTES.MY_PAGE_PRIVACY, element: <Layout><Privacy/></Layout>},
+    { path: ROUTES.MY_PAGE_MESSAGES, element: <Layout><ChatRooms/></Layout>},
+    { path: ROUTES.MESSAGE_DETAIL, element: <Layout><Messages/></Layout>},
     { path: "*", element: <Layout><ErrorPage /></Layout> },
 ]

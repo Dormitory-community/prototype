@@ -203,7 +203,7 @@ const InfoSharingContent: React.FC = () => {
                     }}
                 >
                     <Button
-                        onClick={() => goToBoardWrite("counseling")}
+                        onClick={() => goToBoardWrite("info")}
                         sx={{
                             width: 75,   // 크기 줄임 (기본 FAB 사이즈 정도)
                             height: 44,
