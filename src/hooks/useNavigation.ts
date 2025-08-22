@@ -6,6 +6,10 @@ export const useNavigation = () => {
 
     const goToHome = () => navigate(ROUTES.LANDING)
     const goToMyPage = () => navigate(ROUTES.MY_PAGE)
+    const goToMyPosts = () => navigate(ROUTES.MY_PAGE_POSTS)
+    const goToMyComments = () => navigate(ROUTES.MY_PAGE_COMMENTS)
+    const goToMyBookmarks = () => navigate(ROUTES.MY_PAGE_BOOKMARKS)
+    const goToMyPrivacy = () => navigate(ROUTES.MY_PAGE_PRIVACY)
     const goToNotices = () => navigate(ROUTES.NOTICES)
 
     const goToErrorPage = () => navigate("/404") // Or a specific error route
@@ -16,17 +20,23 @@ export const useNavigation = () => {
     const goToBoardWrite = (type: "free" | "info" | "counseling" | "study" = "free") =>
         navigate(ROUTES.BOARD_WRITE.replace(":type", type))
     const goToSignUp = () => navigate(ROUTES.SIGNUP)
+    const goToSignIn = () => navigate(ROUTES.LOGIN)
     const goToSearch = () => navigate(ROUTES.SEARCH)
 
     return {
         goToHome,
         goToMyPage,
+        goToMyPosts,
+        goToMyComments,
+        goToMyBookmarks,
+        goToMyPrivacy,
         goToNotices,
         goToErrorPage,
         goToBoardDetail,
         goToGroupWrite,
         goToBoardWrite,
         goToSignUp,
-        goToSearch
+        goToSignIn,
+        goToSearch,
     }
 }

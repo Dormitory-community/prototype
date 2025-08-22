@@ -14,6 +14,10 @@ import {Layout} from "@/components/Layout.tsx";
 import SignupPage from "@/pages/auth/SignupPage.tsx";
 import AuthCallback from "@/pages/auth/AuthCallback.tsx";
 import SearchPage from "@/pages/SearchPage.tsx";
+import Posts from "@/components/account/Posts.tsx";
+import Comments from "@/components/account/Comments.tsx";
+import Bookmarks from "@/components/account/Bookmarks"
+import Privacy from "@/components/account/Privacy.tsx";
 
 export const routes: RouteObject[] = [
     { path: "/", element: <Layout><LandingPage /></Layout> },
@@ -30,5 +34,9 @@ export const routes: RouteObject[] = [
     { path: "/groups/write", element: <Layout><GroupWritePage /></Layout> },
     { path: "/notices", element: <Layout><NoticesPage /></Layout> },
     { path: "/search", element: <Layout><SearchPage /></Layout> },
+    { path: "/my-page/posts", element: <Layout><Posts/></Layout>},
+    { path: "/my-page/comments", element: <Layout><Comments/></Layout>},
+    { path: "/my-page/bookmarks", element: <Layout><Bookmarks/></Layout>},
+    { path: "/my-page/privacy", element: <Layout><Privacy/></Layout>},
     { path: "*", element: <Layout><ErrorPage /></Layout> },
 ]
