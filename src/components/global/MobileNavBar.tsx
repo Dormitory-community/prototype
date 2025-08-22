@@ -3,21 +3,23 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
-import {Groups, Dashboard, Person, Home} from "@mui/icons-material"
+import { Groups, Dashboard, Person, Home } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
-import {MessageCircle} from "lucide-react";
+import { MessageCircle } from "lucide-react"
+import ChatInput from "@/components/account/message/ChatInput"
+import { useChat } from "@/contexts/chatContext" // 확장자(.tsx) 제거
 
 export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()
     const location = useLocation()
+    const { sendMessage } = useChat()
 
     const hiddenRoutes = [
         ROUTES.LOGIN,
         ROUTES.SIGNUP,
         ROUTES.BOARD_DETAIL,
-        ROUTES.SIGNUP,
-        ROUTES.MESSAGE_DETAIL
+        // ROUTES.MESSAGE_DETAIL은 여기서 제거 (별도 처리)
     ]
 
     const getActiveTab = (pathname: string): number => {
@@ -35,14 +37,58 @@ export const MobileNavBar: React.FC = () => {
         setValue(getActiveTab(location.pathname))
     }, [location.pathname])
 
-    const shouldHideNavBar = hiddenRoutes.some(route =>
-        location.pathname.startsWith(route.replace(/:.*$/, "")) // 동적 파라미터 제거
-    )
+    // 헬퍼: 동적 파라미터 제거
+    const normalize = (route: string) => route.replace(/:.*$/, "")
 
-    if (shouldHideNavBar) {
-        return null
+    // 현재 라우트가 메시지 상세인지 판단
+    const isMessageDetail = location.pathname.startsWith(normalize(ROUTES.MESSAGE_DETAIL))
+
+    // roomId: 우선 location.state, 없으면 URL 끝부분으로
+    const roomIdFromState = location.state?.room?.id as string | undefined
+    const roomIdFromPath = location.pathname.split("/").pop()
+    const roomId = roomIdFromState ?? roomIdFromPath
+
+    // ChatInput에서 사용할 state는 컴포넌트 최상단에서 선언(결코 조건문 내부 X)
+    const [newMessage, setNewMessage] = useState<string>("")
+
+    const handleSendMessage = async () => {
+        if (!roomId) {
+            console.warn("roomId is missing — cannot send message")
+            return
+        }
+        if (!newMessage.trim()) return
+
+        try {
+            // sendMessage는 ChatContext의 함수 (옵티미스틱 업데이트 또는 API 콜 수행)
+            await sendMessage(roomId, newMessage.trim())
+            setNewMessage("")
+        } catch (err) {
+            console.error("sendMessage failed", err)
+            // 필요하면 토스트/알림으로 실패 알림
+        }
     }
 
+    // 일반적인 숨김 체크 (Message detail은 위에서 별도 처리)
+    const shouldHideNavBar = hiddenRoutes.some(route =>
+        location.pathname.startsWith(normalize(route))
+    )
+
+    // --- 채팅 상세 화면이면 ChatInput만 렌더 ---
+    if (isMessageDetail) {
+        return (
+            <ChatInput
+                value={newMessage}
+                onChange={setNewMessage}
+                onSend={handleSendMessage}
+                disabled={!Boolean(roomId)} // roomId 없으면 입력 비활성화
+            />
+        )
+    }
+
+    // 숨김 라우트이면 아무것도 렌더하지 않음
+    if (shouldHideNavBar) return null
+
+    // 기본: 바텀 네비게이션 렌더
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue)
         switch (newValue) {
@@ -70,11 +116,8 @@ export const MobileNavBar: React.FC = () => {
                 onChange={handleChange}
                 showLabels
                 sx={{
-                    // 내부 아이콘 영역은 56px, safe-area 만큼 추가 높이 확보
                     height: `calc(56px + var(--safe-bottom, env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px))))`,
-                    // 아이콘/레이블이 safe-area 위로 올라오도록 패딩 적용
                     paddingBottom: `var(--safe-bottom, env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px)))`,
-                    // 시각적 보정(선택)
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -83,7 +126,7 @@ export const MobileNavBar: React.FC = () => {
                 <BottomNavigationAction label="홈" icon={<Home />} />
                 <BottomNavigationAction label="그룹 모집" icon={<Groups />} />
                 <BottomNavigationAction label="게시판" icon={<Dashboard />} />
-                <BottomNavigationAction label="채팅" icon={<MessageCircle fill="currentColor" strokeWidth={0}/>} />
+                <BottomNavigationAction label="채팅" icon={<MessageCircle fill="currentColor" strokeWidth={0} />} />
                 <BottomNavigationAction label="마이페이지" icon={<Person />} />
             </BottomNavigation>
         </Paper>

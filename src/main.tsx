@@ -7,6 +7,7 @@ import { AuthProvider } from "./contexts/AuthContext.tsx"
 import { routes } from "@/router/Routes"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { usePWA } from "./hooks/usePWA"
+import {ChatProvider} from "@/contexts/chatContext.tsx";
 
 const router = createBrowserRouter(routes, {
     future: { v7_startTransition: true } as any
@@ -36,7 +37,9 @@ function Main() {
 
                 <CssBaseline />
                     <AuthProvider>
-                        <RouterProvider router={router} />
+                        <ChatProvider>
+                            <RouterProvider router={router} />
+                        </ChatProvider>
                     </AuthProvider>
              </ CustomThemeProvider>
 

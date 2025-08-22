@@ -17,11 +17,9 @@ import {
     ListItemButton,
     Menu,
     MenuItem,
-    Tabs,
-    Tab,
     Button,
 } from "@mui/material"
-import { ArrowBack, MoreVert } from "@mui/icons-material"
+import {  MoreVert } from "@mui/icons-material"
 
 interface Message {
     id: string
@@ -301,9 +299,6 @@ const ChatRooms: React.FC = () => {
                             <Typography variant="h6" sx={{ color: "text.secondary", mb: 2 }}>
                                 아직 대화가 없습니다
                             </Typography>
-                            <Button variant="outlined" onClick={() => { /* 새 메시지 작성 페이지로 이동 등 */ }}>
-                                새 메시지 시작하기
-                            </Button>
                         </Box>
                     )}
                 </Card>
