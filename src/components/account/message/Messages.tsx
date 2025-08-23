@@ -1,8 +1,9 @@
 "use client"
 
 import React, { useState, useEffect, useRef, useCallback } from "react"
-import { Box, Paper, Typography, Avatar, CircularProgress, useTheme, useMediaQuery } from "@mui/material"
-import { theme } from "@/theme/theme.ts"
+import { Box, Paper, Typography, Avatar, CircularProgress, useMediaQuery } from "@mui/material"
+// import { theme } from "@/theme/theme.ts"
+import { useTheme } from '@mui/material/styles'    // <-- 추가
 import ChatInput from "@/components/account/message/ChatInput.tsx"
 import MessageHeader from "@/components/account/message/MessageHeader.tsx";
 
@@ -32,11 +33,11 @@ interface MessagesProps {
 }
 
 const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, onLoadMoreMessages }) => {
+    const theme = useTheme()
     const messagesContainerRef = useRef<HTMLDivElement>(null)
     const chatInputRef = useRef<HTMLDivElement>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const isScrollingToBottomRef = useRef(false)
-
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
     const isSmallScreen = useMediaQuery('(max-height: 600px)')
 
@@ -385,9 +386,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                                             py: isMobile ? 1.5 : 2,
                                             backgroundColor: msg.isFromMe
                                                 ? theme.palette.primary.main
-                                                : theme.palette.mode === "dark"
-                                                    ? theme.palette.background.paper
-                                                    : "grey.100",
+                                                    : theme.palette.grey[600],
                                             color: msg.isFromMe ? "white" : "text.primary",
                                             borderRadius: 2,
                                             borderBottomLeftRadius: !msg.isFromMe ? 0.5 : 2,

@@ -163,11 +163,11 @@ export const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: { main: "#10b981", light: "#34d399", dark: "#059669", contrastText: "#fff" },
-    secondary: { main: "#f472b6", light: "#fbbf24", dark: "#ec4899", contrastText: "#000" },
-    error: { main: "#f87171", light: "#fca5a5", dark: "#ef4444", contrastText: "#000" },
-    warning: { main: "#fbbf24", light: "#fcd34d", dark: "#f59e0b", contrastText: "#000" },
-    info: { main: "#22d3ee", light: "#67e8f9", dark: "#06b6d4", contrastText: "#000" },
-    success: { main: "#34d399", light: "#6ee7b7", dark: "#10b981", contrastText: "#000" },
+    secondary: { main: "#f472b6", light: "#fbbf24", dark: "#ec4899", contrastText: "#fff" }, // ✅ 수정
+    error: { main: "#f87171", light: "#fca5a5", dark: "#ef4444", contrastText: "#fff" },      // ✅ 수정
+    warning: { main: "#fbbf24", light: "#fcd34d", dark: "#f59e0b", contrastText: "#fff" },     // ✅ 수정
+    info: { main: "#22d3ee", light: "#67e8f9", dark: "#06b6d4", contrastText: "#fff" },        // ✅ 수정
+    success: { main: "#34d399", light: "#6ee7b7", dark: "#10b981", contrastText: "#fff" },     // ✅ 수정
     text: { primary: "#f1f5f9", secondary: "#94a3b8", disabled: "#64748b" },
     background: { default: "#0f172a", paper: "#1e293b" },
     divider: "#334155",
