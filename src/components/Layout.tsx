@@ -152,7 +152,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
                 {children}
             </Box>
-            {(!isMessageDetail || (isMessageDetail && window.innerWidth >= 960)) && !isPWA && <MobileNavBar />}
+            {(!isMessageDetail || (isMessageDetail && window.innerWidth >= 960)) && <MobileNavBar />}
         </Box>
     )
 }

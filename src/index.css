@@ -22,8 +22,7 @@ body {
   width: 100%;
   /* position: fixed 제거 - 스크롤 문제 해결 */
   overflow: visible;
-  /* PWA safe-area 지원 */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  /* PWA safe-area 지원 - body에서 제거하고 개별 컴포넌트에서 처리 */
 }
 
 /* 루트 컨테이너가 스크롤 가능하도록 */
@@ -35,7 +34,7 @@ body {
   min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 }
 
-/* iOS PWA 키보드 최적화 개선 */
+/* iOS PWA 키보드 최적화 개선 - 더 정확한 감지 */
 @supports (-webkit-appearance: none) {
   /* iOS Safari PWA 전용 최적화 */
   @media all and (display-mode: standalone) {
@@ -49,22 +48,28 @@ body {
       /* iOS PWA에서 bounce 스크롤 방지 */
       overscroll-behavior: none;
       -webkit-overflow-scrolling: touch;
+      /* iOS에서 키보드 올라올 때 레이아웃 안정성 개선 */
+      position: relative;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
     }
   }
 
   .ios-keyboard-fix {
     /* iOS에서 키보드 올라올 때 부드러운 전환 */
-    transition: height 0.3s ease-out, transform 0.3s ease-out;
+    transition: height 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-/* 모바일 PWA 환경 최적화 */
+/* 모바일 PWA 환경 최적화 - 더 정확한 스크롤 제어 */
 @media screen and (max-width: 768px) {
   /* 모바일에서 입력창이 있는 페이지의 스크롤 최적화 */
   .fixed-input-page {
     height: 100vh;
     height: -webkit-fill-available; /* iOS PWA 지원 */
     overflow: hidden;
+    /* 키보드 상태 변화에 대한 안정성 개선 */
+    position: relative;
   }
 
   .fixed-input-page .scroll-content {
@@ -73,6 +78,9 @@ body {
     -webkit-overflow-scrolling: touch;
     /* 키보드 올라올 때 스크롤 영역 보호 */
     overscroll-behavior: contain;
+    /* 스크롤 성능 최적화 */
+    will-change: scroll-position;
+    transform: translateZ(0); /* 하드웨어 가속 */
   }
 
   /* PWA에서 입력창 포커스 시 줌 방지 */
@@ -82,6 +90,9 @@ body {
     font-size: 16px !important;
     transform-origin: left top;
     transition: none;
+    /* 추가 줌 방지 속성 */
+    -webkit-text-size-adjust: 100%;
+    -webkit-user-select: text;
   }
 }
 
@@ -90,26 +101,27 @@ body {
   body {
     /* PWA에서 bounce 스크롤 방지 */
     overscroll-behavior: none;
-    /* iOS PWA에서 상태바 영역 고려 */
-    padding-top: env(safe-area-inset-top);
+    /* iOS PWA에서 상태바 영역 고려 - Layout 컴포넌트에서 처리하므로 제거 */
   }
 
-  /* PWA에서 고정 입력창 최적화 */
-  .chat-input-container {
+  /* PWA에서 고정 입력창 최적화 - 클래스명 변경 및 개선 */
+  .comment-form-container {
     /* safe-area 고려한 하단 패딩 */
     padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    /* 키보드 상태 감지를 위한 CSS 변수 지원 */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom) + var(--keyboard-height, 0px));
   }
 
-  /* Android PWA에서 키보드 감지 최적화 */
-  @media screen and (max-height: 500px) {
-    .chat-input-container {
-      /* 키보드가 올라온 상태로 추정되는 경우 safe-area 제거 */
-      padding-bottom: 12px;
+  /* Android PWA에서 키보드 감지 최적화 - 더 정확한 임계값 */
+  @media screen and (max-height: 600px) {
+    .comment-form-container {
+      /* 키보드가 올라온 상태로 추정되는 경우 safe-area만 적용 */
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
   }
 }
 
-/* visualViewport API 지원 브라우저 최적화 */
+/* visualViewport API 지원 브라우저 최적화 - 더 포괄적인 지원 */
 @supports (height: 100dvh) {
   /* 동적 viewport 높이 지원 브라우저 */
   #root {
@@ -121,7 +133,14 @@ body {
   }
 }
 
-/* Android Chrome PWA 키보드 최적화 */
+/* CSS 변수를 통한 동적 높이 관리 */
+:root {
+  --comment-form-height: 80px; /* 기본 입력창 높이 */
+  --keyboard-height: 0px; /* 키보드 높이 */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Android Chrome PWA 키보드 최적화 - 더 정확한 감지 */
 @media screen and (max-width: 768px) and (orientation: portrait) {
   /* Android에서 키보드 올라올 때 레이아웃 보정 */
   .android-keyboard-active {
@@ -130,15 +149,40 @@ body {
   }
 
   .android-keyboard-active .messages-container {
-    /* Android에서 키보드 높이만큼 스크롤 영역 축소 */
-    max-height: calc(100vh - 200px); /* 키보드 추정 높이 */
+    /* Android에서 키보드 높이를 CSS 변수로 동적 계산 */
+    max-height: calc(100vh - var(--comment-form-height) - var(--keyboard-height));
+  }
+
+  /* Android에서 키보드 올라올 때 추가 최적화 */
+  @media screen and (max-height: 500px) {
+    .comment-form-container {
+      /* 키보드가 올라온 상태에서 transform 사용 시 패딩 조정 */
+      padding-bottom: 8px;
+    }
   }
 }
 
-/* 고해상도 디스플레이 최적화 */
+/* 고해상도 디스플레이 최적화 - 더 정확한 선택자 */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .chat-input-container {
+  .comment-form-container,
+  [class*="comment-form"] {
     /* 고해상도에서 border 선명도 개선 */
     border-top: 0.5px solid rgba(0, 0, 0, 0.12);
   }
+}
+
+/* 키보드 애니메이션 최적화 */
+.keyboard-transition {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* 스크롤 위치 보정을 위한 유틸리티 클래스 */
+.scroll-to-bottom {
+  scroll-behavior: smooth;
+}
+
+.scroll-to-bottom:focus-within {
+  /* 입력창 포커스 시 스크롤 위치 자동 조정 */
+  scroll-padding-bottom: calc(var(--comment-form-height) + 20px);
 }

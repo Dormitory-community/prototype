@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import type React from "react"
+import { useEffect, useState, useRef } from "react"
 import {
     OutlinedInput,
     IconButton,
@@ -35,55 +36,110 @@ const CommentForm: React.FC<CommentFormProps> = ({
                                                      placeholder = "댓글을 입력하세요...",
                                                      isReplyMode = false,
                                                      replyToCommentAuthor,
-                                                     onCancelReply
+                                                     onCancelReply,
                                                  }) => {
     const theme = useTheme()
     const isDark = theme.palette.mode === "dark"
     const [keyboardHeight, setKeyboardHeight] = useState(0)
     const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
+    const [isPWA, setIsPWA] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
+    const inputRef = useRef<HTMLInputElement>(null)
 
-    // 키보드 높이 감지 및 레이아웃 조정
     useEffect(() => {
+        const detectPWA = () => {
+            return (
+                ("standalone" in window.navigator && (window.navigator as any).standalone === true) ||
+                window.matchMedia("(display-mode: standalone)").matches ||
+                window.matchMedia("(display-mode: fullscreen)").matches ||
+                (typeof document !== "undefined" && document.referrer.includes("android-app://"))
+            )
+        }
+        setIsPWA(detectPWA())
+    }, [])
+
+    useEffect(() => {
+        const initialViewportHeight = window.innerHeight
+        let timeoutId: NodeJS.Timeout
+
         const handleViewportChange = () => {
             const visualViewport = (window as any).visualViewport
-            if (!visualViewport) return
-
-            const currentHeight = visualViewport.height
+            const currentHeight = visualViewport ? visualViewport.height : window.innerHeight
             const windowHeight = window.innerHeight
-            const heightDiff = windowHeight - currentHeight
+            const heightDiff = initialViewportHeight - currentHeight
 
-            if (heightDiff > 150) { // 키보드가 올라온 상태
-                setKeyboardHeight(heightDiff)
+            const isAndroid = /Android/i.test(navigator.userAgent)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+
+            // 키보드 감지 임계값을 디바이스별로 조정
+            const threshold = isAndroid ? 100 : 150
+
+            if (heightDiff > threshold) {
+                // 키보드가 올라온 상태
+                const adjustedHeight = isAndroid ? Math.min(heightDiff, heightDiff * 0.8) : heightDiff
+                setKeyboardHeight(adjustedHeight)
                 setIsKeyboardVisible(true)
-            } else { // 키보드가 내려간 상태
+
+                setTimeout(() => {
+                    if (inputRef.current) {
+                        inputRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" })
+                    }
+                }, 100)
+            } else {
+                // 키보드가 내려간 상태
                 setKeyboardHeight(0)
                 setIsKeyboardVisible(false)
             }
         }
 
-        // iOS PWA용 viewport 리스너
+        const debouncedViewportChange = () => {
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(handleViewportChange, 50)
+        }
+
+        // iOS PWA용 visualViewport 리스너
         const visualViewport = (window as any).visualViewport
         if (visualViewport) {
-            visualViewport.addEventListener('resize', handleViewportChange)
-            // 초기 상태 체크
-            handleViewportChange()
+            visualViewport.addEventListener("resize", debouncedViewportChange)
+            handleViewportChange() // 초기 상태 체크
         }
 
-        // 추가적인 키보드 감지 (Android 등)
-        const handleResize = () => {
-            // 짧은 지연 후 실행하여 iOS 애니메이션 완료 대기
-            setTimeout(handleViewportChange, 100)
+        // Android 등을 위한 추가 리스너
+        window.addEventListener("resize", debouncedViewportChange)
+
+        const handleFocus = () => {
+            setTimeout(handleViewportChange, 300) // 키보드 애니메이션 완료 대기
         }
 
-        window.addEventListener('resize', handleResize)
+        const handleBlur = () => {
+            setTimeout(handleViewportChange, 300)
+        }
+
+        if (inputRef.current) {
+            inputRef.current.addEventListener("focus", handleFocus)
+            inputRef.current.addEventListener("blur", handleBlur)
+        }
 
         return () => {
+            clearTimeout(timeoutId)
             if (visualViewport) {
-                visualViewport.removeEventListener('resize', handleViewportChange)
+                visualViewport.removeEventListener("resize", debouncedViewportChange)
             }
-            window.removeEventListener('resize', handleResize)
+            window.removeEventListener("resize", debouncedViewportChange)
+            if (inputRef.current) {
+                inputRef.current.removeEventListener("focus", handleFocus)
+                inputRef.current.removeEventListener("blur", handleBlur)
+            }
         }
     }, [])
+
+    useEffect(() => {
+        if (containerRef.current) {
+            const height = containerRef.current.offsetHeight
+            // CSS 변수로 실제 입력창 높이 전달
+            document.documentElement.style.setProperty("--comment-form-height", `${height}px`)
+        }
+    }, [isReplyMode, keyboardHeight])
 
     // 색상 변수
     const containerBg = isDark ? theme.palette.background.paper : "#FFFFFF"
@@ -95,27 +151,30 @@ const CommentForm: React.FC<CommentFormProps> = ({
 
     return (
         <Box
+            ref={containerRef}
             sx={{
                 position: "fixed",
                 bottom: 0,
                 left: 0,
                 right: 0,
                 borderTop: `1px solid ${borderTopColor}`,
-                zIndex: 1100, // 더 높은 z-index로 설정
+                zIndex: 1100,
                 bgcolor: containerBg,
                 px: 0,
                 py: 1,
-                // 키보드 상태에 따른 동적 위치 조정
-                transform: isKeyboardVisible && keyboardHeight > 0
-                    ? `translateY(-${keyboardHeight}px)`
-                    : 'translateY(0)',
-                transition: 'transform 0.3s ease-out', // 부드러운 애니메이션
-                // safe-area 고려 (키보드가 없을 때만)
+                transform: isKeyboardVisible && keyboardHeight > 0 ? `translateY(-${keyboardHeight}px)` : "translateY(0)",
+                transition: isPWA
+                    ? "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)" // PWA에서 더 부드러운 애니메이션
+                    : "transform 0.3s ease-out",
                 paddingBottom: !isKeyboardVisible
-                    ? `calc(8px + env(safe-area-inset-bottom))`
-                    : '8px',
-                // 스크롤 영역에서 완전히 분리
-                pointerEvents: 'auto',
+                    ? isPWA
+                        ? `calc(8px + env(safe-area-inset-bottom))`
+                        : `max(8px, env(safe-area-inset-bottom))`
+                    : "8px",
+                paddingLeft: isPWA ? "env(safe-area-inset-left)" : 0,
+                paddingRight: isPWA ? "env(safe-area-inset-right)" : 0,
+                pointerEvents: "auto",
+                boxShadow: isKeyboardVisible ? "0 -4px 20px rgba(0, 0, 0, 0.1)" : "0 -1px 3px rgba(0, 0, 0, 0.05)",
             }}
         >
             {/* 대댓글 모드 헤더 */}
@@ -156,6 +215,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
             >
                 <FormControl variant="outlined" fullWidth>
                     <OutlinedInput
+                        ref={inputRef}
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
                         placeholder={placeholder}
@@ -177,21 +237,23 @@ const CommentForm: React.FC<CommentFormProps> = ({
                                 borderColor: theme.palette.primary.main,
                                 borderWidth: 1.5,
                             },
-                            // 줌 방지: 16px 이상 필수
                             "& .MuiInputBase-inputMultiline": {
                                 padding: "8px 10px",
                                 lineHeight: 1.4,
                                 fontSize: 16, // 줌 방지를 위해 16px 이상
                                 color: theme.palette.text.primary,
+                                inputMode: "text",
+                                autoComplete: "off",
+                                autoCorrect: "off",
+                                autoCapitalize: "sentences",
                             },
                             "& .MuiInputBase-input": {
                                 color: theme.palette.text.primary,
                             },
-                            // 플레이스홀더도 16px 이상
                             "& .MuiInputBase-input::placeholder, & .MuiInputBase-inputMultiline::placeholder": {
                                 color: placeholderColor,
                                 opacity: 1,
-                                fontSize: 16, // 줌 방지
+                                fontSize: 16,
                             },
                         }}
                         startAdornment={
