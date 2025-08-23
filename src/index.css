@@ -13,3 +13,51 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
+
+/* iOS PWA 키보드 이슈 해결을 위한 전역 스타일 */
+html, body {
+  /* iOS에서 키보드로 인한 viewport 변화 최소화 */
+  height: 100%;
+  position: fixed;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* 루트 컨테이너가 스크롤 가능하도록 */
+#root {
+  height: 100vh;
+  width: 100vw;
+  overflow: auto;
+  position: relative;
+}
+
+/* iOS PWA에서 키보드 애니메이션 최적화 */
+@supports (-webkit-appearance: none) {
+  .ios-keyboard-fix {
+    /* iOS에서 키보드 올라올 때 부드러운 전환 */
+    transition: height 0.3s ease-out, transform 0.3s ease-out;
+  }
+}
+
+/* visualViewport 지원하는 브라우저에서 키보드 감지 최적화 */
+@media screen and (max-width: 768px) {
+  /* 모바일에서 입력창이 있는 페이지의 스크롤 최적화 */
+  .fixed-input-page {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .fixed-input-page .scroll-content {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* PWA standalone 모드에서 추가 최적화 */
+@media all and (display-mode: standalone) {
+  body {
+    /* PWA에서 bounce 스크롤 방지 */
+    overscroll-behavior: none;
+  }
+}

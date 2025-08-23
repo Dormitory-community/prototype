@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import {
     OutlinedInput,
     IconButton,
@@ -39,6 +39,51 @@ const CommentForm: React.FC<CommentFormProps> = ({
                                                  }) => {
     const theme = useTheme()
     const isDark = theme.palette.mode === "dark"
+    const [keyboardHeight, setKeyboardHeight] = useState(0)
+    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
+
+    // 키보드 높이 감지 및 레이아웃 조정
+    useEffect(() => {
+        const handleViewportChange = () => {
+            const visualViewport = (window as any).visualViewport
+            if (!visualViewport) return
+
+            const currentHeight = visualViewport.height
+            const windowHeight = window.innerHeight
+            const heightDiff = windowHeight - currentHeight
+
+            if (heightDiff > 150) { // 키보드가 올라온 상태
+                setKeyboardHeight(heightDiff)
+                setIsKeyboardVisible(true)
+            } else { // 키보드가 내려간 상태
+                setKeyboardHeight(0)
+                setIsKeyboardVisible(false)
+            }
+        }
+
+        // iOS PWA용 viewport 리스너
+        const visualViewport = (window as any).visualViewport
+        if (visualViewport) {
+            visualViewport.addEventListener('resize', handleViewportChange)
+            // 초기 상태 체크
+            handleViewportChange()
+        }
+
+        // 추가적인 키보드 감지 (Android 등)
+        const handleResize = () => {
+            // 짧은 지연 후 실행하여 iOS 애니메이션 완료 대기
+            setTimeout(handleViewportChange, 100)
+        }
+
+        window.addEventListener('resize', handleResize)
+
+        return () => {
+            if (visualViewport) {
+                visualViewport.removeEventListener('resize', handleViewportChange)
+            }
+            window.removeEventListener('resize', handleResize)
+        }
+    }, [])
 
     // 색상 변수
     const containerBg = isDark ? theme.palette.background.paper : "#FFFFFF"
@@ -56,12 +101,21 @@ const CommentForm: React.FC<CommentFormProps> = ({
                 left: 0,
                 right: 0,
                 borderTop: `1px solid ${borderTopColor}`,
-                zIndex: 100,
+                zIndex: 1100, // 더 높은 z-index로 설정
                 bgcolor: containerBg,
                 px: 0,
                 py: 1,
-                // safe-area 고려
-                paddingBottom: `calc(8px + env(safe-area-inset-bottom))`,
+                // 키보드 상태에 따른 동적 위치 조정
+                transform: isKeyboardVisible && keyboardHeight > 0
+                    ? `translateY(-${keyboardHeight}px)`
+                    : 'translateY(0)',
+                transition: 'transform 0.3s ease-out', // 부드러운 애니메이션
+                // safe-area 고려 (키보드가 없을 때만)
+                paddingBottom: !isKeyboardVisible
+                    ? `calc(8px + env(safe-area-inset-bottom))`
+                    : '8px',
+                // 스크롤 영역에서 완전히 분리
+                pointerEvents: 'auto',
             }}
         >
             {/* 대댓글 모드 헤더 */}
@@ -109,7 +163,6 @@ const CommentForm: React.FC<CommentFormProps> = ({
                         minRows={1}
                         maxRows={6}
                         aria-label="comment input"
-                        // 줌 방지를 위한 스타일 조정
                         sx={{
                             bgcolor: inputBg,
                             borderRadius: 1.25,

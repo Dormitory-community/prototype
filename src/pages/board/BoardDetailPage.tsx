@@ -146,12 +146,16 @@ const BoardDetailPage: React.FC = () => {
 
     return (
         <>
-            {/* 메인 컨텐츠 - CommentForm을 위한 하단 공간 확보 */}
+            {/* 메인 컨텐츠 - 스크롤 가능 영역 */}
             <Container
                 maxWidth="md"
                 sx={{
-                    py: { xs: 2, md: 4 }, // 상하 패딩 줄임
-                    pb: { xs: 10, md: 4 }, // 모바일에서 CommentForm을 위한 하단 공간 확보
+                    py: { xs: 2, md: 4 },
+                    // 고정 입력창을 위한 하단 공간 제거 (Layout에서 처리)
+                    height: "100%",
+                    overflow: "auto", // 스크롤 가능
+                    // 스크롤이 입력창 영역까지 가지 않도록 제한
+                    paddingBottom: { xs: "100px", md: "80px" }, // 입력창 높이만큼 여백
                 }}
             >
                 <Paper
@@ -184,7 +188,7 @@ const BoardDetailPage: React.FC = () => {
                 </Paper>
             </Container>
 
-            {/* CommentForm - 화면 하단 고정 */}
+            {/* CommentForm - 화면 하단 완전 고정, 스크롤과 분리 */}
             <CommentForm
                 value={newComment}
                 onChange={setNewComment}

@@ -31,17 +31,17 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     const [isInitialized, setIsInitialized] = useState(false)
     const [isPWA, setIsPWA] = useState(false)
 
-    // body overflow 제어
-    useEffect(() => {
-        document.body.style.overflow = 'hidden'
-        document.body.style.overscrollBehavior = 'none'
-        return () => {
-            document.body.style.overflow = 'auto'
-            document.body.style.overscrollBehavior = 'auto'
-        }
-    }, [])
+    // body overflow 제어 제거 - Layout에서 처리하므로
+    // useEffect(() => {
+    //     document.body.style.overflow = 'hidden'
+    //     document.body.style.overscrollBehavior = 'none'
+    //     return () => {
+    //         document.body.style.overflow = 'auto'
+    //         document.body.style.overscrollBehavior = 'auto'
+    //     }
+    // }, [])
 
-    // --vh 세팅 (원래 로직 유지)
+    // PWA 감지는 유지하되 --vh 설정 제거 (입력창에서 개별 처리)
     useEffect(() => {
         const detectPWA = () => {
             const isStandalone =
@@ -50,28 +50,8 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 (typeof document !== 'undefined' && document.referrer.includes('android-app://'))
             return Boolean(isStandalone)
         }
-
         setIsPWA(detectPWA())
-        const setViewportHeight = () => {
-            if (isMobile || detectPWA()) {
-                const vh = window.innerHeight * 0.01
-                document.documentElement.style.setProperty('--vh', `${vh}px`)
-            }
-        }
-        setViewportHeight()
-        const handleResize = setViewportHeight
-        const handleOrientationChange = () => setTimeout(setViewportHeight, 100)
-        if (isMobile || isPWA) {
-            window.addEventListener('resize', handleResize)
-            window.addEventListener('orientationchange', handleOrientationChange)
-        }
-        return () => {
-            if (isMobile || isPWA) {
-                window.removeEventListener('resize', handleResize)
-                window.removeEventListener('orientationchange', handleOrientationChange)
-            }
-        }
-    }, [isMobile, isPWA])
+    }, [])
 
     // mock init (원본 유지)
     useEffect(() => {
@@ -124,7 +104,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         setIsInitialized(true)
     }, [roomData?.messages, isInitialized])
 
-    // 이전 메시지 로드 (원본 로직 유지, 필요시 인자 조정)
+    // 이전 메시지 로드
     const handleScroll = useCallback(() => {
         if (!messagesContainerRef.current || isLoadingMore || !hasMore) return
         const container = messagesContainerRef.current
@@ -160,18 +140,17 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         setTimeout(() => scrollToBottom('smooth'), 50)
     }, [newMessage, roomId, scrollToBottom])
 
-    // 키보드 변화 감지하여 스크롤 조정
-    useEffect(() => {
-        // 키보드 올라올 때 visualViewport 처리 (모바일)
-        const vv = (window as any).visualViewport
-        const onVvResize = () => setTimeout(() => scrollToBottom('auto'), 50)
-        if (vv) vv.addEventListener('resize', onVvResize)
-        else window.addEventListener('resize', onVvResize)
-        return () => {
-            if (vv) vv.removeEventListener('resize', onVvResize)
-            else window.removeEventListener('resize', onVvResize)
-        }
-    }, [scrollToBottom])
+    // 키보드 변화 감지하여 스크롤 조정 - ChatInput에서 처리하므로 제거
+    // useEffect(() => {
+    //     const vv = (window as any).visualViewport
+    //     const onVvResize = () => setTimeout(() => scrollToBottom('auto'), 50)
+    //     if (vv) vv.addEventListener('resize', onVvResize)
+    //     else window.addEventListener('resize', onVvResize)
+    //     return () => {
+    //         if (vv) vv.removeEventListener('resize', onVvResize)
+    //         else window.removeEventListener('resize', onVvResize)
+    //     }
+    // }, [scrollToBottom])
 
     const formatTime = (timestamp: string) => {
         const date = new Date(timestamp)
@@ -184,19 +163,19 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
 
     return (
         <>
-            {/* 메인 콘텐츠: CommentForm처럼 고정 입력창을 위한 하단 여백 확보 */}
+            {/* 메인 콘텐츠: 스크롤 가능 영역 */}
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    height: { xs: 'calc(var(--vh, 1vh) * 100)', md: 'calc(100vh - 64px - 32px)' },
+                    height: { xs: 'calc(100vh - 56px)', md: 'calc(100vh - 64px)' }, // 헤더 높이만 제외
                     backgroundColor: 'background.default',
-                    pb: { xs: 10, md: 4 }, // 모바일에서 고정 입력창을 위한 하단 공간 확보
+                    overflow: 'hidden', // 전체 컨테이너는 overflow hidden
                 }}
             >
                 <MessageHeader userName={roomData?.userName || ''} userAvatar={roomData?.userAvatar} />
 
-                {/* 메시지 영역 (스크롤) */}
+                {/* 메시지 영역 (스크롤) - 고정 입력창을 위한 하단 공간 확보 */}
                 <Box
                     ref={messagesContainerRef}
                     onScroll={handleScroll}
@@ -208,6 +187,8 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                         display: 'flex',
                         flexDirection: 'column',
                         WebkitOverflowScrolling: 'touch',
+                        // 고정 입력창을 위한 하단 패딩
+                        paddingBottom: { xs: "100px", md: "80px" }, // 입력창 높이만큼 여백
                     }}
                 >
                     {isLoadingMore && (
@@ -251,7 +232,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 </Box>
             </Box>
 
-            {/* ChatInput: 이제 position: fixed로 화면 하단에 고정 */}
+            {/* ChatInput: 화면 하단에 완전 고정, 스크롤과 분리 */}
             <ChatInput
                 value={newMessage}
                 onChange={setNewMessage}

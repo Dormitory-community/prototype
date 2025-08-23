@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useState, useEffect } from "react"
 import {
     Paper,
     TextField,
@@ -10,6 +11,7 @@ import {
     type Theme,
     useTheme,
     useMediaQuery,
+    Box,
 } from "@mui/material"
 import { Send } from "@mui/icons-material"
 
@@ -36,6 +38,53 @@ const ChatInput: React.FC<ChatInputProps> = ({
                                              }) => {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down("md"))
+    const [keyboardHeight, setKeyboardHeight] = useState(0)
+    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
+
+    // 키보드 높이 감지 및 레이아웃 조정
+    useEffect(() => {
+        const handleViewportChange = () => {
+            const visualViewport = (window as any).visualViewport
+            if (!visualViewport) return
+
+            const currentHeight = visualViewport.height
+            const windowHeight = window.innerHeight
+            const heightDiff = windowHeight - currentHeight
+
+            if (heightDiff > 150) { // 키보드가 올라온 상태
+                setKeyboardHeight(heightDiff)
+                setIsKeyboardVisible(true)
+            } else { // 키보드가 내려간 상태
+                setKeyboardHeight(0)
+                setIsKeyboardVisible(false)
+            }
+        }
+
+        // iOS PWA용 viewport 리스너
+        const visualViewport = (window as any).visualViewport
+        if (visualViewport) {
+            visualViewport.addEventListener('resize', handleViewportChange)
+            visualViewport.addEventListener('scroll', handleViewportChange)
+            // 초기 상태 체크
+            handleViewportChange()
+        }
+
+        // 추가적인 키보드 감지 (Android 등)
+        const handleResize = () => {
+            // 짧은 지연 후 실행하여 iOS 애니메이션 완료 대기
+            setTimeout(handleViewportChange, 100)
+        }
+
+        window.addEventListener('resize', handleResize)
+
+        return () => {
+            if (visualViewport) {
+                visualViewport.removeEventListener('resize', handleViewportChange)
+                visualViewport.removeEventListener('scroll', handleViewportChange)
+            }
+            window.removeEventListener('resize', handleResize)
+        }
+    }, [])
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -56,24 +105,35 @@ const ChatInput: React.FC<ChatInputProps> = ({
         <Paper
             elevation={0}
             sx={{
-                position: "fixed", // CommentForm처럼 고정 위치
+                position: "fixed",
                 bottom: 0,
                 left: 0,
                 right: 0,
-                borderRadius: 0, // 하단 고정이므로 radius 제거
+                borderRadius: 0,
                 backgroundColor: "background.paper",
                 borderTop: 1,
                 borderColor: "divider",
                 p: isMobile ? 1.5 : 2,
-                paddingBottom: `calc(${isMobile ? '12px' : '16px'} + env(safe-area-inset-bottom))`, // 고정값으로 변경
-                zIndex: 100, // CommentForm과 동일
+                zIndex: 1100, // 높은 z-index로 스크롤과 분리
+                // 키보드 상태에 따른 동적 위치 조정
+                transform: isKeyboardVisible && keyboardHeight > 0
+                    ? `translateY(-${keyboardHeight}px)`
+                    : 'translateY(0)',
+                transition: 'transform 0.3s ease-out', // 부드러운 애니메이션
+                // safe-area 고려 (키보드가 없을 때만)
+                paddingBottom: !isKeyboardVisible
+                    ? `calc(${isMobile ? '12px' : '16px'} + env(safe-area-inset-bottom))`
+                    : isMobile ? '12px' : '16px',
+                // 스크롤 영역에서 완전히 분리
+                pointerEvents: 'auto',
                 ...sx,
             }}
         >
+            <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
             <TextField
-                fullWidth
+                // fullWidth
                 multiline
-                minRows={1} // CommentForm과 동일
+                minRows={1}
                 maxRows={maxRows}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
@@ -84,21 +144,21 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 disabled={disabled}
                 size="medium"
                 sx={{
-                    maxWidth: 900, // CommentForm과 동일한 최대 너비
-                    mx: "auto", // 중앙 정렬
+                    width: "100%",          // 부모 폭의 100%이지만
+                    maxWidth: 900,
+                    mx: "auto",
                     "& .MuiOutlinedInput-root": {
                         borderRadius: 3,
                         backgroundColor: "background.paper",
-                        // minHeight 제거 - 동적 높이 변경 방지
                         "& input, & textarea": {
                             fontSize: isMobile ? "16px" : "14px", // 16px로 줌 방지
                             lineHeight: 1.4,
-                            padding: "8px 10px", // CommentForm과 동일한 패딩
+                            padding: "8px 10px",
                         },
                         "&.Mui-focused": {
                             "& .MuiOutlinedInput-notchedOutline": {
                                 borderColor: "primary.main",
-                                borderWidth: "1.5px", // CommentForm과 동일
+                                borderWidth: "1.5px",
                             },
                         },
                         ...(!isMobile && {
@@ -120,7 +180,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                                     onClick={handleSend}
                                     size={isMobile ? "small" : "medium"}
                                     sx={{
-                                        width: isMobile ? 32 : 40, // CommentForm과 유사한 크기
+                                        width: isMobile ? 32 : 40,
                                         height: isMobile ? 32 : 40,
                                         backgroundColor:
                                             value.trim() && !disabled ? "primary.main" : "transparent",
@@ -146,6 +206,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     },
                 }}
             />
+            </Box>
         </Paper>
     )
 }
