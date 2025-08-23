@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useRef, useCallback } from "react"
+import React, {useState, useEffect, useRef, useCallback, useLayoutEffect} from "react"
 import { Box, Paper, Typography, Avatar, CircularProgress, useMediaQuery } from "@mui/material"
 // import { theme } from "@/theme/theme.ts"
 import { useTheme } from '@mui/material/styles'    // <-- 추가
@@ -149,15 +149,20 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     // ----------------------------
     // 4️⃣ 초기 스크롤 설정
     // ----------------------------
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!roomData?.messages.length || isInitialized) return
 
-        const timeoutId = setTimeout(() => {
-            scrollToBottom('auto')
+        const container = messagesContainerRef.current
+        if (!container) {
             setIsInitialized(true)
-        }, 100)
+            return
+        }
 
-        return () => clearTimeout(timeoutId)
+        // 초기엔 부드러운 애니메이션이 아니라 즉시 위치로 이동
+        container.scrollTo({ top: container.scrollHeight, behavior: "auto" })
+
+        // 동기적으로 처리되므로 paint 전에 위치가 맞춰지는 효과가 있음
+        setIsInitialized(true)
     }, [roomData?.messages, isInitialized, scrollToBottom])
 
     // ----------------------------
@@ -386,7 +391,9 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                                             py: isMobile ? 1.5 : 2,
                                             backgroundColor: msg.isFromMe
                                                 ? theme.palette.primary.main
-                                                    : theme.palette.grey[600],
+                                                    : theme.palette.mode=== "dark"
+                                                      ? theme.palette.grey[600]
+                                                            : theme.palette.grey[100],
                                             color: msg.isFromMe ? "white" : "text.primary",
                                             borderRadius: 2,
                                             borderBottomLeftRadius: !msg.isFromMe ? 0.5 : 2,
