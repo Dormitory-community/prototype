@@ -26,7 +26,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const isBoardDetail = location.pathname.startsWith(normalize(ROUTES.BOARD_DETAIL))
 
     // 입력창이 있는 페이지들
-    const hasFixedInput = isMessageDetail || isBoardDetail
+    // const hasFixedInput = isMessageDetail || isBoardDetail
+
+    const getDynamicPaddingBottom = (isPWA: boolean) => {
+        if (!isPWA) return { xs: "56px", sm: "80px" }
+        const baseHeight = window.innerWidth < 600 ? "56px" : "80px"
+        return `calc(${baseHeight} + env(safe-area-inset-bottom))`
+    }
+
+
 
     useEffect(() => {
         const detectPWA = () => {
@@ -77,8 +85,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     // 헤더 높이만큼 패딩
                     pt: hideHeader || isMessageDetail ? 0 : { xs: "56px", sm: "64px" },
                     // 하단 네비게이션 높이만큼 패딩 (고정 입력창이 없는 경우만)
-                    pb: { xs: "56px", sm: "80px" },
-                    // 메시지 상세 페이지는 전체 높이 사용
+                    pb: !isPWA ? 10 : getDynamicPaddingBottom(isPWA),                    // 메시지 상세 페이지는 전체 높이 사용
                     ...(isMessageDetail && {
                         height: "100vh",
                         overflow: "hidden",

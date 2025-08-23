@@ -34,6 +34,8 @@ interface MessagesProps {
 
 const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, onLoadMoreMessages }) => {
     const theme = useTheme()
+    const [isPWA, setIsPWA] = useState(false)
+
     const messagesContainerRef = useRef<HTMLDivElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null)
     const isMobile = useMediaQuery(theme.breakpoints.down("md"))
@@ -157,6 +159,10 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         return date.toLocaleDateString("ko-KR", { month: "short", day: "numeric" })
     }
 
+    const CHAT_INPUT_HEIGHT_MOBILE = 64
+    const CHAT_INPUT_HEIGHT_DESKTOP = 90
+    const EXTRA_PADDING = 8 // 메시지와 입력창 사이 여유 공간
+
     return (
         <>
             {/* 메인 콘텐츠 */}
@@ -182,8 +188,6 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                         display: "flex",
                         flexDirection: "column",
                         WebkitOverflowScrolling: "touch",
-                        // 하단 입력창 공간 확보
-                        paddingBottom: "100px",
                     }}
                 >
                     {isLoadingMore && (
@@ -197,7 +201,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                         return (
                             <Box
                                 key={msg.id}
-                                sx={{ display: "flex", justifyContent: msg.isFromMe ? "flex-end" : "flex-start", mb: 1.5 }}
+                                sx={{ display: "flex", justifyContent: msg.isFromMe ? "flex-end" : "flex-start", mb: 1.5}}
                             >
                                 <Box
                                     sx={{
@@ -262,6 +266,17 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     })}
                     <div ref={messagesEndRef} />
                 </Box>
+                <Box
+                    sx={{
+                        height: !isPWA
+                            ? { xs: CHAT_INPUT_HEIGHT_MOBILE, sm: CHAT_INPUT_HEIGHT_DESKTOP }
+                            : {
+                                xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + env(safe-area-inset-bottom))`,
+                                sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + env(safe-area-inset-bottom))`,
+                            },
+                        flexShrink: 0,
+                    }}
+                />
             </Box>
 
             {/* ChatInput: 화면 하단에 완전 고정 */}
