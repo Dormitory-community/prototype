@@ -29,6 +29,7 @@ export interface Post {
   likes: number
   comments: Comment[]
   commentsCount: number
+  bookmarkCount: number
   isAnonymous?: boolean
   tags?: string[]
   views?: number

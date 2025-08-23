@@ -51,8 +51,10 @@ const CommentForm: React.FC<CommentFormProps> = ({
     return (
         <Box
             sx={{
-                position: "sticky",
+                position: "fixed",
                 bottom: 0,
+                left: 0,
+                right: 0,
                 borderTop: `1px solid ${borderTopColor}`,
                 zIndex: 100,
                 bgcolor: containerBg,

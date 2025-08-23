@@ -54,6 +54,7 @@ const BoardDetailPage: React.FC = () => {
             updatedAt: new Date("2024-07-20T10:00:00"),
             category: "고민상담",
             likes: 12,
+            bookmarkCount: 4,
             images: [profileImage, profileImage, profileImage, profileImage, profileImage, profileImage],
             comments: [
                 {
@@ -172,6 +173,7 @@ const BoardDetailPage: React.FC = () => {
                         post={post}
                         totalLikeCount={post.likes}
                         totalCommentCount={post.commentsCount}
+                        totalBookmarkCount={post.bookmarkCount}
                     />
 
                     <CommentList
