@@ -19,12 +19,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         location.pathname.startsWith(normalize(route))
     )
 
-
-    // 메시지 상세 화면인지 확인
     const isMessageDetail = location.pathname.startsWith(
         normalize(ROUTES.MESSAGE_DETAIL)
     )
-
 
     return (
         <Box sx={{
@@ -34,36 +31,29 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             minHeight: isMessageDetail ? { xs: "100vh", md: "calc(100vh - 64px)" } : "auto",
             overflow: isMessageDetail ? { xs: "hidden", md: "visible" } : "visible"
         }}>
-            {/* 헤더 */}
             {!hideHeader && !isMessageDetail && <Header />}
-            {/* 메인 콘텐츠 */}
             <Box
                 component="main"
                 sx={{
-                    // 메시지 상세 화면
                     ...(isMessageDetail ? {
-                        // 모바일/PWA: 전체 높이 사용
                         flex: { xs: 1, md: "none" },
-                        height: { xs: 0, md: "auto" }, // flex item이 올바르게 작동하도록
-                        overflow: { xs: "hidden", md: "visible" },
-                        pt: { xs: "56px", md: "64px" }, // 헤더 높이
-                        // PC: 일반적인 패딩 적용
+                        height: { xs: 0, md: "auto" },
+                        overflow: { xs: "hidden", md: "visible" }, // 채팅 상세 페이지에서만 hidden
+                        overscrollBehavior: { xs: "none", md: "auto" }, // 채팅 상세 페이지에서만 overscroll 방지
+                        pt: { xs: "56px", md: "64px" },
                         px: { xs: 0, md: 3 },
                         py: { xs: 0, md: 2 },
                     } : {
-                        // 일반 페이지
                         flexGrow: 1,
                         pt: { xs: "56px", sm: "64px" },
                         pb: { xs: `calc(env(safe-area-inset-bottom) + 56px)`, sm: 3 },
+                        overflow: "auto", // 다른 페이지에서 스크롤 가능
                     })
                 }}
             >
                 {children}
             </Box>
-
-            {/* 바텀 네비게이션 (메시지 상세 PC에서는 항상 표시) */}
             {(!isMessageDetail || (isMessageDetail && window.innerWidth >= 960)) && <MobileNavBar />}
-
         </Box>
     )
 }

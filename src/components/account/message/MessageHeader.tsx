@@ -11,32 +11,31 @@ interface MessageHeaderProps {
     unreadCount?: number
 }
 
-const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar}) => {
+const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) => {
     const navigate = useNavigate()
 
     return (
         <Paper
             elevation={1}
             sx={{
-                // position: "sticky",
-                // top: 0,
+                position: "fixed",
+                top: 0,
                 left: 0,
                 right: 0,
-                // zIndex: 10,
+                zIndex: 10,
                 px: 2,
                 py: 1.5,
                 borderRadius: 0,
                 borderBottom: 1,
                 borderColor: "divider",
+                overscrollBehavior: "none",
             }}
         >
-
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                     <IconButton sx={{ mr: 1 }} onClick={() => navigate(-1)}>
                         <ArrowBack />
                     </IconButton>
-
                     <Box sx={{ position: "relative", mr: 2 }}>
                         <Badge
                             color="success"
@@ -59,12 +58,10 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar}) =>
                             </Avatar>
                         </Badge>
                     </Box>
-
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
                         {userName}
                     </Typography>
                 </Box>
-
                 <IconButton>
                     <MoreVert />
                 </IconButton>
