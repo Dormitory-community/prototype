@@ -67,8 +67,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             sx={{
                 display: "flex",
                 flexDirection: "column",
-                minHeight: "100vh",
-                // PWA에서 safe-area 적용
+                minHeight: "100dvh", // 동적 뷰포트 높이 사용
                 ...(isPWA && {
                     paddingTop: "env(safe-area-inset-top)",
                     paddingLeft: "env(safe-area-inset-left)",
@@ -82,15 +81,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    // 헤더 높이만큼 패딩
-                    pt: hideHeader || isMessageDetail ? 0 : { xs: "56px", sm: "64px" },
-                    // 하단 네비게이션 높이만큼 패딩 (고정 입력창이 없는 경우만)
-                    pb: !isPWA ? 10 : getDynamicPaddingBottom(isPWA),                    // 메시지 상세 페이지는 전체 높이 사용
+                    pt: hideHeader || isMessageDetail ? 0 : { xs: "48px", sm: "56px", md: "64px" }, // 헤더 높이 반응형
+                    pb: isPWA
+                        ? { xs: "calc(56px + env(safe-area-inset-bottom))", sm: "calc(80px + env(safe-area-inset-bottom))" }
+                        : { xs: "56px", sm: "80px" }, // 반응형 패딩
                     ...(isMessageDetail && {
-                        height: "100vh",
+                        height: "100dvh",
                         overflow: "hidden",
                         pb: 0,
                     }),
+                    width: "100%",
+                    maxWidth: "100vw", // 뷰포트 너비 초과 방지
+                    boxSizing: "border-box",
                 }}
             >
                 {children}

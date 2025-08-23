@@ -127,22 +127,26 @@ const BoardDetailPage: React.FC = () => {
         <>
             {/* 메인 컨텐츠 - 스크롤 가능 영역 */}
             <Container
-                maxWidth="md"
+                maxWidth={false} // maxWidth를 제거하여 뷰포트에 맞게 조정
                 sx={{
-                    py: { xs: 2, md: 4 },
+                    py: { xs: 1, sm: 2, md: 4 },
                     height: "100%",
                     overflow: "auto",
-                    // 하단 입력창 공간 확보
-                    paddingBottom: "100px",
+                    paddingBottom: { xs: "80px", sm: "100px" }, // 하단 입력창 공간 확보
+                    width: { xs: "100%", sm: "90%", md: "960px" }, // 반응형 너비
+                    mx: "auto",
+                    px: { xs: 1, sm: 2 }, // 좌우 패딩 축소
                 }}
             >
                 <Paper
                     sx={{
-                        p: { xs: 3, md: 5 },
+                        p: { xs: 2, sm: 3, md: 4 }, // 패딩 축소
                         borderRadius: 4,
                         border: "1px solid",
                         borderColor: "divider",
                         backgroundColor: "background.paper",
+                        width: "100%",
+                        boxSizing: "border-box",
                     }}
                 >
                     <PostHeader
