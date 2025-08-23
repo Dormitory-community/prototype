@@ -71,7 +71,6 @@ export const MobileNavBar: React.FC = () => {
 
     return (
         <Paper
-            className="mobile-nav-bar"
             sx={{
                 position: "fixed",
                 left: 0,
@@ -84,7 +83,7 @@ export const MobileNavBar: React.FC = () => {
                 ...(isPWA && {
                     paddingLeft: "env(safe-area-inset-left, 0px)",
                     paddingRight: "env(safe-area-inset-right, 0px)",
-                    paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)",
+                    paddingBottom: "env(safe-area-inset-bottom, 0px)", // 8px 여유 제거
                 }),
             }}
             elevation={3}

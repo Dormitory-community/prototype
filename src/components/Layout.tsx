@@ -76,9 +76,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     flexGrow: 1,
                     pt: hideHeader || isMessageDetail ? 0 : { xs: "48px", sm: "56px", md: "64px" },
                     pb: isBoardDetail
-                        ? { xs: "calc(80px + 8px)", sm: "calc(100px + 8px)" }
+                        ? { xs: "80px", sm: "100px" } // 8px 여유 제거, 기본값 복원
                         : isPWA
-                            ? { xs: "calc(48px + 8px)", sm: "calc(56px + 8px)" }
+                            ? { xs: "48px", sm: "56px" } // 8px 여유 제거, 네비 높이와 맞춤
                             : { xs: 48, sm: 56 },
                     ...(isMessageDetail && {
                         height: "100dvh",
