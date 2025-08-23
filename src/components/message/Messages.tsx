@@ -163,9 +163,12 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     const CHAT_INPUT_HEIGHT_DESKTOP = 90
     const EXTRA_PADDING = 8 // 메시지와 입력창 사이 여유 공간
 
+    useEffect(() => {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        setIsPWA(isStandalone);
+    }, []);
+
     return (
-        <>
-            {/* 메인 콘텐츠 */}
             <Box
                 sx={{
                     display: "flex",
@@ -175,25 +178,20 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     overflow: "hidden",
                 }}
             >
+                <MessageHeader userName={roomData?.userName || ""} userAvatar={roomData?.userAvatar} />
                 <Box
                     sx={{
-                        height: !isPWA
-                            ? { xs: CHAT_INPUT_HEIGHT_MOBILE, sm: CHAT_INPUT_HEIGHT_DESKTOP }
-                            : {
-                                xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + env(safe-area-inset-bottom))`,
-                                sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + env(safe-area-inset-bottom))`,
-                            },
-                        minHeight: !isPWA
-                            ? { xs: CHAT_INPUT_HEIGHT_MOBILE, sm: CHAT_INPUT_HEIGHT_DESKTOP }
-                            : {
-                                xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + env(safe-area-inset-bottom))`,
-                                sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + env(safe-area-inset-bottom))`,
-                            },
+                        height: {
+                            xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                            sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                        },
+                        minHeight: {
+                            xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                            sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                        },
                         flexShrink: 0,
                     }}
                 />
-                <MessageHeader userName={roomData?.userName || ""} userAvatar={roomData?.userAvatar} />
-
                 <Box
                     ref={messagesContainerRef}
                     onScroll={handleScroll}
@@ -202,6 +200,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                         overflowY: "auto",
                         px: { xs: 2, md: 3 },
                         py: { xs: 2, md: 3 },
+                        paddingBottom: isPWA ? `calc(${EXTRA_PADDING}px + env(safe-area-inset-bottom, 0px))` : EXTRA_PADDING,
                         display: "flex",
                         flexDirection: "column",
                         WebkitOverflowScrolling: "touch",
@@ -285,26 +284,21 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 </Box>
                 <Box
                     sx={{
-                        height: !isPWA
-                            ? { xs: CHAT_INPUT_HEIGHT_MOBILE, sm: CHAT_INPUT_HEIGHT_DESKTOP }
-                            : {
-                                xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + env(safe-area-inset-bottom))`,
-                                sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + env(safe-area-inset-bottom))`,
-                            },
-                        minHeight: !isPWA
-                            ? { xs: CHAT_INPUT_HEIGHT_MOBILE, sm: CHAT_INPUT_HEIGHT_DESKTOP }
-                            : {
-                                xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + env(safe-area-inset-bottom))`,
-                                sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + env(safe-area-inset-bottom))`,
-                            },
-                        flexShrink: 0,
-                    }}
+                    height: {
+                        xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                        sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                    },
+                    minHeight: {
+                        xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                        sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                    },
+                    flexShrink: 0,
+                }}
                 />
-            </Box>
 
             {/* ChatInput: 화면 하단에 완전 고정 */}
             <ChatInput value={newMessage} onChange={setNewMessage} onSend={handleSendMessage} />
-        </>
+            </Box>
     )
 }
 
