@@ -14,36 +14,56 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-/* iOS PWA 키보드 이슈 해결을 위한 전역 스타일 */
-html, body {
+/* PWA 환경에서 키보드 및 safe-area 처리 개선 */
+html,
+body {
   /* iOS에서 키보드로 인한 viewport 변화 최소화 */
   height: 100%;
-  position: fixed;
   width: 100%;
-  overflow: hidden;
+  /* position: fixed 제거 - 스크롤 문제 해결 */
+  overflow: visible;
+  /* PWA safe-area 지원 */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* 루트 컨테이너가 스크롤 가능하도록 */
 #root {
-  height: 100vh;
-  width: 100vw;
-  overflow: auto;
+  min-height: 100vh;
+  width: 100%;
   position: relative;
+  /* PWA에서 전체 화면 활용 */
+  min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 }
 
-/* iOS PWA에서 키보드 애니메이션 최적화 */
+/* iOS PWA 키보드 최적화 개선 */
 @supports (-webkit-appearance: none) {
+  /* iOS Safari PWA 전용 최적화 */
+  @media all and (display-mode: standalone) {
+    html {
+      /* iOS PWA에서 키보드 올라올 때 viewport 고정 */
+      height: 100vh;
+      height: -webkit-fill-available;
+    }
+
+    body {
+      /* iOS PWA에서 bounce 스크롤 방지 */
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
   .ios-keyboard-fix {
     /* iOS에서 키보드 올라올 때 부드러운 전환 */
     transition: height 0.3s ease-out, transform 0.3s ease-out;
   }
 }
 
-/* visualViewport 지원하는 브라우저에서 키보드 감지 최적화 */
+/* 모바일 PWA 환경 최적화 */
 @media screen and (max-width: 768px) {
   /* 모바일에서 입력창이 있는 페이지의 스크롤 최적화 */
   .fixed-input-page {
     height: 100vh;
+    height: -webkit-fill-available; /* iOS PWA 지원 */
     overflow: hidden;
   }
 
@@ -51,13 +71,74 @@ html, body {
     height: 100%;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    /* 키보드 올라올 때 스크롤 영역 보호 */
+    overscroll-behavior: contain;
+  }
+
+  /* PWA에서 입력창 포커스 시 줌 방지 */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+    transform-origin: left top;
+    transition: none;
   }
 }
 
-/* PWA standalone 모드에서 추가 최적화 */
+/* PWA standalone 모드 전용 최적화 */
 @media all and (display-mode: standalone) {
   body {
     /* PWA에서 bounce 스크롤 방지 */
     overscroll-behavior: none;
+    /* iOS PWA에서 상태바 영역 고려 */
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* PWA에서 고정 입력창 최적화 */
+  .chat-input-container {
+    /* safe-area 고려한 하단 패딩 */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+
+  /* Android PWA에서 키보드 감지 최적화 */
+  @media screen and (max-height: 500px) {
+    .chat-input-container {
+      /* 키보드가 올라온 상태로 추정되는 경우 safe-area 제거 */
+      padding-bottom: 12px;
+    }
+  }
+}
+
+/* visualViewport API 지원 브라우저 최적화 */
+@supports (height: 100dvh) {
+  /* 동적 viewport 높이 지원 브라우저 */
+  #root {
+    min-height: 100dvh;
+  }
+
+  .fixed-input-page {
+    height: 100dvh;
+  }
+}
+
+/* Android Chrome PWA 키보드 최적화 */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  /* Android에서 키보드 올라올 때 레이아웃 보정 */
+  .android-keyboard-active {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .android-keyboard-active .messages-container {
+    /* Android에서 키보드 높이만큼 스크롤 영역 축소 */
+    max-height: calc(100vh - 200px); /* 키보드 추정 높이 */
+  }
+}
+
+/* 고해상도 디스플레이 최적화 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .chat-input-container {
+    /* 고해상도에서 border 선명도 개선 */
+    border-top: 0.5px solid rgba(0, 0, 0, 0.12);
   }
 }

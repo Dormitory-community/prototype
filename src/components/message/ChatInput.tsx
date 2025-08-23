@@ -40,49 +40,82 @@ const ChatInput: React.FC<ChatInputProps> = ({
     const isMobile = useMediaQuery(theme.breakpoints.down("md"))
     const [keyboardHeight, setKeyboardHeight] = useState(0)
     const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
+    const [isPWA, setIsPWA] = useState(false)
 
-    // 키보드 높이 감지 및 레이아웃 조정
     useEffect(() => {
+        const detectPWA = () => {
+            const isStandalone =
+                ("standalone" in window.navigator && (window.navigator as any).standalone === true) ||
+                window.matchMedia("(display-mode: standalone)").matches ||
+                window.matchMedia("(display-mode: fullscreen)").matches ||
+                (typeof document !== "undefined" && document.referrer.includes("android-app://"))
+            return Boolean(isStandalone)
+        }
+        setIsPWA(detectPWA())
+    }, [])
+
+    useEffect(() => {
+        const initialViewportHeight = window.innerHeight
+        let initialVisualViewportHeight = (window as any).visualViewport?.height || window.innerHeight
+
         const handleViewportChange = () => {
             const visualViewport = (window as any).visualViewport
-            if (!visualViewport) return
 
-            const currentHeight = visualViewport.height
-            const windowHeight = window.innerHeight
-            const heightDiff = windowHeight - currentHeight
+            if (visualViewport) {
+                // iOS Safari PWA 처리
+                const currentHeight = visualViewport.height
+                const heightDiff = initialVisualViewportHeight - currentHeight
 
-            if (heightDiff > 150) { // 키보드가 올라온 상태
-                setKeyboardHeight(heightDiff)
-                setIsKeyboardVisible(true)
-            } else { // 키보드가 내려간 상태
-                setKeyboardHeight(0)
-                setIsKeyboardVisible(false)
+                if (heightDiff > 150) {
+                    // 키보드가 올라온 상태
+                    setKeyboardHeight(heightDiff)
+                    setIsKeyboardVisible(true)
+                } else {
+                    // 키보드가 내려간 상태
+                    setKeyboardHeight(0)
+                    setIsKeyboardVisible(false)
+                }
+            } else {
+                // Android Chrome PWA 처리 - window.innerHeight 기반
+                const currentHeight = window.innerHeight
+                const heightDiff = initialViewportHeight - currentHeight
+
+                if (heightDiff > 150) {
+                    // Android에서는 키보드 높이를 더 보수적으로 계산
+                    const adjustedHeight = Math.min(heightDiff, window.screen.height * 0.4)
+                    setKeyboardHeight(adjustedHeight)
+                    setIsKeyboardVisible(true)
+                } else {
+                    setKeyboardHeight(0)
+                    setIsKeyboardVisible(false)
+                }
             }
         }
 
-        // iOS PWA용 viewport 리스너
+        // 초기 높이 저장
         const visualViewport = (window as any).visualViewport
         if (visualViewport) {
-            visualViewport.addEventListener('resize', handleViewportChange)
-            visualViewport.addEventListener('scroll', handleViewportChange)
-            // 초기 상태 체크
-            handleViewportChange()
+            initialVisualViewportHeight = visualViewport.height
+            visualViewport.addEventListener("resize", handleViewportChange)
+            visualViewport.addEventListener("scroll", handleViewportChange)
         }
 
-        // 추가적인 키보드 감지 (Android 등)
+        // Android 및 fallback 처리
         const handleResize = () => {
-            // 짧은 지연 후 실행하여 iOS 애니메이션 완료 대기
             setTimeout(handleViewportChange, 100)
         }
 
-        window.addEventListener('resize', handleResize)
+        window.addEventListener("resize", handleResize)
+
+        // 초기 상태 체크
+        handleViewportChange()
 
         return () => {
             if (visualViewport) {
-                visualViewport.removeEventListener('resize', handleViewportChange)
-                visualViewport.removeEventListener('scroll', handleViewportChange)
+                visualViewport.removeEventListener("resize", handleViewportChange)
+                visualViewport.removeEventListener("scroll", handleViewportChange)
             }
-            window.removeEventListener('resize', handleResize)
+            window.removeEventListener("resize", handleResize)
         }
     }, [])
 
@@ -101,12 +134,29 @@ const ChatInput: React.FC<ChatInputProps> = ({
         }
     }
 
+    const getBottomPosition = () => {
+        if (!isKeyboardVisible) {
+            // 키보드가 없을 때는 safe-area 고려
+            return isPWA ? "env(safe-area-inset-bottom)" : "0px"
+        } else {
+            // 키보드가 있을 때는 키보드 높이만큼 올리되, Android에서는 더 정확하게
+            const visualViewport = (window as any).visualViewport
+            if (visualViewport) {
+                // iOS: visualViewport 기반
+                return `${keyboardHeight}px`
+            } else {
+                // Android: 더 보수적인 계산
+                return `${Math.max(keyboardHeight - 20, 0)}px`
+            }
+        }
+    }
+
     return (
         <Paper
             elevation={0}
             sx={{
                 position: "fixed",
-                bottom: 0,
+                bottom: getBottomPosition(),
                 left: 0,
                 right: 0,
                 borderRadius: 0,
@@ -114,98 +164,89 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 borderTop: 1,
                 borderColor: "divider",
                 p: isMobile ? 1.5 : 2,
-                zIndex: 1100, // 높은 z-index로 스크롤과 분리
-                // 키보드 상태에 따른 동적 위치 조정
-                transform: isKeyboardVisible && keyboardHeight > 0
-                    ? `translateY(-${keyboardHeight}px)`
-                    : 'translateY(0)',
-                transition: 'transform 0.3s ease-out', // 부드러운 애니메이션
-                // safe-area 고려 (키보드가 없을 때만)
-                paddingBottom: !isKeyboardVisible
-                    ? `calc(${isMobile ? '12px' : '16px'} + env(safe-area-inset-bottom))`
-                    : isMobile ? '12px' : '16px',
-                // 스크롤 영역에서 완전히 분리
-                pointerEvents: 'auto',
+                zIndex: 1100,
+                transition: "bottom 0.3s ease-out",
+                paddingBottom:
+                    !isKeyboardVisible && isPWA
+                        ? `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-bottom))`
+                        : isMobile
+                            ? "12px"
+                            : "16px",
+                pointerEvents: "auto",
                 ...sx,
             }}
         >
             <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-            <TextField
-                // fullWidth
-                multiline
-                minRows={1}
-                maxRows={maxRows}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={placeholder}
-                variant="outlined"
-                autoFocus={autoFocus}
-                disabled={disabled}
-                size="medium"
-                sx={{
-                    width: "100%",          // 부모 폭의 100%이지만
-                    maxWidth: 900,
-                    mx: "auto",
-                    "& .MuiOutlinedInput-root": {
-                        borderRadius: 3,
-                        backgroundColor: "background.paper",
-                        "& input, & textarea": {
-                            fontSize: isMobile ? "16px" : "14px", // 16px로 줌 방지
-                            lineHeight: 1.4,
-                            padding: "8px 10px",
-                        },
-                        "&.Mui-focused": {
-                            "& .MuiOutlinedInput-notchedOutline": {
-                                borderColor: "primary.main",
-                                borderWidth: "1.5px",
+                <TextField
+                    multiline
+                    minRows={1}
+                    maxRows={maxRows}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder={placeholder}
+                    variant="outlined"
+                    autoFocus={autoFocus}
+                    disabled={disabled}
+                    size="medium"
+                    sx={{
+                        width: "100%",
+                        maxWidth: 900,
+                        mx: "auto",
+                        "& .MuiOutlinedInput-root": {
+                            borderRadius: 3,
+                            backgroundColor: "background.paper",
+                            "& input, & textarea": {
+                                fontSize: isMobile ? "16px" : "14px", // 16px로 줌 방지
+                                lineHeight: 1.4,
+                                padding: "8px 10px",
                             },
-                        },
-                        ...(!isMobile && {
-                            "&:hover": {
+                            "&.Mui-focused": {
                                 "& .MuiOutlinedInput-notchedOutline": {
-                                    borderColor: "primary.light",
+                                    borderColor: "primary.main",
+                                    borderWidth: "1.5px",
                                 },
                             },
-                        }),
-                    },
-                }}
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton
-                                    color="primary"
-                                    disabled={disabled || !value.trim()}
-                                    onClick={handleSend}
-                                    size={isMobile ? "small" : "medium"}
-                                    sx={{
-                                        width: isMobile ? 32 : 40,
-                                        height: isMobile ? 32 : 40,
-                                        backgroundColor:
-                                            value.trim() && !disabled ? "primary.main" : "transparent",
-                                        color:
-                                            value.trim() && !disabled ? "white" : "text.disabled",
-                                        "&:hover": {
-                                            backgroundColor:
-                                                value.trim() && !disabled
-                                                    ? "primary.dark"
-                                                    : "action.hover",
-                                        },
-                                        "&.Mui-disabled": {
-                                            backgroundColor: "transparent",
-                                            color: "text.disabled",
-                                        },
-                                        transition: "all 0.2s ease-in-out",
-                                    }}
-                                >
-                                    <Send sx={{ fontSize: isMobile ? 16 : 20 }} />
-                                </IconButton>
-                            </InputAdornment>
-                        ),
-                    },
-                }}
-            />
+                            ...(!isMobile && {
+                                "&:hover": {
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: "primary.light",
+                                    },
+                                },
+                            }),
+                        },
+                    }}
+                    slotProps={{
+                        input: {
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        color="primary"
+                                        disabled={disabled || !value.trim()}
+                                        onClick={handleSend}
+                                        size={isMobile ? "small" : "medium"}
+                                        sx={{
+                                            width: isMobile ? 32 : 40,
+                                            height: isMobile ? 32 : 40,
+                                            backgroundColor: value.trim() && !disabled ? "primary.main" : "transparent",
+                                            color: value.trim() && !disabled ? "white" : "text.disabled",
+                                            "&:hover": {
+                                                backgroundColor: value.trim() && !disabled ? "primary.dark" : "action.hover",
+                                            },
+                                            "&.Mui-disabled": {
+                                                backgroundColor: "transparent",
+                                                color: "text.disabled",
+                                            },
+                                            transition: "all 0.2s ease-in-out",
+                                        }}
+                                    >
+                                        <Send sx={{ fontSize: isMobile ? 16 : 20 }} />
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        },
+                    }}
+                />
             </Box>
         </Paper>
     )
