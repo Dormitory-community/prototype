@@ -74,11 +74,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    pt: hideHeader || isMessageDetail ? 0 : { xs: "48px", sm: "56px", md: "64px" }, // 헤더 높이 반응형
+                    pt: hideHeader || isMessageDetail ? 0 : { xs: "48px", sm: "56px", md: "64px" },
                     pb: isBoardDetail
-                        ? { xs: "calc(80px + env(safe-area-inset-bottom, 0px))", sm: "calc(100px + env(safe-area-inset-bottom, 0px))" }
+                        ? { xs: "calc(80px - env(safe-area-inset-bottom, 0px))", sm: "calc(100px - env(safe-area-inset-bottom, 0px))" }
                         : isPWA
-                            ? { xs: "calc(48px + env(safe-area-inset-bottom, 0px))", sm: "calc(56px + env(safe-area-inset-bottom, 0px))" }
+                            ? { xs: "calc(48px - env(safe-area-inset-bottom, 0px))", sm: "calc(56px - env(safe-area-inset-bottom, 0px))" }
                             : { xs: 48, sm: 56 },
                     ...(isMessageDetail && {
                         height: "100dvh",
@@ -86,7 +86,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         pb: 0,
                     }),
                     width: "100%",
-                    maxWidth: "100vw", // 뷰포트 너비 초과 방지
+                    maxWidth: "100vw",
                     boxSizing: "border-box",
                 }}
             >

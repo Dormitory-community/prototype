@@ -83,7 +83,7 @@ export const MobileNavBar: React.FC = () => {
                 ...(isPWA && {
                     paddingLeft: "env(safe-area-inset-left, 0px)",
                     paddingRight: "env(safe-area-inset-right, 0px)",
-                    paddingBottom: "env(safe-area-inset-bottom, 0px)", // iOS 홈 바 고려
+                    paddingBottom: "env(safe-area-inset-bottom, 0px)",
                 }),
             }}
             elevation={3}
@@ -93,7 +93,7 @@ export const MobileNavBar: React.FC = () => {
                 onChange={handleChange}
                 showLabels
                 sx={{
-                    height: { xs: 48, sm: 56 }, // 기존 높이 유지
+                    height: { xs: "calc(48px - env(safe-area-inset-bottom, 0px))", sm: "calc(56px - env(safe-area-inset-bottom, 0px))" },
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-around",
