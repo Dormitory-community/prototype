@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react"
 import { Box, Paper, Typography, Avatar, CircularProgress, useMediaQuery, Theme, SxProps } from "@mui/material"
 import { useTheme } from '@mui/material/styles'
-import ChatInput from "@/components/account/message/ChatInput.tsx"
-import MessageHeader from "@/components/account/message/MessageHeader.tsx"
+import ChatInput from "@/components/message/ChatInput.tsx"
+import MessageHeader from "@/components/message/MessageHeader.tsx"
 import { useChat } from "@/contexts/chatContext.tsx"
 
 interface Message {
@@ -277,6 +277,8 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     }
 
     return (
+        <>
+
         <Box sx={getContainerStyles()}>
             <MessageHeader userName={roomData?.userName || ''} userAvatar={roomData?.userAvatar} />
             <Box
@@ -368,6 +370,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 })}
                 <div ref={messagesEndRef} />
             </Box>
+        </Box>
             <Box ref={chatInputRef} sx={{
                 flexShrink: 0,
                 position: "sticky",
@@ -393,7 +396,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     }}
                 />
             </Box>
-        </Box>
+        </>
     )
 }
 

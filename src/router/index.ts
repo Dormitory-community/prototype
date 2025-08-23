@@ -17,6 +17,7 @@ export const ROUTES = {
         NOTICES: "/notices",
         LOGIN: "/sign-in",
         SIGNUP: "/sign-up",
+        FORGOT_PASSWORD: "/reset-password",
         ERROR: "/404",
         AUTH_CALLBACK: "/auth/callback",
         SEARCH: "/search",

@@ -20,7 +20,7 @@ import {
     Button,
 } from "@mui/material"
 import {  MoreVert } from "@mui/icons-material"
-import ChatRoomsHeader from "@/components/account/message/ChatRoomsHeader.tsx";
+import ChatRoomsHeader from "@/components/message/ChatRoomsHeader.tsx";
 
 interface Message {
     id: string

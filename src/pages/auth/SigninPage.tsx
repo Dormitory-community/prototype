@@ -18,6 +18,7 @@ import {
 import { ArrowBack } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
+import {ROUTES} from "@/router";
 
 const SigninPage: React.FC = () => {
     const theme = useTheme()
@@ -272,7 +273,7 @@ const SigninPage: React.FC = () => {
                         >
                             계정이 없으신가요?{" "}
                             <Button
-                                onClick={() => navigate("/sign-up")}
+                                onClick={() => navigate(ROUTES.SIGNUP)}
                                 variant="text"
                                 sx={{
                                     textTransform: "none",
@@ -323,6 +324,30 @@ const SigninPage: React.FC = () => {
                     >
                         카카오로 로그인
                     </Button>
+                    <Divider sx={{ my: 2.5 }}/>
+
+                    <Box sx={{ textAlign: "center", mb: 2.5 }}>
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}
+                        >
+                            비밀번호를 잊어버리셨나요?{" "}
+                            <Button
+                                onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}
+                                variant="text"
+                                sx={{
+                                    textTransform: "none",
+                                    fontWeight: 600,
+                                    fontSize: isMobile ? '0.8rem' : '0.875rem',
+                                    minWidth: 'auto',
+                                    p: 0.5,
+                                }}
+                            >
+                                비밀번호 재설정
+                            </Button>
+                        </Typography>
+                    </Box>
                 </Paper>
             </Box>
 

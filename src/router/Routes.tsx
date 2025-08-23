@@ -18,9 +18,9 @@ import Posts from "@/components/account/Posts.tsx";
 import Comments from "@/components/account/Comments.tsx";
 import Bookmarks from "@/components/account/Bookmarks"
 import Privacy from "@/components/account/Privacy.tsx";
-import ChatRooms from "@/components/account/message/ChatRooms.tsx";
+import ChatRooms from "@/pages/message/ChatRooms.tsx";
 import {ROUTES} from "@/router/index.ts";
-import Messages from "@/components/account/message/Messages.tsx";
+import Messages from "@/components/message/Messages.tsx";
 
 export const routes: RouteObject[] = [
     { path: ROUTES.LANDING, element: <Layout><LandingPage /></Layout> },
