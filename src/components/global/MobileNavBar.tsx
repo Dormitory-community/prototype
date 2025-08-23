@@ -3,10 +3,9 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
-import { Groups, Dashboard, Person, Home } from "@mui/icons-material"
+import {Groups, Dashboard, Person, Home, ChatBubble} from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
-import { MessageCircle } from "lucide-react"
 
 export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()
@@ -42,16 +41,12 @@ export const MobileNavBar: React.FC = () => {
         setValue(getActiveTab(location.pathname))
     }, [location.pathname])
 
-    // 헬퍼: 동적 파라미터 제거
     const normalize = (route: string) => route.replace(/:.*$/, "")
 
-    // 일반적인 숨김 체크 (Message detail은 위에서 별도 처리)
     const shouldHideNavBar = hiddenRoutes.some((route) => location.pathname.startsWith(normalize(route)))
 
-    // 숨김 라우트이면 아무것도 렌더하지 않음
     if (shouldHideNavBar) return null
 
-    // 기본: 바텀 네비게이션 렌더
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue)
         switch (newValue) {
@@ -81,9 +76,13 @@ export const MobileNavBar: React.FC = () => {
                 right: 0,
                 bottom: 0,
                 zIndex: 1100,
+                width: "100%",
+                maxWidth: "100vw", // 뷰포트 너비 초과 방지
+                boxSizing: "border-box",
                 ...(isPWA && {
                     paddingLeft: "env(safe-area-inset-left)",
                     paddingRight: "env(safe-area-inset-right)",
+                    paddingBottom: "env(safe-area-inset-bottom)",
                 }),
             }}
             elevation={3}
@@ -94,26 +93,41 @@ export const MobileNavBar: React.FC = () => {
                 showLabels
                 sx={{
                     height: isPWA
-                        ? `calc(56px + env(safe-area-inset-bottom))`
-                        : `calc(56px + var(--safe-bottom, env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px))))`,
-                    paddingBottom: isPWA
-                        ? `env(safe-area-inset-bottom)`
-                        : `var(--safe-bottom, env(safe-area-inset-bottom, constant(safe-area-inset-bottom, 0px)))`,
+                        ? { xs: "calc(48px + env(safe-area-inset-bottom))", sm: "calc(56px + env(safe-area-inset-bottom))" }
+                        : { xs: 48, sm: 56 }, // 반응형 높이
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    ...(isPWA && {
-                        backgroundColor: "background.paper",
-                        borderTop: "1px solid",
-                        borderColor: "divider",
-                    }),
+                    justifyContent: "space-around", // 아이템 간격 균등 분배
+                    backgroundColor: "background.paper",
+                    borderTop: "1px solid",
+                    borderColor: "divider",
+                    "& .MuiBottomNavigationAction-root": {
+                        minWidth: { xs: 60, sm: 80 }, // 좁은 화면에서 너비 축소
+                        padding: { xs: "4px 2px", sm: "6px 4px" }, // 패딩 반응형
+                        "& .MuiBottomNavigationAction-label": {
+                            fontSize: { xs: "0.7rem", sm: "0.8rem" }, // 라벨 폰트 크기 반응형
+                            marginTop: { xs: "2px", sm: "4px" },
+                        },
+                        "& .MuiSvgIcon-root": {
+                            fontSize: { xs: 20, sm: 24 }, // 아이콘 크기 반응형
+                        },
+                    },
+                    "& .Mui-selected": {
+                        "& .MuiBottomNavigationAction-label": {
+                            fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                            fontWeight: 600,
+                        },
+                    },
                 }}
             >
-                <BottomNavigationAction label="홈" icon={<Home />} />
-                <BottomNavigationAction label="그룹 모집" icon={<Groups />} />
-                <BottomNavigationAction label="게시판" icon={<Dashboard />} />
-                <BottomNavigationAction label="채팅" icon={<MessageCircle fill="currentColor" strokeWidth={0} />} />
-                <BottomNavigationAction label="마이페이지" icon={<Person />} />
+                <BottomNavigationAction label="홈" icon={<Home sx={{ fontSize: { xs: 20, sm: 24 } }} />} />
+                <BottomNavigationAction label="그룹 모집" icon={<Groups sx={{ fontSize: { xs: 20, sm: 24 } }} />} />
+                <BottomNavigationAction label="게시판" icon={<Dashboard sx={{ fontSize: { xs: 20, sm: 24 } }} />} />
+                <BottomNavigationAction
+                    label="채팅"
+                    icon={<ChatBubble sx={{ xs: 20, sm: 24 }} />}
+                />
+                <BottomNavigationAction label="마이페이지" icon={<Person sx={{ fontSize: { xs: 20, sm: 24 } }} />} />
             </BottomNavigation>
         </Paper>
     )
