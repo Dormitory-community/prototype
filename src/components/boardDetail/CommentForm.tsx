@@ -60,35 +60,46 @@ const CommentForm: React.FC<CommentFormProps> = ({
 
     useEffect(() => {
         const initialViewportHeight = window.innerHeight
+        const isAndroid = /Android/i.test(navigator.userAgent)
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+
         let timeoutId: NodeJS.Timeout
 
         const handleViewportChange = () => {
             const visualViewport = (window as any).visualViewport
-            const currentHeight = visualViewport ? visualViewport.height : window.innerHeight
-            const windowHeight = window.innerHeight
-            const heightDiff = initialViewportHeight - currentHeight
 
-            const isAndroid = /Android/i.test(navigator.userAgent)
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+            if (visualViewport) {
+                // iOS Safari PWA - visualViewport 사용
+                const currentHeight = visualViewport.height
+                const heightDiff = initialViewportHeight - currentHeight
 
-            // 키보드 감지 임계값을 디바이스별로 조정
-            const threshold = isAndroid ? 100 : 150
+                if (heightDiff > 150) {
+                    // 키보드가 올라온 상태 - 정확한 키보드 높이 사용
+                    setKeyboardHeight(heightDiff)
+                    setIsKeyboardVisible(true)
 
-            if (heightDiff > threshold) {
-                // 키보드가 올라온 상태
-                const adjustedHeight = isAndroid ? Math.min(heightDiff, heightDiff * 0.8) : heightDiff
-                setKeyboardHeight(adjustedHeight)
-                setIsKeyboardVisible(true)
-
-                setTimeout(() => {
-                    if (inputRef.current) {
-                        inputRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" })
-                    }
-                }, 100)
+                    setTimeout(() => {
+                        if (inputRef.current) {
+                            inputRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" })
+                        }
+                    }, 100)
+                } else {
+                    setKeyboardHeight(0)
+                    setIsKeyboardVisible(false)
+                }
             } else {
-                // 키보드가 내려간 상태
-                setKeyboardHeight(0)
-                setIsKeyboardVisible(false)
+                // Android Chrome PWA - window.innerHeight 사용
+                const currentHeight = window.innerHeight
+                const heightDiff = initialViewportHeight - currentHeight
+
+                if (heightDiff > 100) {
+                    // Android에서도 키보드 높이를 그대로 사용 (보정 제거)
+                    setKeyboardHeight(heightDiff)
+                    setIsKeyboardVisible(true)
+                } else {
+                    setKeyboardHeight(0)
+                    setIsKeyboardVisible(false)
+                }
             }
         }
 
@@ -154,7 +165,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
             ref={containerRef}
             sx={{
                 position: "fixed",
-                bottom: 0,
+                bottom: isKeyboardVisible && keyboardHeight > 0 ? `${keyboardHeight}px` : 0,
                 left: 0,
                 right: 0,
                 borderTop: `1px solid ${borderTopColor}`,
@@ -162,10 +173,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                 bgcolor: containerBg,
                 px: 0,
                 py: 1,
-                transform: isKeyboardVisible && keyboardHeight > 0 ? `translateY(-${keyboardHeight}px)` : "translateY(0)",
-                transition: isPWA
-                    ? "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)" // PWA에서 더 부드러운 애니메이션
-                    : "transform 0.3s ease-out",
+                transition: "bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
                 paddingBottom: !isKeyboardVisible
                     ? isPWA
                         ? `calc(8px + env(safe-area-inset-bottom))`

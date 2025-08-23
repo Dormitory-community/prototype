@@ -56,34 +56,31 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
     useEffect(() => {
         const initialViewportHeight = window.innerHeight
-        let initialVisualViewportHeight = (window as any).visualViewport?.height || window.innerHeight
+        const isAndroid = /Android/i.test(navigator.userAgent)
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+
+        let timeoutId: NodeJS.Timeout
 
         const handleViewportChange = () => {
             const visualViewport = (window as any).visualViewport
 
             if (visualViewport) {
-                // iOS Safari PWA 처리
                 const currentHeight = visualViewport.height
-                const heightDiff = initialVisualViewportHeight - currentHeight
+                const heightDiff = initialViewportHeight - currentHeight
 
                 if (heightDiff > 150) {
-                    // 키보드가 올라온 상태
                     setKeyboardHeight(heightDiff)
                     setIsKeyboardVisible(true)
                 } else {
-                    // 키보드가 내려간 상태
                     setKeyboardHeight(0)
                     setIsKeyboardVisible(false)
                 }
             } else {
-                // Android Chrome PWA 처리 - window.innerHeight 기반
                 const currentHeight = window.innerHeight
                 const heightDiff = initialViewportHeight - currentHeight
 
-                if (heightDiff > 150) {
-                    // Android에서는 키보드 높이를 더 보수적으로 계산
-                    const adjustedHeight = Math.min(heightDiff, window.screen.height * 0.4)
-                    setKeyboardHeight(adjustedHeight)
+                if (heightDiff > 100) {
+                    setKeyboardHeight(heightDiff)
                     setIsKeyboardVisible(true)
                 } else {
                     setKeyboardHeight(0)
@@ -92,30 +89,28 @@ const ChatInput: React.FC<ChatInputProps> = ({
             }
         }
 
-        // 초기 높이 저장
+        const debouncedViewportChange = () => {
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(handleViewportChange, 50)
+        }
+
         const visualViewport = (window as any).visualViewport
         if (visualViewport) {
-            initialVisualViewportHeight = visualViewport.height
-            visualViewport.addEventListener("resize", handleViewportChange)
-            visualViewport.addEventListener("scroll", handleViewportChange)
+            visualViewport.addEventListener("resize", debouncedViewportChange)
+            visualViewport.addEventListener("scroll", debouncedViewportChange)
         }
 
-        // Android 및 fallback 처리
-        const handleResize = () => {
-            setTimeout(handleViewportChange, 100)
-        }
+        window.addEventListener("resize", debouncedViewportChange)
 
-        window.addEventListener("resize", handleResize)
-
-        // 초기 상태 체크
         handleViewportChange()
 
         return () => {
+            clearTimeout(timeoutId)
             if (visualViewport) {
-                visualViewport.removeEventListener("resize", handleViewportChange)
-                visualViewport.removeEventListener("scroll", handleViewportChange)
+                visualViewport.removeEventListener("resize", debouncedViewportChange)
+                visualViewport.removeEventListener("scroll", debouncedViewportChange)
             }
-            window.removeEventListener("resize", handleResize)
+            window.removeEventListener("resize", debouncedViewportChange)
         }
     }, [])
 
@@ -136,18 +131,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
     const getBottomPosition = () => {
         if (!isKeyboardVisible) {
-            // 키보드가 없을 때는 safe-area 고려
             return isPWA ? "env(safe-area-inset-bottom)" : "0px"
         } else {
-            // 키보드가 있을 때는 키보드 높이만큼 올리되, Android에서는 더 정확하게
-            const visualViewport = (window as any).visualViewport
-            if (visualViewport) {
-                // iOS: visualViewport 기반
-                return `${keyboardHeight}px`
-            } else {
-                // Android: 더 보수적인 계산
-                return `${Math.max(keyboardHeight - 20, 0)}px`
-            }
+            return `${keyboardHeight}px`
         }
     }
 
@@ -165,13 +151,15 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 borderColor: "divider",
                 p: isMobile ? 1.5 : 2,
                 zIndex: 1100,
-                transition: "bottom 0.3s ease-out",
+                transition: "bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
                 paddingBottom:
                     !isKeyboardVisible && isPWA
                         ? `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-bottom))`
                         : isMobile
                             ? "12px"
                             : "16px",
+                paddingLeft: isPWA ? `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-left))` : undefined,
+                paddingRight: isPWA ? `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-right))` : undefined,
                 pointerEvents: "auto",
                 ...sx,
             }}
@@ -197,7 +185,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                             borderRadius: 3,
                             backgroundColor: "background.paper",
                             "& input, & textarea": {
-                                fontSize: isMobile ? "16px" : "14px", // 16px로 줌 방지
+                                fontSize: isMobile ? "16px" : "14px",
                                 lineHeight: 1.4,
                                 padding: "8px 10px",
                             },
