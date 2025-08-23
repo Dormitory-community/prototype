@@ -373,7 +373,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         </Box>
             <Box ref={chatInputRef} sx={{
                 flexShrink: 0,
-                position: "sticky",
+                position: "fixed",
                 bottom: 0,
                 zIndex: 10,
                 backgroundColor: "background.paper"
