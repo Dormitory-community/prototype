@@ -440,7 +440,6 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     onChange={setNewMessage}
                     onSend={handleSendMessage}
                     sx={{
-                        position: (isMobile || isPWA) ? 'fixed' : 'sticky',
                         borderTop: "1px solid",
                         borderColor: "divider",
                         paddingBottom: (isMobile || isPWA)
