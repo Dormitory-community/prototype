@@ -175,6 +175,23 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     overflow: "hidden",
                 }}
             >
+                <Box
+                    sx={{
+                        height: !isPWA
+                            ? { xs: CHAT_INPUT_HEIGHT_MOBILE, sm: CHAT_INPUT_HEIGHT_DESKTOP }
+                            : {
+                                xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + env(safe-area-inset-bottom))`,
+                                sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + env(safe-area-inset-bottom))`,
+                            },
+                        minHeight: !isPWA
+                            ? { xs: CHAT_INPUT_HEIGHT_MOBILE, sm: CHAT_INPUT_HEIGHT_DESKTOP }
+                            : {
+                                xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + env(safe-area-inset-bottom))`,
+                                sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + env(safe-area-inset-bottom))`,
+                            },
+                        flexShrink: 0,
+                    }}
+                />
                 <MessageHeader userName={roomData?.userName || ""} userAvatar={roomData?.userAvatar} />
 
                 <Box
@@ -269,6 +286,12 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 <Box
                     sx={{
                         height: !isPWA
+                            ? { xs: CHAT_INPUT_HEIGHT_MOBILE, sm: CHAT_INPUT_HEIGHT_DESKTOP }
+                            : {
+                                xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + env(safe-area-inset-bottom))`,
+                                sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + env(safe-area-inset-bottom))`,
+                            },
+                        minHeight: !isPWA
                             ? { xs: CHAT_INPUT_HEIGHT_MOBILE, sm: CHAT_INPUT_HEIGHT_DESKTOP }
                             : {
                                 xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + env(safe-area-inset-bottom))`,
