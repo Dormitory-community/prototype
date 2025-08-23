@@ -76,9 +76,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     flexGrow: 1,
                     pt: hideHeader || isMessageDetail ? 0 : { xs: "48px", sm: "56px", md: "64px" },
                     pb: isBoardDetail
-                        ? { xs: "calc(80px - env(safe-area-inset-bottom, 0px))", sm: "calc(100px - env(safe-area-inset-bottom, 0px))" }
+                        ? { xs: "calc(80px + 8px)", sm: "calc(100px + 8px)" }
                         : isPWA
-                            ? { xs: "calc(48px - env(safe-area-inset-bottom, 0px))", sm: "calc(56px - env(safe-area-inset-bottom, 0px))" }
+                            ? { xs: "calc(48px + 8px)", sm: "calc(56px + 8px)" }
                             : { xs: 48, sm: 56 },
                     ...(isMessageDetail && {
                         height: "100dvh",

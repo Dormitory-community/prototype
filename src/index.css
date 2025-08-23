@@ -1,13 +1,3 @@
-/* No Tailwind CSS directives here */
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-  "Droid Sans", "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f8fafc;
-  -webkit-overflow-scrolling: touch;
-}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -67,10 +57,33 @@ html, body {
   }
 }
 
-/* 다크 모드 대응 */
-@media (prefers-color-scheme: dark) {
-  .fixed-input-container {
-    background-color: #1e293b;
-    border-top: 1px solid #334155;
+
+
+/* 기존 스타일 */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+  "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 다크 모드 및 PWA 환경에서 하단 safe-area 색상 통일 */
+@media (prefers-color-scheme: dark), (display-mode: standalone) {
+  body {
+    background-color: #1e293b; /* 네비 색상과 통일 */
+  }
+
+  .mobile-nav-bar::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-bottom, 0px);
+    background-color: #1e293b; /* 네비 색상 */
+    z-index: -1;
   }
 }

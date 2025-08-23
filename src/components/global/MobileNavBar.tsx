@@ -71,6 +71,7 @@ export const MobileNavBar: React.FC = () => {
 
     return (
         <Paper
+            className="mobile-nav-bar"
             sx={{
                 position: "fixed",
                 left: 0,
@@ -83,7 +84,7 @@ export const MobileNavBar: React.FC = () => {
                 ...(isPWA && {
                     paddingLeft: "env(safe-area-inset-left, 0px)",
                     paddingRight: "env(safe-area-inset-right, 0px)",
-                    paddingBottom: "env(safe-area-inset-bottom, 0px)",
+                    paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)",
                 }),
             }}
             elevation={3}
@@ -93,7 +94,7 @@ export const MobileNavBar: React.FC = () => {
                 onChange={handleChange}
                 showLabels
                 sx={{
-                    height: { xs: "calc(48px - env(safe-area-inset-bottom, 0px))", sm: "calc(56px - env(safe-area-inset-bottom, 0px))" },
+                    height: { xs: 48, sm: 56 },
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-around",
