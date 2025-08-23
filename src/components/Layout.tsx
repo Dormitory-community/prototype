@@ -15,7 +15,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const location = useLocation()
     const normalize = (route: string) => route.replace(/:.*$/, "")
 
-    const hideHeader = [ROUTES.LOGIN].some(route =>
+    const hideHeader = [ROUTES.LOGIN, ROUTES.MY_PAGE_MESSAGES].some(route =>
         location.pathname.startsWith(normalize(route))
     )
 
@@ -40,12 +40,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         height: { xs: 0, md: "auto" },
                         overflow: { xs: "hidden", md: "visible" }, // 채팅 상세 페이지에서만 hidden
                         overscrollBehavior: { xs: "none", md: "auto" }, // 채팅 상세 페이지에서만 overscroll 방지
-                        pt: { xs: "56px", md: "64px" },
+                        pt: { xs: "56px", md: "64px" }, // Keep for message detail
                         px: { xs: 0, md: 3 },
                         py: { xs: 0, md: 2 },
                     } : {
                         flexGrow: 1,
-                        pt: { xs: "56px", sm: "64px" },
+                        pt: hideHeader ? 0 : { xs: "56px", sm: "64px" }, // Conditional: Remove pt when header is hidden
                         pb: { xs: `calc(env(safe-area-inset-bottom) + 56px)`, sm: 3 },
                         overflow: "auto", // 다른 페이지에서 스크롤 가능
                     })

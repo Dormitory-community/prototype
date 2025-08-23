@@ -20,6 +20,7 @@ import {
     Button,
 } from "@mui/material"
 import {  MoreVert } from "@mui/icons-material"
+import ChatRoomsHeader from "@/components/account/message/ChatRoomsHeader.tsx";
 
 interface Message {
     id: string
@@ -157,6 +158,68 @@ const ChatRooms: React.FC = () => {
                 }
             ]
         },
+        {
+            id: "room-4",
+            userId: "user-1",
+            userName: "이민수",
+            userAvatar: "",
+            lastMessage: "과제 관련해서 질문이 있어서 연락드립니다.",
+            lastMessageTime: "2024-01-15 14:30",
+            unreadCount: 2,
+            messages: [],
+        },
+        {
+            id: "room-5",
+            userId: "user-1",
+            userName: "이민수",
+            userAvatar: "",
+            lastMessage: "과제 관련해서 질문이 있어서 연락드립니다.",
+            lastMessageTime: "2024-01-15 14:30",
+            unreadCount: 2,
+            messages: [],
+        },
+        {
+            id: "room-6",
+            userId: "user-1",
+            userName: "이민수",
+            userAvatar: "",
+            lastMessage: "과제 관련해서 질문이 있어서 연락드립니다.",
+            lastMessageTime: "2024-01-15 14:30",
+            unreadCount: 0,
+            messages: [],
+        },
+        {
+            id: "room-7",
+            userId: "user-1",
+            userName: "이민수",
+            userAvatar: "",
+            lastMessage: "과제 관련해서 질문이 있어서 연락드립니다.",
+            lastMessageTime: "2024-01-15 14:30",
+            unreadCount: 0,
+            messages: [],
+        },
+
+        {
+            id: "room-8",
+            userId: "user-1",
+            userName: "이민수",
+            userAvatar: "",
+            lastMessage: "과제 관련해서 질문이 있어서 연락드립니다.",
+            lastMessageTime: "2024-01-15 14:30",
+            unreadCount: 0,
+            messages: [],
+        },
+
+        {
+            id: "room-9",
+            userId: "user-1",
+            userName: "이민수",
+            userAvatar: "",
+            lastMessage: "과제 관련해서 질문이 있어서 연락드립니다.",
+            lastMessageTime: "2024-01-15 14:30",
+            unreadCount: 0,
+            messages: [],
+        },
     ])
 
     const handleChatRoomClick = (room: ChatRoom) => {
@@ -169,7 +232,10 @@ const ChatRooms: React.FC = () => {
     }
 
     return (
-        <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
+        <>
+            <ChatRoomsHeader/>
+            <Box sx={{ height: { xs: "56px", md: "64px" } }} /> {/* Spacer for header */}
+            <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
             {/* 탭 */}
             {/*<Card sx={{ borderRadius: 2, mb: 2 }}>*/}
             {/*    <Tabs*/}
@@ -322,7 +388,9 @@ const ChatRooms: React.FC = () => {
                 <MenuItem onClick={handleMenuClose}>알림 끄기</MenuItem>
             </Menu>
         </Container>
+        </>
     )
+
 }
 
 export default ChatRooms
