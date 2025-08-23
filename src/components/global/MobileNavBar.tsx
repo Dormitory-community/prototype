@@ -11,7 +11,6 @@ export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const [isPWA, setIsPWA] = useState(false)
-    const [isIOS, setIsIOS] = useState(false)
 
     useEffect(() => {
         const detectPWA = () => {
@@ -23,12 +22,7 @@ export const MobileNavBar: React.FC = () => {
             return Boolean(isStandalone)
         }
 
-        const detectIOS = () => {
-            return /iPhone|iPad|iPod/i.test(navigator.userAgent)
-        }
-
         setIsPWA(detectPWA())
-        setIsIOS(detectIOS())
     }, [])
 
     const hiddenRoutes = [ROUTES.LOGIN, ROUTES.SIGNUP, ROUTES.BOARD_DETAIL, ROUTES.MESSAGE_DETAIL]
@@ -89,8 +83,6 @@ export const MobileNavBar: React.FC = () => {
                 ...(isPWA && {
                     paddingLeft: "env(safe-area-inset-left)",
                     paddingRight: "env(safe-area-inset-right)",
-                    // iOS에서 safe-area-inset-bottom을 패딩으로만 처리
-                    paddingBottom: isIOS ? "env(safe-area-inset-bottom, 0px)" : "env(safe-area-inset-bottom, 0px)",
                 }),
             }}
             elevation={3}
@@ -104,7 +96,7 @@ export const MobileNavBar: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-around", // 아이템 간격 균등 분배
-                    backgroundColor: "background.paper",
+                    backgroundColor: "background.default",
                     borderTop: "1px solid",
                     borderColor: "divider",
                     "& .MuiBottomNavigationAction-root": {
