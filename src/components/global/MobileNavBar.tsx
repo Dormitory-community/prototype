@@ -83,6 +83,7 @@ export const MobileNavBar: React.FC = () => {
                 ...(isPWA && {
                     paddingLeft: "env(safe-area-inset-left)",
                     paddingRight: "env(safe-area-inset-right)",
+                    paddingBottom: "env(safe-area-inset-bottom, 0px)",
                 }),
             }}
             elevation={3}
