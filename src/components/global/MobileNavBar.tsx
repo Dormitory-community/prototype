@@ -78,12 +78,12 @@ export const MobileNavBar: React.FC = () => {
                 bottom: 0,
                 zIndex: 1100,
                 width: "100%",
-                maxWidth: "100vw", // 뷰포트 너비 초과 방지
+                maxWidth: "100vw",
                 boxSizing: "border-box",
                 ...(isPWA && {
-                    paddingLeft: "env(safe-area-inset-left)",
-                    paddingRight: "env(safe-area-inset-right)",
-                    paddingBottom: "env(safe-area-inset-bottom, 0px)",
+                    paddingLeft: "env(safe-area-inset-left, 0px)",
+                    paddingRight: "env(safe-area-inset-right, 0px)",
+                    paddingBottom: "env(safe-area-inset-bottom, 0px)", // iOS 홈 바 고려
                 }),
             }}
             elevation={3}
@@ -93,22 +93,22 @@ export const MobileNavBar: React.FC = () => {
                 onChange={handleChange}
                 showLabels
                 sx={{
-                    height: { xs: 48, sm: 56 }, // 높이를 플랫폼 독립적으로 설정
+                    height: { xs: 48, sm: 56 }, // 기존 높이 유지
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-around", // 아이템 간격 균등 분배
+                    justifyContent: "space-around",
                     backgroundColor: "background.default",
                     borderTop: "1px solid",
                     borderColor: "divider",
                     "& .MuiBottomNavigationAction-root": {
-                        minWidth: { xs: 50, sm: 70, md: 80 }, // 더 좁은 화면에서 너비 축소
-                        padding: { xs: "4px 2px", sm: "6px 4px" }, // 패딩 반응형
+                        minWidth: { xs: 50, sm: 70, md: 80 },
+                        padding: { xs: "4px 2px", sm: "6px 4px" },
                         "& .MuiBottomNavigationAction-label": {
-                            fontSize: { xs: "0.65rem", sm: "0.75rem", md: "0.8rem" }, // 라벨 폰트 크기 조정
+                            fontSize: { xs: "0.65rem", sm: "0.75rem", md: "0.8rem" },
                             marginTop: { xs: "2px", sm: "4px" },
                         },
                         "& .MuiSvgIcon-root": {
-                            fontSize: { xs: 18, sm: 22, md: 24 }, // 아이콘 크기 반응형
+                            fontSize: { xs: 18, sm: 22, md: 24 },
                         },
                     },
                     "& .Mui-selected": {
