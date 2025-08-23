@@ -1,9 +1,10 @@
 "use client"
 
 import React, { useState, useEffect, useRef, useCallback } from "react"
-import { Box, Paper, Typography, Avatar, CircularProgress } from "@mui/material"
+import { Box, Paper, Typography, Avatar, CircularProgress, useTheme, useMediaQuery } from "@mui/material"
 import { theme } from "@/theme/theme.ts"
 import ChatInput from "@/components/account/message/ChatInput.tsx"
+import MessageHeader from "@/components/account/message/MessageHeader.tsx";
 
 interface Message {
     id: string
@@ -33,62 +34,74 @@ interface MessagesProps {
 const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, onLoadMoreMessages }) => {
     const messagesContainerRef = useRef<HTMLDivElement>(null)
     const chatInputRef = useRef<HTMLDivElement>(null)
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+    const isScrollingToBottomRef = useRef(false)
+
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+    const isSmallScreen = useMediaQuery('(max-height: 600px)')
 
     const [roomData, setRoomData] = useState<ChatRoom | null>(initialRoomData || null)
     const [isLoadingMore, setIsLoadingMore] = useState(false)
     const [hasMoreMessages, setHasMoreMessages] = useState(true)
     const [newMessage, setNewMessage] = useState("")
-    const [chatInputHeight, setChatInputHeight] = useState(72)
-    const [safeAreaBottom, setSafeAreaBottom] = useState(0)
     const [isAtBottom, setIsAtBottom] = useState(true)
-    const [isVisible, setIsVisible] = useState(false)
+    const [isInitialized, setIsInitialized] = useState(false)
+    const [isPWA, setIsPWA] = useState(false)
 
     // ----------------------------
-    // 1️⃣ 실제 viewport 높이 계산
+    // 1️⃣ PWA 감지 및 뷰포트 설정
     // ----------------------------
     useEffect(() => {
-        const setVh = () => {
-            document.documentElement.style.setProperty("--vh", `${window.innerHeight}px`)
-        }
-        setVh()
-        window.addEventListener("resize", setVh)
-        return () => window.removeEventListener("resize", setVh)
-    }, [])
+        const detectPWA = () => {
+            const isStandalone =
+                // iOS 홈화면 실행 체크 (타입 안전성 위해 any로 캐스팅)
+                (('standalone' in window.navigator && (window.navigator as any).standalone === true)) ||
+                // display-mode 체크 (표준)
+                window.matchMedia('(display-mode: standalone)').matches ||
+                // android intent referrer 체크 (optional)
+                (typeof document !== 'undefined' && document.referrer.includes('android-app://'))
 
-    // ----------------------------
-    // 2️⃣ ChatInput 높이와 safe-area 계산
-    // ----------------------------
-    useEffect(() => {
-        const updateOffsets = () => {
-            if (!chatInputRef.current) return
-            const el = chatInputRef.current
-            const style = getComputedStyle(el)
-            const paddingBottom = parseInt(style.paddingBottom) || 0
-            setChatInputHeight(el.offsetHeight)
-            setSafeAreaBottom(paddingBottom)
+            return Boolean(isStandalone)
         }
 
-        updateOffsets()
-        window.addEventListener("resize", updateOffsets)
-        const ro = new ResizeObserver(updateOffsets)
-        if (chatInputRef.current) ro.observe(chatInputRef.current)
+        setIsPWA(detectPWA())
+
+        const setViewportHeight = () => {
+            if (isMobile || detectPWA()) {
+                const vh = window.innerHeight * 0.01
+                document.documentElement.style.setProperty('--vh', `${vh}px`)
+            }
+        }
+
+        setViewportHeight()
+
+        const handleResize = setViewportHeight
+        const handleOrientationChange = () => setTimeout(setViewportHeight, 100)
+
+        if (isMobile || isPWA) {
+            window.addEventListener('resize', handleResize)
+            window.addEventListener('orientationchange', handleOrientationChange)
+        }
+
         return () => {
-            window.removeEventListener("resize", updateOffsets)
-            ro.disconnect()
+            if (isMobile || isPWA) {
+                window.removeEventListener('resize', handleResize)
+                window.removeEventListener('orientationchange', handleOrientationChange)
+            }
         }
-    }, [])
+    }, [isMobile, isPWA])
 
     // ----------------------------
-    // 3️⃣ Mock 데이터 (없으면 생성)
+    // 2️⃣ Mock 데이터 초기화
     // ----------------------------
     useEffect(() => {
         if (initialRoomData) return
         const mockMessages: Message[] = [
             { id: "msg-1", content: "안녕하세요!", timestamp: "2024-01-15 14:25", isFromMe: false },
             { id: "msg-2", content: "네, 어떤 부분이 궁금한가요?", timestamp: "2024-01-15 14:27", isFromMe: true },
-            ...Array.from({ length: 15 }, (_, i) => ({
+            ...Array.from({ length: 18 }, (_, i) => ({
                 id: `msg-${i + 3}`,
-                content: `테스트 메시지 ${i + 1}`,
+                content: `테스트 메시지 ${i + 1}입니다. 스크롤 테스트를 위한 메시지입니다.`,
                 timestamp: `2024-01-15 ${14 + Math.floor(i / 4)}:${30 + ((i * 5) % 60)}`,
                 isFromMe: i % 2 === 0,
                 isRead: true,
@@ -108,118 +121,245 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     }, [initialRoomData, roomId])
 
     // ----------------------------
-    // 4️⃣ Scroll to Bottom
+    // 3️⃣ 스크롤 유틸리티 함수들
     // ----------------------------
-    const scrollToBottom = useCallback((smooth = true) => {
+    const scrollToBottom = useCallback((behavior: 'smooth' | 'auto' = 'smooth') => {
+        if (!messagesContainerRef.current) return
+
+        isScrollingToBottomRef.current = true
         const container = messagesContainerRef.current
-        if (!container) return
-        const scrollHeight = container.scrollHeight
-        const clientHeight = container.clientHeight
+
         container.scrollTo({
-            top: scrollHeight - clientHeight,
-            behavior: smooth ? "smooth" : "auto",
+            top: container.scrollHeight,
+            behavior
         })
+
+        setTimeout(() => {
+            isScrollingToBottomRef.current = false
+        }, behavior === 'smooth' ? 300 : 50)
     }, [])
 
-    // 초기 렌더 후 스크롤
-    useEffect(() => {
-        if (!roomData?.messages.length) return
-        // iOS PWA 대응: setTimeout으로 조금 늦게 호출
-        const t = setTimeout(() => {
-            scrollToBottom(false)
-            setIsVisible(true)
-        }, 50)
-        return () => clearTimeout(t)
-    }, [roomData?.messages, scrollToBottom])
-
-    // 새 메시지 올 때
-    useEffect(() => {
-        if (isAtBottom && roomData?.messages.length) scrollToBottom(true)
-    }, [roomData?.messages, isAtBottom, scrollToBottom])
+    const isScrolledToBottom = useCallback(() => {
+        if (!messagesContainerRef.current) return true
+        const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current
+        return scrollHeight - scrollTop - clientHeight < 50
+    }, [])
 
     // ----------------------------
-    // 5️⃣ Scroll 핸들링
+    // 4️⃣ 초기 스크롤 설정
+    // ----------------------------
+    useEffect(() => {
+        if (!roomData?.messages.length || isInitialized) return
+
+        const timeoutId = setTimeout(() => {
+            scrollToBottom('auto')
+            setIsInitialized(true)
+        }, 100)
+
+        return () => clearTimeout(timeoutId)
+    }, [roomData?.messages, isInitialized, scrollToBottom])
+
+    // ----------------------------
+    // 5️⃣ 새 메시지 추가 시 스크롤 처리
+    // ----------------------------
+    useEffect(() => {
+        if (!isInitialized || !roomData?.messages.length) return
+
+        if (isAtBottom) {
+            setTimeout(() => scrollToBottom('smooth'), 50)
+        }
+    }, [roomData?.messages.length, isAtBottom, isInitialized, scrollToBottom])
+
+    // ----------------------------
+    // 6️⃣ 스크롤 이벤트 핸들러
     // ----------------------------
     const handleScroll = useCallback(() => {
         const container = messagesContainerRef.current
-        if (!container) return
+        if (!container || isScrollingToBottomRef.current) return
+
         const { scrollTop, scrollHeight, clientHeight } = container
-        const scrollBottom = scrollHeight - scrollTop - clientHeight
-        setIsAtBottom(scrollBottom < 50)
+
+        const atBottom = scrollHeight - scrollTop - clientHeight < 50
+        setIsAtBottom(atBottom)
 
         if (scrollTop < 100 && hasMoreMessages && !isLoadingMore && onLoadMoreMessages) {
             loadMoreMessages()
         }
     }, [hasMoreMessages, isLoadingMore, onLoadMoreMessages])
 
+    // ----------------------------
+    // 7️⃣ 더 많은 메시지 로드
+    // ----------------------------
     const loadMoreMessages = useCallback(async () => {
         if (!roomData?.messages.length || !onLoadMoreMessages) return
+
+        const container = messagesContainerRef.current
+        if (!container) return
+
+        const previousScrollHeight = container.scrollHeight
+        const previousScrollTop = container.scrollTop
+
         setIsLoadingMore(true)
+
         try {
             const cursor = roomData.messages[0].id
             const newMessages = await onLoadMoreMessages(cursor)
-            if (newMessages.length > 0)
+
+            if (newMessages.length > 0) {
                 setRoomData(prev => prev ? { ...prev, messages: [...newMessages, ...prev.messages] } : null)
-            else setHasMoreMessages(false)
+
+                setTimeout(() => {
+                    if (container) {
+                        const newScrollHeight = container.scrollHeight
+                        const scrollDiff = newScrollHeight - previousScrollHeight
+                        container.scrollTop = previousScrollTop + scrollDiff
+                    }
+                }, 50)
+            } else {
+                setHasMoreMessages(false)
+            }
         } catch (err) {
-            console.error(err)
+            console.error('메시지 로드 실패:', err)
         } finally {
             setIsLoadingMore(false)
         }
     }, [roomData?.messages, onLoadMoreMessages])
 
+    // ----------------------------
+    // 8️⃣ 메시지 전송 핸들러
+    // ----------------------------
+    const handleSendMessage = useCallback(() => {
+        if (!newMessage.trim()) return
+
+        const message: Message = {
+            id: `msg-${Date.now()}`,
+            content: newMessage,
+            timestamp: new Date().toISOString(),
+            isFromMe: true,
+            isRead: true
+        }
+
+        setRoomData(prev =>
+            prev ? { ...prev, messages: [...prev.messages, message] } : null
+        )
+        setNewMessage("")
+
+        setTimeout(() => scrollToBottom('smooth'), 50)
+    }, [newMessage, scrollToBottom])
+
     const formatTime = (ts: string) =>
         new Date(ts).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false })
 
-    if (!roomData)
+    if (!roomData) {
         return (
-            <Box sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Box sx={{
+                height: isMobile || isPWA ? "calc(var(--vh, 1vh) * 100)" : "calc(100vh - 120px)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+            }}>
                 <CircularProgress />
             </Box>
         )
+    }
 
     // ----------------------------
-    // 6️⃣ Render
+    // 9️⃣ 반응형 스타일 계산
     // ----------------------------
-    return (
-        <Box
-            sx={{
+    const getContainerStyles = () => {
+        if (isMobile || isPWA) {
+            // 모바일/PWA: 전체 화면 사용
+            return {
                 height: "calc(var(--vh, 1vh) * 100)",
                 display: "flex",
                 flexDirection: "column",
-                position: "relative",
-            }}
-        >
+                overflow: "hidden"
+            }
+        } else {
+            // PC: 일반적인 채팅창 스타일
+            return {
+                height: "calc(100vh - 120px)", // 헤더 공간 제외
+                maxHeight: "800px",
+                display: "flex",
+                flexDirection: "column",
+                mx: "auto",
+                maxWidth: "1200px",
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 2,
+                overflow: "hidden",
+                backgroundColor: "background.paper"
+            }
+        }
+    }
+
+    const getMessagesContainerStyles = () => {
+        const baseStyles = {
+            flex: 1,
+            overflowY: "auto",
+            overflowX: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            "&::-webkit-scrollbar": { width: isMobile ? "4px" : "6px" },
+            "&::-webkit-scrollbar-track": { backgroundColor: "transparent" },
+            "&::-webkit-scrollbar-thumb": {
+                backgroundColor: theme.palette.divider,
+                borderRadius: "3px"
+            },
+        }
+
+        if (isMobile || isPWA) {
+            return {
+                ...baseStyles,
+                px: 2,
+                py: 1,
+                WebkitOverflowScrolling: "touch",
+            }
+        } else {
+            return {
+                ...baseStyles,
+                px: 3,
+                py: 2,
+            }
+        }
+    }
+
+    // ----------------------------
+    // 🔟 렌더링
+    // ----------------------------
+    return (
+        <Box sx={getContainerStyles()}>
+            <MessageHeader userName={roomData.userName} userAvatar={roomData.userAvatar} />
             <Box
                 ref={messagesContainerRef}
                 onScroll={handleScroll}
-                style={{ visibility: isVisible ? "visible" : "hidden" }}
-                sx={{
-                    flex: 1,
-                    overflowY: "auto",
-                    px: 2,
-                    py: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    "&::-webkit-scrollbar": { width: "4px" },
-                    "&::-webkit-scrollbar-track": { backgroundColor: "transparent" },
-                    "&::-webkit-scrollbar-thumb": { backgroundColor: theme.palette.divider, borderRadius: "2px" },
-                    paddingBottom: chatInputHeight + safeAreaBottom + 8,
-                }}
+                sx={getMessagesContainerStyles()}
             >
+                {/* 로딩 인디케이터 */}
                 {isLoadingMore && (
                     <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
                         <CircularProgress size={24} />
                     </Box>
                 )}
+
+                {/* 메시지 목록 */}
                 {roomData.messages.map((msg, i) => {
-                    const showAvatar =
-                        !msg.isFromMe && (i === 0 || roomData.messages[i - 1].isFromMe !== msg.isFromMe)
+                    const showAvatar = !msg.isFromMe &&
+                        (i === 0 || roomData.messages[i - 1].isFromMe !== msg.isFromMe)
+
                     return (
-                        <Box key={msg.id} sx={{ display: "flex", justifyContent: msg.isFromMe ? "flex-end" : "flex-start", mb: 1 }}>
+                        <Box
+                            key={msg.id}
+                            sx={{
+                                display: "flex",
+                                justifyContent: msg.isFromMe ? "flex-end" : "flex-start",
+                                mb: 1.5,
+                                minHeight: "fit-content"
+                            }}
+                        >
                             <Box
                                 sx={{
-                                    maxWidth: "70%",
+                                    maxWidth: isMobile ? "85%" : "70%",
                                     display: "flex",
                                     flexDirection: msg.isFromMe ? "row-reverse" : "row",
                                     alignItems: "flex-end",
@@ -227,30 +367,54 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                                 }}
                             >
                                 {!msg.isFromMe && showAvatar && (
-                                    <Avatar sx={{ width: 32, height: 32, backgroundColor: "primary.main" }}>
+                                    <Avatar sx={{
+                                        width: isMobile ? 32 : 36,
+                                        height: isMobile ? 32 : 36,
+                                        backgroundColor: "primary.main",
+                                        flexShrink: 0
+                                    }}>
                                         {roomData.userName.charAt(0)}
                                     </Avatar>
                                 )}
-                                <Box>
+
+                                <Box sx={{ minWidth: 0 }}>
                                     <Paper
                                         elevation={1}
                                         sx={{
-                                            px: 2,
-                                            py: 1.5,
+                                            px: isMobile ? 2 : 2.5,
+                                            py: isMobile ? 1.5 : 2,
                                             backgroundColor: msg.isFromMe
                                                 ? theme.palette.primary.main
                                                 : theme.palette.mode === "dark"
                                                     ? theme.palette.background.paper
-                                                    : "grey.600",
+                                                    : "grey.100",
                                             color: msg.isFromMe ? "white" : "text.primary",
                                             borderRadius: 2,
                                             borderBottomLeftRadius: !msg.isFromMe ? 0.5 : 2,
                                             borderBottomRightRadius: msg.isFromMe ? 0.5 : 2,
+                                            wordBreak: "break-word",
+                                            boxShadow: theme.shadows[1]
                                         }}
                                     >
-                                        <Typography variant="body2">{msg.content}</Typography>
+                                        <Typography
+                                            variant={isMobile ? "body2" : "body1"}
+                                            sx={{ whiteSpace: "pre-wrap" }}
+                                        >
+                                            {msg.content}
+                                        </Typography>
                                     </Paper>
-                                    <Typography variant="caption" sx={{ mt: 0.5, px: 1, color: "text.secondary", display: "block", textAlign: msg.isFromMe ? "right" : "left" }}>
+
+                                    <Typography
+                                        variant="caption"
+                                        sx={{
+                                            mt: 0.5,
+                                            px: 1,
+                                            color: "text.secondary",
+                                            display: "block",
+                                            textAlign: msg.isFromMe ? "right" : "left",
+                                            fontSize: isMobile ? "0.7rem" : "0.75rem"
+                                        }}
+                                    >
                                         {formatTime(msg.timestamp)}
                                     </Typography>
                                 </Box>
@@ -258,20 +422,28 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                         </Box>
                     )
                 })}
+
+                <div ref={messagesEndRef} />
             </Box>
 
-            {/* ChatInput: sticky로 배치 */}
-            <Box ref={chatInputRef} sx={{ position: "sticky", bottom: 0, zIndex: 1000 }}>
+            {/* 채팅 입력창 */}
+            <Box ref={chatInputRef} sx={{ flexShrink: 0 }}>
                 <ChatInput
                     value={newMessage}
                     onChange={setNewMessage}
-                    onSend={() => {
-                        if (!newMessage.trim()) return
-                        setRoomData(prev => prev ? { ...prev, messages: [...prev.messages, { id: `${Date.now()}`, content: newMessage, timestamp: new Date().toISOString(), isFromMe: true }] } : prev)
-                        setNewMessage("")
-                        setTimeout(() => scrollToBottom(true), 50)
+                    onSend={handleSendMessage}
+                    sx={{
+                        borderTop: "1px solid",
+                        borderColor: "divider",
+                        paddingBottom: (isMobile || isPWA)
+                            ? `max(8px, env(safe-area-inset-bottom))`
+                            : "12px",
+                        backgroundColor: "background.paper",
+                        ...((!isMobile && !isPWA) && {
+                            borderBottomLeftRadius: 8,
+                            borderBottomRightRadius: 8,
+                        })
                     }}
-                    sx={{ paddingBottom: "env(safe-area-inset-bottom, 8px)" }}
                 />
             </Box>
         </Box>

@@ -1,0 +1,242 @@
+/* src/styles/pwa-chat.css */
+
+/* PWA 환경 기본 설정 */
+:root {
+    --vh: 1vh;
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
+    --safe-area-inset-right: env(safe-area-inset-right);
+}
+
+/* iOS PWA에서 바운스 스크롤 방지 */
+html,
+body {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+#root {
+    width: 100%;
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+    overflow: hidden;
+}
+
+/* 채팅 컨테이너 최적화 */
+.chat-container {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 메시지 스크롤 영역 최적화 */
+.messages-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+}
+
+/* iOS에서 스크롤 관성 최적화 */
+.messages-scroll-area::-webkit-scrollbar {
+    width: 4px;
+    background: transparent;
+}
+
+.messages-scroll-area::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+/* 다크모드에서 스크롤바 */
+@media (prefers-color-scheme: dark) {
+    .messages-scroll-area::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* 채팅 입력창 고정 */
+.chat-input-container {
+    position: sticky;
+    bottom: 0;
+    z-index: 1000;
+    background: var(--mui-palette-background-paper);
+    padding-bottom: var(--safe-area-inset-bottom);
+    border-top: 1px solid var(--mui-palette-divider);
+}
+
+/* 메시지 버블 최적화 */
+.message-bubble {
+    max-width: 75%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+/* 터치 디바이스에서 탭 하이라이트 제거 */
+.message-bubble,
+.chat-input-container * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* 텍스트 입력 영역은 선택 가능하게 */
+.chat-input-container input,
+.chat-input-container textarea {
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* PWA에서 가상 키보드 대응 */
+@supports (height: 100dvh) {
+    .chat-container {
+        height: 100dvh;
+    }
+}
+
+/* 가로 모드 대응 */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    .messages-scroll-area {
+        flex: 1;
+    }
+
+    .chat-input-container {
+        padding: 8px 16px;
+        padding-bottom: calc(8px + var(--safe-area-inset-bottom));
+    }
+}
+
+/* 초소형 기기 대응 */
+@media screen and (max-width: 320px) {
+    .message-bubble {
+        max-width: 85%;
+        font-size: 0.875rem;
+    }
+}
+
+/* 큰 화면에서 최적화 */
+@media screen and (min-width: 768px) {
+    .chat-container {
+        max-width: none;
+    }
+
+    .messages-scroll-area {
+        padding: 16px 24px;
+    }
+
+    .chat-input-container {
+        padding: 16px 24px;
+        padding-bottom: calc(16px + var(--safe-area-inset-bottom));
+    }
+}
+
+/* iOS에서 viewport 변경 시 깜빡임 방지 */
+.chat-container {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+/* 메시지 애니메이션 최적화 */
+.message-enter {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.message-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+/* 로딩 상태 최적화 */
+.loading-messages {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
+}
+
+.loading-messages.loaded {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 스크롤 위치 인디케이터 (선택사항) */
+.scroll-indicator {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--mui-palette-primary-main);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: opacity 200ms ease-in-out;
+    z-index: 1001;
+}
+
+.scroll-indicator.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 메시지 헤더 고정 */
+.message-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    background: var(--mui-palette-background-paper);
+    border-bottom: 1px solid var(--mui-palette-divider);
+    padding-top: var(--safe-area-inset-top);
+}
+
+/* 컨텐츠 영역 패딩 조정 */
+.chat-content {
+    padding-top: calc(64px + var(--safe-area-inset-top));
+    padding-bottom: calc(72px + var(--safe-area-inset-bottom));
+}
+
+/* 성능 최적화: GPU 가속 */
+.message-bubble,
+.chat-input-container,
+.messages-scroll-area {
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* 포커스 스타일 최적화 */
+.chat-input-container input:focus,
+.chat-input-container textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--mui-palette-primary-main);
+}
+
+/* PWA 상태표시줄 색상 */
+@supports (padding: max(0px)) {
+    .message-header {
+        padding-top: max(var(--safe-area-inset-top), 20px);
+    }
+}

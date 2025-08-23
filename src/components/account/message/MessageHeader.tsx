@@ -18,11 +18,11 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar}) =>
         <Paper
             elevation={1}
             sx={{
-                position: "fixed",
-                top: 0,
+                // position: "sticky",
+                // top: 0,
                 left: 0,
                 right: 0,
-                zIndex: 10,
+                // zIndex: 10,
                 px: 2,
                 py: 1.5,
                 borderRadius: 0,
@@ -30,6 +30,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar}) =>
                 borderColor: "divider",
             }}
         >
+
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                     <IconButton sx={{ mr: 1 }} onClick={() => navigate(-1)}>
