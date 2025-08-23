@@ -277,8 +277,6 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     }
 
     return (
-        <>
-
         <Box sx={getContainerStyles()}>
             <MessageHeader userName={roomData?.userName || ''} userAvatar={roomData?.userAvatar} />
             <Box
@@ -370,7 +368,6 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 })}
                 <div ref={messagesEndRef} />
             </Box>
-        </Box>
             <Box ref={chatInputRef} sx={{
                 flexShrink: 0,
                 position: "fixed" ,
@@ -398,7 +395,8 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     }}
                 />
             </Box>
-        </>
+            </Box>
+
     )
 }
 
