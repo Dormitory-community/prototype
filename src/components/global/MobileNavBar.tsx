@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
-import {Groups, Dashboard, Person, Home, ChatBubble} from "@mui/icons-material"
+import { Groups, Dashboard, Person, Home, ChatBubble } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
 
@@ -11,6 +11,7 @@ export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const [isPWA, setIsPWA] = useState(false)
+    const [isIOS, setIsIOS] = useState(false)
 
     useEffect(() => {
         const detectPWA = () => {
@@ -21,7 +22,13 @@ export const MobileNavBar: React.FC = () => {
                 (typeof document !== "undefined" && document.referrer.includes("android-app://"))
             return Boolean(isStandalone)
         }
+
+        const detectIOS = () => {
+            return /iPhone|iPad|iPod/i.test(navigator.userAgent)
+        }
+
         setIsPWA(detectPWA())
+        setIsIOS(detectIOS())
     }, [])
 
     const hiddenRoutes = [ROUTES.LOGIN, ROUTES.SIGNUP, ROUTES.BOARD_DETAIL, ROUTES.MESSAGE_DETAIL]
@@ -82,7 +89,8 @@ export const MobileNavBar: React.FC = () => {
                 ...(isPWA && {
                     paddingLeft: "env(safe-area-inset-left)",
                     paddingRight: "env(safe-area-inset-right)",
-                    paddingBottom: "env(safe-area-inset-bottom)",
+                    // iOS에서 safe-area-inset-bottom을 패딩으로만 처리
+                    paddingBottom: isIOS ? "env(safe-area-inset-bottom, 0px)" : "env(safe-area-inset-bottom, 0px)",
                 }),
             }}
             elevation={3}
@@ -92,9 +100,7 @@ export const MobileNavBar: React.FC = () => {
                 onChange={handleChange}
                 showLabels
                 sx={{
-                    height: isPWA
-                        ? { xs: "calc(48px + env(safe-area-inset-bottom))", sm: "calc(56px + env(safe-area-inset-bottom))" }
-                        : { xs: 48, sm: 56 }, // 반응형 높이
+                    height: { xs: 48, sm: 56 }, // 높이를 플랫폼 독립적으로 설정
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-around", // 아이템 간격 균등 분배
@@ -102,32 +108,32 @@ export const MobileNavBar: React.FC = () => {
                     borderTop: "1px solid",
                     borderColor: "divider",
                     "& .MuiBottomNavigationAction-root": {
-                        minWidth: { xs: 60, sm: 80 }, // 좁은 화면에서 너비 축소
+                        minWidth: { xs: 50, sm: 70, md: 80 }, // 더 좁은 화면에서 너비 축소
                         padding: { xs: "4px 2px", sm: "6px 4px" }, // 패딩 반응형
                         "& .MuiBottomNavigationAction-label": {
-                            fontSize: { xs: "0.7rem", sm: "0.8rem" }, // 라벨 폰트 크기 반응형
+                            fontSize: { xs: "0.65rem", sm: "0.75rem", md: "0.8rem" }, // 라벨 폰트 크기 조정
                             marginTop: { xs: "2px", sm: "4px" },
                         },
                         "& .MuiSvgIcon-root": {
-                            fontSize: { xs: 20, sm: 24 }, // 아이콘 크기 반응형
+                            fontSize: { xs: 18, sm: 22, md: 24 }, // 아이콘 크기 반응형
                         },
                     },
                     "& .Mui-selected": {
                         "& .MuiBottomNavigationAction-label": {
-                            fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                            fontSize: { xs: "0.65rem", sm: "0.75rem", md: "0.8rem" },
                             fontWeight: 600,
                         },
                     },
                 }}
             >
-                <BottomNavigationAction label="홈" icon={<Home sx={{ fontSize: { xs: 20, sm: 24 } }} />} />
-                <BottomNavigationAction label="그룹 모집" icon={<Groups sx={{ fontSize: { xs: 20, sm: 24 } }} />} />
-                <BottomNavigationAction label="게시판" icon={<Dashboard sx={{ fontSize: { xs: 20, sm: 24 } }} />} />
+                <BottomNavigationAction label="홈" icon={<Home sx={{ fontSize: { xs: 18, sm: 22, md: 24 } }} />} />
+                <BottomNavigationAction label="그룹 모집" icon={<Groups sx={{ fontSize: { xs: 18, sm: 22, md: 24 } }} />} />
+                <BottomNavigationAction label="게시판" icon={<Dashboard sx={{ fontSize: { xs: 18, sm: 22, md: 24 } }} />} />
                 <BottomNavigationAction
                     label="채팅"
-                    icon={<ChatBubble sx={{ xs: 20, sm: 24 }} />}
+                    icon={<ChatBubble sx={{ fontSize: { xs: 18, sm: 22, md: 24 } }} />}
                 />
-                <BottomNavigationAction label="마이페이지" icon={<Person sx={{ fontSize: { xs: 20, sm: 24 } }} />} />
+                <BottomNavigationAction label="마이페이지" icon={<Person sx={{ fontSize: { xs: 18, sm: 22, md: 24 } }} />} />
             </BottomNavigation>
         </Paper>
     )
