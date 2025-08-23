@@ -7,6 +7,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f8fafc; /* A light background color for the whole app */
+  overscroll-behavior: none; /* 스크롤 전파 방지 */
+  -webkit-overflow-scrolling: touch; /* iOS 터치 스크롤 부드럽게 */
+  height: 100vh; /* PWA 전체 높이 고정 */
+  overflow: hidden; /* body 스크롤 완전 방지 */
 }
 
 code {
