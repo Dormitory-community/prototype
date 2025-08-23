@@ -83,7 +83,7 @@ body {
     left: 0;
     right: 0;
     height: env(safe-area-inset-bottom, 0px);
-    background-color: #1e293b; /* 네비 색상 */
+    background-color: #0f172a;
     z-index: -1;
   }
 }
