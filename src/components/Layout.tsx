@@ -1,11 +1,9 @@
 "use client"
 
 import React from "react"
-import { Box, Fab } from "@mui/material"
-import { Download } from "@mui/icons-material"
+import { Box } from "@mui/material"
 import { Header } from "@/components/global/Header.tsx"
 import { MobileNavBar } from "@/components/global/MobileNavBar.tsx"
-import { usePWA } from "@/hooks/usePWA"
 import { useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
 
@@ -14,7 +12,6 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-    const { isInstallable, installPWA } = usePWA()
     const location = useLocation()
     const normalize = (route: string) => route.replace(/:.*$/, "")
 
@@ -28,8 +25,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         normalize(ROUTES.MESSAGE_DETAIL)
     )
 
-    // PWA 설치 버튼 표시 여부
-    const showInstallButton = isInstallable && !isMessageDetail
 
     return (
         <Box sx={{
@@ -69,22 +64,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* 바텀 네비게이션 (메시지 상세 PC에서는 항상 표시) */}
             {(!isMessageDetail || (isMessageDetail && window.innerWidth >= 960)) && <MobileNavBar />}
 
-            {/* PWA 설치 버튼 */}
-            {showInstallButton && (
-                <Fab
-                    color="primary"
-                    aria-label="install app"
-                    onClick={installPWA}
-                    sx={{
-                        position: "fixed",
-                        bottom: { xs: 80, sm: 20 },
-                        right: 20,
-                        zIndex: 1000,
-                    }}
-                >
-                    <Download />
-                </Fab>
-            )}
         </Box>
     )
 }

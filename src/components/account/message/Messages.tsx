@@ -1,7 +1,7 @@
 "use client"
 
 import React, {useState, useEffect, useRef, useCallback, useLayoutEffect} from "react"
-import { Box, Paper, Typography, Avatar, CircularProgress, useMediaQuery } from "@mui/material"
+import {Box, Paper, Typography, Avatar, CircularProgress, useMediaQuery, Theme, SxProps} from "@mui/material"
 // import { theme } from "@/theme/theme.ts"
 import { useTheme } from '@mui/material/styles'    // <-- 추가
 import ChatInput from "@/components/account/message/ChatInput.tsx"
@@ -272,11 +272,12 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     // ----------------------------
     // 9️⃣ 반응형 스타일 계산
     // ----------------------------
-    const getContainerStyles = () => {
+    const getContainerStyles = (): SxProps<Theme> => {
         if (isMobile || isPWA) {
             // 모바일/PWA: 전체 화면 사용
             return {
                 height: "calc(var(--vh, 1vh) * 100)",
+                maxHeight: "none",
                 display: "flex",
                 flexDirection: "column",
                 overflow: "hidden"
@@ -439,6 +440,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     onChange={setNewMessage}
                     onSend={handleSendMessage}
                     sx={{
+                        position: (isMobile || isPWA) ? 'fixed' : 'sticky',
                         borderTop: "1px solid",
                         borderColor: "divider",
                         paddingBottom: (isMobile || isPWA)
