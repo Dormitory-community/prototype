@@ -15,6 +15,7 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const location = useLocation()
     const [isPWA, setIsPWA] = useState(false)
+    const [isIOS, setIsIOS] = useState(false)
 
     const normalize = (route: string) => route.replace(/:.*$/, "")
 
@@ -24,17 +25,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     const isMessageDetail = location.pathname.startsWith(normalize(ROUTES.MESSAGE_DETAIL))
     const isBoardDetail = location.pathname.startsWith(normalize(ROUTES.BOARD_DETAIL))
-
-    // 입력창이 있는 페이지들
-    // const hasFixedInput = isMessageDetail || isBoardDetail
-
-    const getDynamicPaddingBottom = (isPWA: boolean) => {
-        if (!isPWA) return { xs: "56px", sm: "80px" }
-        const baseHeight = window.innerWidth < 600 ? "56px" : "80px"
-        return `calc(${baseHeight} + env(safe-area-inset-bottom))`
-    }
-
-
 
     useEffect(() => {
         const detectPWA = () => {
@@ -46,17 +36,20 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             return Boolean(isStandalone)
         }
 
+        const detectIOS = () => {
+            return /iPhone|iPad|iPod/i.test(navigator.userAgent)
+        }
+
         setIsPWA(detectPWA())
+        setIsIOS(detectIOS())
     }, [])
 
     useEffect(() => {
-        // PWA 환경에서 body에 클래스 추가
         if (isPWA) {
             document.body.classList.add("pwa-environment")
         } else {
             document.body.classList.remove("pwa-environment")
         }
-
         return () => {
             document.body.classList.remove("pwa-environment")
         }
@@ -82,9 +75,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 sx={{
                     flexGrow: 1,
                     pt: hideHeader || isMessageDetail ? 0 : { xs: "48px", sm: "56px", md: "64px" }, // 헤더 높이 반응형
-                    pb: isPWA
-                        ? { xs: "calc(56px + env(safe-area-inset-bottom))", sm: "calc(80px + env(safe-area-inset-bottom))" }
-                        : { xs: "56px", sm: "80px" }, // 반응형 패딩
+                    pb: isBoardDetail
+                        ? { xs: "calc(80px + env(safe-area-inset-bottom, 0px))", sm: "calc(100px + env(safe-area-inset-bottom, 0px))" } // CommentForm 높이 고려
+                        : isPWA
+                            ? { xs: "calc(48px + env(safe-area-inset-bottom, 0px))", sm: "calc(56px + env(safe-area-inset-bottom, 0px))" } // MobileNavBar 높이와 동기화
+                            : { xs: 48, sm: 56 },
                     ...(isMessageDetail && {
                         height: "100dvh",
                         overflow: "hidden",
