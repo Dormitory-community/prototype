@@ -56,20 +56,24 @@ const ChatInput: React.FC<ChatInputProps> = ({
         <Paper
             elevation={0}
             sx={{
-                borderRadius: isMobile ? 0 : "0 0 8px 8px",
+                position: "fixed", // CommentForm처럼 고정 위치
+                bottom: 0,
+                left: 0,
+                right: 0,
+                borderRadius: 0, // 하단 고정이므로 radius 제거
                 backgroundColor: "background.paper",
                 borderTop: 1,
                 borderColor: "divider",
                 p: isMobile ? 1.5 : 2,
-                paddingBottom: isMobile
-                    ? `max(12px, env(safe-area-inset-bottom, 0px))`
-                    : "16px",
+                paddingBottom: `calc(${isMobile ? '12px' : '16px'} + env(safe-area-inset-bottom))`, // 고정값으로 변경
+                zIndex: 100, // CommentForm과 동일
                 ...sx,
             }}
         >
             <TextField
                 fullWidth
                 multiline
+                minRows={1} // CommentForm과 동일
                 maxRows={maxRows}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
@@ -80,18 +84,21 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 disabled={disabled}
                 size="medium"
                 sx={{
+                    maxWidth: 900, // CommentForm과 동일한 최대 너비
+                    mx: "auto", // 중앙 정렬
                     "& .MuiOutlinedInput-root": {
                         borderRadius: 3,
                         backgroundColor: "background.paper",
-                        minHeight: isMobile ? "56px" : "60px",
+                        // minHeight 제거 - 동적 높이 변경 방지
                         "& input, & textarea": {
-                            fontSize: isMobile ? "16px" : "14px",
+                            fontSize: isMobile ? "16px" : "14px", // 16px로 줌 방지
                             lineHeight: 1.4,
+                            padding: "8px 10px", // CommentForm과 동일한 패딩
                         },
                         "&.Mui-focused": {
                             "& .MuiOutlinedInput-notchedOutline": {
                                 borderColor: "primary.main",
-                                borderWidth: "2px",
+                                borderWidth: "1.5px", // CommentForm과 동일
                             },
                         },
                         ...(!isMobile && {
@@ -113,8 +120,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
                                     onClick={handleSend}
                                     size={isMobile ? "small" : "medium"}
                                     sx={{
-                                        width: isMobile ? 36 : 40,
-                                        height: isMobile ? 36 : 40,
+                                        width: isMobile ? 32 : 40, // CommentForm과 유사한 크기
+                                        height: isMobile ? 32 : 40,
                                         backgroundColor:
                                             value.trim() && !disabled ? "primary.main" : "transparent",
                                         color:
@@ -124,21 +131,15 @@ const ChatInput: React.FC<ChatInputProps> = ({
                                                 value.trim() && !disabled
                                                     ? "primary.dark"
                                                     : "action.hover",
-                                            transform:
-                                                value.trim() && !disabled && !isMobile
-                                                    ? "scale(1.05)"
-                                                    : "none",
                                         },
                                         "&.Mui-disabled": {
                                             backgroundColor: "transparent",
                                             color: "text.disabled",
                                         },
                                         transition: "all 0.2s ease-in-out",
-                                        transform:
-                                            value.trim() && !disabled ? "scale(1)" : "scale(0.9)",
                                     }}
                                 >
-                                    <Send sx={{ fontSize: isMobile ? 18 : 20 }} />
+                                    <Send sx={{ fontSize: isMobile ? 16 : 20 }} />
                                 </IconButton>
                             </InputAdornment>
                         ),

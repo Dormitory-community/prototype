@@ -19,7 +19,6 @@ interface MessagesProps {
 const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, onLoadMoreMessages }) => {
     const theme = useTheme()
     const messagesContainerRef = useRef<HTMLDivElement | null>(null)
-    const chatInputWrapperRef = useRef<HTMLDivElement | null>(null) // 입력영역 wrapper
     const messagesEndRef = useRef<HTMLDivElement | null>(null)
     const isMobile = useMediaQuery(theme.breakpoints.down('md'))
     const isSmallScreen = useMediaQuery('(max-height: 600px)')
@@ -161,26 +160,18 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         setTimeout(() => scrollToBottom('smooth'), 50)
     }, [newMessage, roomId, scrollToBottom])
 
-    // input 영역(그리드의 마지막 행)이 바뀔 때(높이 변동) 메시지 하단 유지
+    // 키보드 변화 감지하여 스크롤 조정
     useEffect(() => {
-        const inputWrapper = chatInputWrapperRef.current
-        if (!inputWrapper) return
-        const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => {
-            // input 높이 변하면 하단으로 스크롤
-            setTimeout(() => scrollToBottom('auto'), 50)
-        }) : null
-        if (ro) ro.observe(inputWrapper)
         // 키보드 올라올 때 visualViewport 처리 (모바일)
         const vv = (window as any).visualViewport
         const onVvResize = () => setTimeout(() => scrollToBottom('auto'), 50)
         if (vv) vv.addEventListener('resize', onVvResize)
         else window.addEventListener('resize', onVvResize)
         return () => {
-            if (ro) ro.disconnect()
             if (vv) vv.removeEventListener('resize', onVvResize)
             else window.removeEventListener('resize', onVvResize)
         }
-    }, [chatInputWrapperRef, scrollToBottom])
+    }, [scrollToBottom])
 
     const formatTime = (timestamp: string) => {
         const date = new Date(timestamp)
@@ -192,90 +183,81 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     }
 
     return (
-        // Grid 레이아웃: header / messages / input
-        <Box
-            sx={{
-                display: 'grid',
-                gridTemplateRows: 'auto 1fr auto', // header / messages / input
-                height: { xs: 'calc(var(--vh, 1vh) * 100)', md: 'calc(100vh - 64px - 32px)' },
-                backgroundColor: 'background.default',
-            }}
-        >
-            <MessageHeader userName={roomData?.userName || ''} userAvatar={roomData?.userAvatar} />
-
-            {/* 메시지 영역 (스크롤) */}
+        <>
+            {/* 메인 콘텐츠: CommentForm처럼 고정 입력창을 위한 하단 여백 확보 */}
             <Box
-                ref={messagesContainerRef}
-                onScroll={handleScroll}
                 sx={{
-                    overflowY: 'auto',
-                    px: { xs: 2, md: 3 },
-                    py: { xs: 2, md: 3 },
                     display: 'flex',
                     flexDirection: 'column',
-                    WebkitOverflowScrolling: 'touch',
+                    height: { xs: 'calc(var(--vh, 1vh) * 100)', md: 'calc(100vh - 64px - 32px)' },
+                    backgroundColor: 'background.default',
+                    pb: { xs: 10, md: 4 }, // 모바일에서 고정 입력창을 위한 하단 공간 확보
                 }}
             >
-                {isLoadingMore && (
-                    <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-                        <CircularProgress size={24} />
-                    </Box>
-                )}
+                <MessageHeader userName={roomData?.userName || ''} userAvatar={roomData?.userAvatar} />
 
-                {roomData?.messages.map((msg, i) => {
-                    const showAvatar = !msg.isFromMe && (i === 0 || roomData.messages[i - 1].isFromMe !== msg.isFromMe)
-                    return (
-                        <Box key={msg.id} sx={{ display: 'flex', justifyContent: msg.isFromMe ? 'flex-end' : 'flex-start', mb: 1.5 }}>
-                            <Box sx={{ maxWidth: isMobile ? '85%' : '70%', display: 'flex', flexDirection: msg.isFromMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: 1 }}>
-                                {!msg.isFromMe && showAvatar && (
-                                    <Avatar sx={{ width: isMobile ? 32 : 36, height: isMobile ? 32 : 36, backgroundColor: 'primary.main', flexShrink: 0 }}>
-                                        {roomData.userName.charAt(0)}
-                                    </Avatar>
-                                )}
-                                <Box sx={{ minWidth: 0 }}>
-                                    <Paper elevation={1} sx={{
-                                        px: isMobile ? 2 : 2.5,
-                                        py: isMobile ? 1.5 : 2,
-                                        backgroundColor: msg.isFromMe ? theme.palette.primary.main : (theme.palette.mode === 'dark' ? theme.palette.grey[600] : theme.palette.grey[100]),
-                                        color: msg.isFromMe ? 'white' : 'text.primary',
-                                        borderRadius: 2,
-                                        borderBottomLeftRadius: !msg.isFromMe ? 0.5 : 2,
-                                        borderBottomRightRadius: msg.isFromMe ? 0.5 : 2,
-                                        wordBreak: 'break-word'
-                                    }}>
-                                        <Typography variant={isMobile ? 'body2' : 'body1'} sx={{ whiteSpace: 'pre-wrap' }}>{msg.content}</Typography>
-                                    </Paper>
-                                    <Typography variant='caption' sx={{ mt: 0.5, px: 1, color: 'text.secondary', display: 'block', textAlign: msg.isFromMe ? 'right' : 'left', fontSize: isMobile ? '0.7rem' : '0.75rem' }}>
-                                        {formatTime(msg.timestamp)}
-                                    </Typography>
+                {/* 메시지 영역 (스크롤) */}
+                <Box
+                    ref={messagesContainerRef}
+                    onScroll={handleScroll}
+                    sx={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        px: { xs: 2, md: 3 },
+                        py: { xs: 2, md: 3 },
+                        display: 'flex',
+                        flexDirection: 'column',
+                        WebkitOverflowScrolling: 'touch',
+                    }}
+                >
+                    {isLoadingMore && (
+                        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                            <CircularProgress size={24} />
+                        </Box>
+                    )}
+
+                    {roomData?.messages.map((msg, i) => {
+                        const showAvatar = !msg.isFromMe && (i === 0 || roomData.messages[i - 1].isFromMe !== msg.isFromMe)
+                        return (
+                            <Box key={msg.id} sx={{ display: 'flex', justifyContent: msg.isFromMe ? 'flex-end' : 'flex-start', mb: 1.5 }}>
+                                <Box sx={{ maxWidth: isMobile ? '85%' : '70%', display: 'flex', flexDirection: msg.isFromMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: 1 }}>
+                                    {!msg.isFromMe && showAvatar && (
+                                        <Avatar sx={{ width: isMobile ? 32 : 36, height: isMobile ? 32 : 36, backgroundColor: 'primary.main', flexShrink: 0 }}>
+                                            {roomData.userName.charAt(0)}
+                                        </Avatar>
+                                    )}
+                                    <Box sx={{ minWidth: 0 }}>
+                                        <Paper elevation={1} sx={{
+                                            px: isMobile ? 2 : 2.5,
+                                            py: isMobile ? 1.5 : 2,
+                                            backgroundColor: msg.isFromMe ? theme.palette.primary.main : (theme.palette.mode === 'dark' ? theme.palette.grey[600] : theme.palette.grey[100]),
+                                            color: msg.isFromMe ? 'white' : 'text.primary',
+                                            borderRadius: 2,
+                                            borderBottomLeftRadius: !msg.isFromMe ? 0.5 : 2,
+                                            borderBottomRightRadius: msg.isFromMe ? 0.5 : 2,
+                                            wordBreak: 'break-word'
+                                        }}>
+                                            <Typography variant={isMobile ? 'body2' : 'body1'} sx={{ whiteSpace: 'pre-wrap' }}>{msg.content}</Typography>
+                                        </Paper>
+                                        <Typography variant='caption' sx={{ mt: 0.5, px: 1, color: 'text.secondary', display: 'block', textAlign: msg.isFromMe ? 'right' : 'left', fontSize: isMobile ? '0.7rem' : '0.75rem' }}>
+                                            {formatTime(msg.timestamp)}
+                                        </Typography>
+                                    </Box>
                                 </Box>
                             </Box>
-                        </Box>
-                    )
-                })}
-                <div ref={messagesEndRef} />
+                        )
+                    })}
+                    <div ref={messagesEndRef} />
+                </Box>
             </Box>
 
-            {/* 입력영역: grid의 마지막 행 (겹치지 않음). safe-area 적용 */}
-            <Box ref={chatInputWrapperRef} sx={{
-                // 입력 영역은 grid의 마지막 auto row에서 자연스럽게 높이를 가짐
-                borderTop: '1px solid',
-                borderColor: 'divider',
-                // safe-area 적용: 홈스크린 PWA 등에서 inset을 반영
-                paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-                backgroundColor: 'background.paper',
-            }}>
-                <ChatInput
-                    value={newMessage}
-                    onChange={setNewMessage}
-                    onSend={handleSendMessage}
-                    sx={{
-                        // ChatInput 내부 padding 이 safe-area를 중복해서 처리하지 않도록 조정 가능
-                        backgroundColor: 'background.paper'
-                    }}
-                />
-            </Box>
-        </Box>
+            {/* ChatInput: 이제 position: fixed로 화면 하단에 고정 */}
+            <ChatInput
+                value={newMessage}
+                onChange={setNewMessage}
+                onSend={handleSendMessage}
+            />
+        </>
     )
 }
 
