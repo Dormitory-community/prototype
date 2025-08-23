@@ -22,8 +22,6 @@ const BoardDetailPage: React.FC = () => {
     const [newComment, setNewComment] = useState("")
     const [isAnonymousComment, setIsAnonymousComment] = useState(false)
     const [replyToComment, setReplyToComment] = useState<string | null>(null)
-    const [replyContent, setReplyContent] = useState("")
-    const [isAnonymousReply, setIsAnonymousReply] = useState(false)
 
     const handleGoBack = () => {
         navigate(-1)
@@ -121,27 +119,8 @@ const BoardDetailPage: React.FC = () => {
         setIsAnonymousComment(false)
     }
 
-    const handleReplySubmit = () => {
-        console.log("New reply:", {
-            commentId: replyToComment,
-            content: replyContent,
-            isAnonymous: isAnonymousReply
-        })
-        setReplyContent("")
-        setIsAnonymousReply(false)
-        setReplyToComment(null)
-    }
-
     const handleReplyClick = (commentId: string) => {
         setReplyToComment(replyToComment === commentId ? null : commentId)
-        setReplyContent("")
-        setIsAnonymousReply(false)
-    }
-
-    const handleReplyCancel = () => {
-        setReplyToComment(null)
-        setReplyContent("")
-        setIsAnonymousReply(false)
     }
 
     return (
@@ -151,11 +130,10 @@ const BoardDetailPage: React.FC = () => {
                 maxWidth="md"
                 sx={{
                     py: { xs: 2, md: 4 },
-                    // 고정 입력창을 위한 하단 공간 제거 (Layout에서 처리)
                     height: "100%",
-                    overflow: "auto", // 스크롤 가능
-                    // 스크롤이 입력창 영역까지 가지 않도록 제한
-                    paddingBottom: { xs: "100px", md: "80px" }, // 입력창 높이만큼 여백
+                    overflow: "auto",
+                    // 하단 입력창 공간 확보
+                    paddingBottom: "100px",
                 }}
             >
                 <Paper
@@ -188,7 +166,6 @@ const BoardDetailPage: React.FC = () => {
                 </Paper>
             </Container>
 
-            {/* CommentForm - 화면 하단 완전 고정, 스크롤과 분리 */}
             <CommentForm
                 value={newComment}
                 onChange={setNewComment}

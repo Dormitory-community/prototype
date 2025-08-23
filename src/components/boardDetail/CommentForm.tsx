@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import {
     OutlinedInput,
     IconButton,
@@ -40,11 +40,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                                                  }) => {
     const theme = useTheme()
     const isDark = theme.palette.mode === "dark"
-    const [keyboardHeight, setKeyboardHeight] = useState(0)
-    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
     const [isPWA, setIsPWA] = useState(false)
-    const containerRef = useRef<HTMLDivElement>(null)
-    const inputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         const detectPWA = () => {
@@ -58,100 +54,6 @@ const CommentForm: React.FC<CommentFormProps> = ({
         setIsPWA(detectPWA())
     }, [])
 
-    useEffect(() => {
-        const initialViewportHeight = window.innerHeight
-        const isAndroid = /Android/i.test(navigator.userAgent)
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-
-        let timeoutId: NodeJS.Timeout
-
-        const handleViewportChange = () => {
-            const visualViewport = (window as any).visualViewport
-
-            if (visualViewport) {
-                // iOS Safari PWA - visualViewport 사용
-                const currentHeight = visualViewport.height
-                const heightDiff = initialViewportHeight - currentHeight
-
-                if (heightDiff > 150) {
-                    // 키보드가 올라온 상태 - 정확한 키보드 높이 사용
-                    setKeyboardHeight(heightDiff)
-                    setIsKeyboardVisible(true)
-
-                    setTimeout(() => {
-                        if (inputRef.current) {
-                            inputRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" })
-                        }
-                    }, 100)
-                } else {
-                    setKeyboardHeight(0)
-                    setIsKeyboardVisible(false)
-                }
-            } else {
-                // Android Chrome PWA - window.innerHeight 사용
-                const currentHeight = window.innerHeight
-                const heightDiff = initialViewportHeight - currentHeight
-
-                if (heightDiff > 100) {
-                    // Android에서도 키보드 높이를 그대로 사용 (보정 제거)
-                    setKeyboardHeight(heightDiff)
-                    setIsKeyboardVisible(true)
-                } else {
-                    setKeyboardHeight(0)
-                    setIsKeyboardVisible(false)
-                }
-            }
-        }
-
-        const debouncedViewportChange = () => {
-            clearTimeout(timeoutId)
-            timeoutId = setTimeout(handleViewportChange, 50)
-        }
-
-        // iOS PWA용 visualViewport 리스너
-        const visualViewport = (window as any).visualViewport
-        if (visualViewport) {
-            visualViewport.addEventListener("resize", debouncedViewportChange)
-            handleViewportChange() // 초기 상태 체크
-        }
-
-        // Android 등을 위한 추가 리스너
-        window.addEventListener("resize", debouncedViewportChange)
-
-        const handleFocus = () => {
-            setTimeout(handleViewportChange, 300) // 키보드 애니메이션 완료 대기
-        }
-
-        const handleBlur = () => {
-            setTimeout(handleViewportChange, 300)
-        }
-
-        if (inputRef.current) {
-            inputRef.current.addEventListener("focus", handleFocus)
-            inputRef.current.addEventListener("blur", handleBlur)
-        }
-
-        return () => {
-            clearTimeout(timeoutId)
-            if (visualViewport) {
-                visualViewport.removeEventListener("resize", debouncedViewportChange)
-            }
-            window.removeEventListener("resize", debouncedViewportChange)
-            if (inputRef.current) {
-                inputRef.current.removeEventListener("focus", handleFocus)
-                inputRef.current.removeEventListener("blur", handleBlur)
-            }
-        }
-    }, [])
-
-    useEffect(() => {
-        if (containerRef.current) {
-            const height = containerRef.current.offsetHeight
-            // CSS 변수로 실제 입력창 높이 전달
-            document.documentElement.style.setProperty("--comment-form-height", `${height}px`)
-        }
-    }, [isReplyMode, keyboardHeight])
-
     // 색상 변수
     const containerBg = isDark ? theme.palette.background.paper : "#FFFFFF"
     const borderTopColor = isDark ? theme.palette.divider : "#e0e0e0"
@@ -162,27 +64,18 @@ const CommentForm: React.FC<CommentFormProps> = ({
 
     return (
         <Box
-            ref={containerRef}
+            className="fixed-input-container"
             sx={{
-                position: "fixed",
-                bottom: isKeyboardVisible && keyboardHeight > 0 ? `${keyboardHeight}px` : 0,
-                left: 0,
-                right: 0,
-                borderTop: `1px solid ${borderTopColor}`,
-                zIndex: 1100,
                 bgcolor: containerBg,
-                px: 0,
+                borderTopColor: borderTopColor,
+                px: 1,
                 py: 1,
-                transition: "bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-                paddingBottom: !isKeyboardVisible
-                    ? isPWA
-                        ? `calc(8px + env(safe-area-inset-bottom))`
-                        : `max(8px, env(safe-area-inset-bottom))`
-                    : "8px",
-                paddingLeft: isPWA ? "env(safe-area-inset-left)" : 0,
-                paddingRight: isPWA ? "env(safe-area-inset-right)" : 0,
-                pointerEvents: "auto",
-                boxShadow: isKeyboardVisible ? "0 -4px 20px rgba(0, 0, 0, 0.1)" : "0 -1px 3px rgba(0, 0, 0, 0.05)",
+                // PWA에서 추가 패딩
+                ...(isPWA && {
+                    paddingLeft: "calc(8px + env(safe-area-inset-left))",
+                    paddingRight: "calc(8px + env(safe-area-inset-right))",
+                    paddingBottom: "calc(8px + env(safe-area-inset-bottom))",
+                }),
             }}
         >
             {/* 대댓글 모드 헤더 */}
@@ -223,13 +116,12 @@ const CommentForm: React.FC<CommentFormProps> = ({
             >
                 <FormControl variant="outlined" fullWidth>
                     <OutlinedInput
-                        ref={inputRef}
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
                         placeholder={placeholder}
                         multiline
                         minRows={1}
-                        maxRows={6}
+                        maxRows={4}
                         aria-label="comment input"
                         sx={{
                             bgcolor: inputBg,

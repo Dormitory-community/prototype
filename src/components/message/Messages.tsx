@@ -37,7 +37,6 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     const messagesContainerRef = useRef<HTMLDivElement | null>(null)
     const messagesEndRef = useRef<HTMLDivElement | null>(null)
     const isMobile = useMediaQuery(theme.breakpoints.down("md"))
-    const isSmallScreen = useMediaQuery("(max-height: 600px)")
     const { loadMoreMessages, hasMoreMessages } = useChat()
 
     const [roomData, setRoomData] = useState<ChatRoom | null>(initialRoomData || null)
@@ -45,66 +44,6 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     const [hasMore, setHasMore] = useState(true)
     const [newMessage, setNewMessage] = useState("")
     const [isInitialized, setIsInitialized] = useState(false)
-    const [isPWA, setIsPWA] = useState(false)
-    const [keyboardHeight, setKeyboardHeight] = useState(0)
-    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
-
-    useEffect(() => {
-        const detectPWA = () => {
-            const isStandalone =
-                ("standalone" in window.navigator && (window.navigator as any).standalone === true) ||
-                window.matchMedia("(display-mode: standalone)").matches ||
-                window.matchMedia("(display-mode: fullscreen)").matches ||
-                (typeof document !== "undefined" && document.referrer.includes("android-app://"))
-            return Boolean(isStandalone)
-        }
-        setIsPWA(detectPWA())
-    }, [])
-
-    useEffect(() => {
-        const handleViewportChange = () => {
-            const visualViewport = (window as any).visualViewport
-
-            if (visualViewport) {
-                const currentHeight = visualViewport.height
-                const windowHeight = window.innerHeight
-                const heightDiff = windowHeight - currentHeight
-
-                if (heightDiff > 150) {
-                    setKeyboardHeight(heightDiff)
-                    setIsKeyboardVisible(true)
-                } else {
-                    setKeyboardHeight(0)
-                    setIsKeyboardVisible(false)
-                }
-            } else {
-                const currentHeight = window.innerHeight
-                const initialHeight = window.screen.height
-                const heightDiff = initialHeight - currentHeight
-
-                if (heightDiff > 150) {
-                    setKeyboardHeight(heightDiff)
-                    setIsKeyboardVisible(true)
-                } else {
-                    setKeyboardHeight(0)
-                    setIsKeyboardVisible(false)
-                }
-            }
-        }
-
-        const visualViewport = (window as any).visualViewport
-        if (visualViewport) {
-            visualViewport.addEventListener("resize", handleViewportChange)
-        }
-        window.addEventListener("resize", handleViewportChange)
-
-        return () => {
-            if (visualViewport) {
-                visualViewport.removeEventListener("resize", handleViewportChange)
-            }
-            window.removeEventListener("resize", handleViewportChange)
-        }
-    }, [])
 
     // mock init (원본 유지)
     useEffect(() => {
@@ -145,6 +84,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         return scrollHeight - scrollTop - clientHeight < 50
     }, [])
 
+    // 초기 스크롤 처리
     useLayoutEffect(() => {
         if (!roomData?.messages.length || isInitialized) return
 
@@ -154,30 +94,11 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
             return
         }
 
-        // PWA 환경에서는 여러 번 시도하여 확실히 스크롤
-        const scrollToBottomWithRetry = (attempts = 0) => {
-            if (attempts > 5) {
-                setIsInitialized(true)
-                return
-            }
-
+        // 단순한 스크롤 처리
+        setTimeout(() => {
             container.scrollTo({ top: container.scrollHeight, behavior: "auto" })
-
-            // 스크롤이 제대로 되었는지 확인
-            setTimeout(() => {
-                const { scrollTop, scrollHeight, clientHeight } = container
-                const isAtBottom = scrollHeight - scrollTop - clientHeight < 10
-
-                if (!isAtBottom) {
-                    scrollToBottomWithRetry(attempts + 1)
-                } else {
-                    setIsInitialized(true)
-                }
-            }, 100)
-        }
-
-        // 초기 지연 후 스크롤 시작
-        setTimeout(() => scrollToBottomWithRetry(), 50)
+            setIsInitialized(true)
+        }, 100)
     }, [roomData?.messages, isInitialized])
 
     // 이전 메시지 로드
@@ -227,17 +148,6 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         setTimeout(() => scrollToBottom("smooth"), 50)
     }, [newMessage, roomId, scrollToBottom])
 
-    useEffect(() => {
-        if (isKeyboardVisible && roomData?.messages.length) {
-            // 키보드가 올라올 때 마지막 메시지가 보이도록 스크롤 조정
-            setTimeout(() => {
-                if (isScrolledToBottom()) {
-                    scrollToBottom("auto")
-                }
-            }, 300) // 키보드 애니메이션 완료 후
-        }
-    }, [isKeyboardVisible, scrollToBottom, isScrolledToBottom])
-
     const formatTime = (timestamp: string) => {
         const date = new Date(timestamp)
         const now = new Date()
@@ -247,27 +157,14 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         return date.toLocaleDateString("ko-KR", { month: "short", day: "numeric" })
     }
 
-    const getMessagesBottomPadding = () => {
-        const baseInputHeight = isMobile ? 80 : 70 // 기본 입력창 높이
-        const safeAreaBottom = isPWA ? 20 : 0 // safe-area 추정값
-
-        if (isKeyboardVisible) {
-            // 키보드가 올라온 상태에서는 입력창 높이만 고려
-            return `${baseInputHeight + 20}px`
-        } else {
-            // 키보드가 없을 때는 입력창 + safe-area 고려
-            return `${baseInputHeight + safeAreaBottom + 20}px`
-        }
-    }
-
     return (
         <>
-            {/* 메인 콘텐츠: 스크롤 가능 영역 */}
+            {/* 메인 콘텐츠 */}
             <Box
                 sx={{
                     display: "flex",
                     flexDirection: "column",
-                    height: { xs: "calc(100vh - 56px)", md: "calc(100vh - 64px)" },
+                    height: "100vh",
                     backgroundColor: "background.default",
                     overflow: "hidden",
                 }}
@@ -285,10 +182,8 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                         display: "flex",
                         flexDirection: "column",
                         WebkitOverflowScrolling: "touch",
-                        // 동적 하단 패딩 적용
-                        paddingBottom: getMessagesBottomPadding(),
-                        // 스크롤 바운스 방지 (iOS)
-                        overscrollBehavior: "none",
+                        // 하단 입력창 공간 확보
+                        paddingBottom: "100px",
                     }}
                 >
                     {isLoadingMore && (
@@ -369,7 +264,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 </Box>
             </Box>
 
-            {/* ChatInput: 화면 하단에 완전 고정, 스크롤과 분리 */}
+            {/* ChatInput: 화면 하단에 완전 고정 */}
             <ChatInput value={newMessage} onChange={setNewMessage} onSend={handleSendMessage} />
         </>
     )

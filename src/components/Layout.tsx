@@ -15,7 +15,6 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const location = useLocation()
     const [isPWA, setIsPWA] = useState(false)
-    const [viewportHeight, setViewportHeight] = useState("100vh")
 
     const normalize = (route: string) => route.replace(/:.*$/, "")
 
@@ -24,10 +23,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     )
 
     const isMessageDetail = location.pathname.startsWith(normalize(ROUTES.MESSAGE_DETAIL))
-
     const isBoardDetail = location.pathname.startsWith(normalize(ROUTES.BOARD_DETAIL))
 
-    // 입력창이 있는 페이지들 - 하단에 고정 입력창을 위한 공간 확보 필요
+    // 입력창이 있는 페이지들
     const hasFixedInput = isMessageDetail || isBoardDetail
 
     useEffect(() => {
@@ -41,117 +39,56 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         }
 
         setIsPWA(detectPWA())
-
-        // PWA 환경에서 viewport 높이 최적화
-        const updateViewportHeight = () => {
-            if (detectPWA()) {
-                // PWA에서는 동적 viewport 높이 사용
-                const vh = window.innerHeight * 0.01
-                document.documentElement.style.setProperty("--vh", `${vh}px`)
-
-                // visualViewport 지원 시 더 정확한 높이 계산
-                const visualViewport = (window as any).visualViewport
-                if (visualViewport) {
-                    setViewportHeight(`${visualViewport.height}px`)
-                } else {
-                    setViewportHeight(`${window.innerHeight}px`)
-                }
-            }
-        }
-
-        updateViewportHeight()
-
-        // 리사이즈 이벤트 리스너
-        const handleResize = () => {
-            updateViewportHeight()
-        }
-
-        window.addEventListener("resize", handleResize)
-
-        // visualViewport 이벤트 리스너 (iOS Safari PWA)
-        const visualViewport = (window as any).visualViewport
-        if (visualViewport) {
-            visualViewport.addEventListener("resize", updateViewportHeight)
-        }
-
-        return () => {
-            window.removeEventListener("resize", handleResize)
-            if (visualViewport) {
-                visualViewport.removeEventListener("resize", updateViewportHeight)
-            }
-        }
     }, [])
 
     useEffect(() => {
-        if (hasFixedInput) {
-            document.body.classList.add("fixed-input-page")
-            if (isPWA) {
-                document.body.classList.add("pwa-mode")
-            }
+        // PWA 환경에서 body에 클래스 추가
+        if (isPWA) {
+            document.body.classList.add("pwa-environment")
         } else {
-            document.body.classList.remove("fixed-input-page", "pwa-mode")
+            document.body.classList.remove("pwa-environment")
         }
 
         return () => {
-            document.body.classList.remove("fixed-input-page", "pwa-mode")
+            document.body.classList.remove("pwa-environment")
         }
-    }, [hasFixedInput, isPWA])
+    }, [isPWA])
 
     return (
         <Box
             sx={{
                 display: "flex",
                 flexDirection: "column",
-                height: isMessageDetail ? (isPWA ? viewportHeight : { xs: "100vh", md: "auto" }) : "auto",
-                minHeight: isMessageDetail ? (isPWA ? viewportHeight : { xs: "100vh", md: "calc(100vh - 64px)" }) : "auto",
-                overflow: isMessageDetail ? { xs: "hidden", md: "visible" } : "visible",
+                minHeight: "100vh",
+                // PWA에서 safe-area 적용
                 ...(isPWA && {
                     paddingTop: "env(safe-area-inset-top)",
                     paddingLeft: "env(safe-area-inset-left)",
                     paddingRight: "env(safe-area-inset-right)",
-                    // 하단은 입력창에서 개별 처리하므로 제외
                 }),
             }}
         >
             {!hideHeader && !isMessageDetail && <Header />}
+
             <Box
                 component="main"
-                className={hasFixedInput ? "scroll-content" : ""}
                 sx={{
-                    ...(isMessageDetail
-                        ? {
-                            flex: { xs: 1, md: "none" },
-                            height: { xs: 0, md: "auto" },
-                            overflow: { xs: "hidden", md: "visible" },
-                            overscrollBehavior: { xs: "none", md: "auto" },
-                            pt: isPWA ? 0 : { xs: "56px", md: "64px" },
-                            px: { xs: 0, md: 3 },
-                            py: { xs: 0, md: 2 },
-                        }
-                        : {
-                            flexGrow: 1,
-                            pt: hideHeader ? 0 : { xs: "56px", sm: "64px" },
-                            // 고정 입력창이 있는 페이지는 하단 패딩 제거 (입력창이 고정이므로)
-                            pb: hasFixedInput
-                                ? 0
-                                : {
-                                    xs: isPWA
-                                        ? `calc(env(safe-area-inset-bottom) + 56px)`
-                                        : `calc(env(safe-area-inset-bottom) + 56px)`,
-                                    sm: 3,
-                                },
-                            overflow: "auto",
-                            // 고정 입력창이 있는 페이지에서 스크롤 영역이 입력창 아래로 가지 않도록
-                            ...(hasFixedInput && {
-                                maxHeight: isPWA
-                                    ? `calc(${viewportHeight} - 56px - 80px)`
-                                    : { xs: "calc(100vh - 56px - 80px)", sm: "calc(100vh - 64px - 80px)" },
-                            }),
-                        }),
+                    flexGrow: 1,
+                    // 헤더 높이만큼 패딩
+                    pt: hideHeader || isMessageDetail ? 0 : { xs: "56px", sm: "64px" },
+                    // 하단 네비게이션 높이만큼 패딩 (고정 입력창이 없는 경우만)
+                    pb: { xs: "56px", sm: "80px" },
+                    // 메시지 상세 페이지는 전체 높이 사용
+                    ...(isMessageDetail && {
+                        height: "100vh",
+                        overflow: "hidden",
+                        pb: 0,
+                    }),
                 }}
             >
                 {children}
             </Box>
+
             {(!isMessageDetail || (isMessageDetail && window.innerWidth >= 960)) && <MobileNavBar />}
         </Box>
     )

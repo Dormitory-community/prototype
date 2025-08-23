@@ -38,8 +38,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
                                              }) => {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down("md"))
-    const [keyboardHeight, setKeyboardHeight] = useState(0)
-    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
     const [isPWA, setIsPWA] = useState(false)
 
     useEffect(() => {
@@ -52,66 +50,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
             return Boolean(isStandalone)
         }
         setIsPWA(detectPWA())
-    }, [])
-
-    useEffect(() => {
-        const initialViewportHeight = window.innerHeight
-        const isAndroid = /Android/i.test(navigator.userAgent)
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-
-        let timeoutId: NodeJS.Timeout
-
-        const handleViewportChange = () => {
-            const visualViewport = (window as any).visualViewport
-
-            if (visualViewport) {
-                const currentHeight = visualViewport.height
-                const heightDiff = initialViewportHeight - currentHeight
-
-                if (heightDiff > 150) {
-                    setKeyboardHeight(heightDiff)
-                    setIsKeyboardVisible(true)
-                } else {
-                    setKeyboardHeight(0)
-                    setIsKeyboardVisible(false)
-                }
-            } else {
-                const currentHeight = window.innerHeight
-                const heightDiff = initialViewportHeight - currentHeight
-
-                if (heightDiff > 100) {
-                    setKeyboardHeight(heightDiff)
-                    setIsKeyboardVisible(true)
-                } else {
-                    setKeyboardHeight(0)
-                    setIsKeyboardVisible(false)
-                }
-            }
-        }
-
-        const debouncedViewportChange = () => {
-            clearTimeout(timeoutId)
-            timeoutId = setTimeout(handleViewportChange, 50)
-        }
-
-        const visualViewport = (window as any).visualViewport
-        if (visualViewport) {
-            visualViewport.addEventListener("resize", debouncedViewportChange)
-            visualViewport.addEventListener("scroll", debouncedViewportChange)
-        }
-
-        window.addEventListener("resize", debouncedViewportChange)
-
-        handleViewportChange()
-
-        return () => {
-            clearTimeout(timeoutId)
-            if (visualViewport) {
-                visualViewport.removeEventListener("resize", debouncedViewportChange)
-                visualViewport.removeEventListener("scroll", debouncedViewportChange)
-            }
-            window.removeEventListener("resize", debouncedViewportChange)
-        }
     }, [])
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -129,38 +67,20 @@ const ChatInput: React.FC<ChatInputProps> = ({
         }
     }
 
-    const getBottomPosition = () => {
-        if (!isKeyboardVisible) {
-            return isPWA ? "env(safe-area-inset-bottom)" : "0px"
-        } else {
-            return `${keyboardHeight}px`
-        }
-    }
-
     return (
         <Paper
             elevation={0}
+            className="fixed-input-container"
             sx={{
-                position: "fixed",
-                bottom: getBottomPosition(),
-                left: 0,
-                right: 0,
-                borderRadius: 0,
                 backgroundColor: "background.paper",
-                borderTop: 1,
                 borderColor: "divider",
-                p: isMobile ? 1.5 : 2,
-                zIndex: 1100,
-                transition: "bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-                paddingBottom:
-                    !isKeyboardVisible && isPWA
-                        ? `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-bottom))`
-                        : isMobile
-                            ? "12px"
-                            : "16px",
-                paddingLeft: isPWA ? `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-left))` : undefined,
-                paddingRight: isPWA ? `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-right))` : undefined,
-                pointerEvents: "auto",
+                p: isMobile ? 0.5 : 1,
+                // PWA에서 추가 패딩
+                ...(isPWA && {
+                    paddingLeft: `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-left))`,
+                    paddingRight: `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-right))`,
+                    paddingBottom: `calc(${isMobile ? "12px" : "16px"} + env(safe-area-inset-bottom))`,
+                }),
                 ...sx,
             }}
         >
@@ -185,7 +105,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                             borderRadius: 3,
                             backgroundColor: "background.paper",
                             "& input, & textarea": {
-                                fontSize: isMobile ? "16px" : "14px",
+                                fontSize: isMobile ? "16px" : "14px", // 16px로 줌 방지
                                 lineHeight: 1.4,
                                 padding: "8px 10px",
                             },
