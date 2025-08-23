@@ -88,6 +88,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     width: "100%",
                     maxWidth: "100vw",
                     boxSizing: "border-box",
+                    bgcolor: "background.default",
                 }}
             >
                 {children}
