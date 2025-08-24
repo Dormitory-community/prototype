@@ -1,89 +1,54 @@
+/* index.css (기존 부분 수정/추가) */
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
-}
-
-/* 기본 레이아웃 */
-html, body {
-  height: 100%;
-  width: 100%;
-  overflow: visible;
-}
-
-#root {
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-}
-
-/* PWA 환경에서 safe-area 처리 */
-@supports (padding: max(0px)) {
-  .pwa-safe-area {
-    padding-top: env(safe-area-inset-top);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
-
-  .pwa-safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-}
-
-/* 모바일 환경에서 줌 방지 */
-@media screen and (max-width: 768px) {
-  input, textarea, select {
-    font-size: 16px !important;
-    -webkit-text-size-adjust: 100%;
-  }
-}
-
-/* 하단 고정 입력창 기본 스타일 */
-.fixed-input-container {
-  position: fixed !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 1100 !important;
-  background-color: white;
-  border-top: 1px solid #e0e0e0;
-}
-
-/* PWA standalone 모드에서 safe-area 적용 */
-@media all and (display-mode: standalone) {
-  .fixed-input-container {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-}
-
-
-
-/* 기존 스타일 */
+/* 기본 body 색상 */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-  "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: /* ... */;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f8fafc;
+  background-color: #f8fafc; /* 라이트 모드 */
   -webkit-overflow-scrolling: touch;
 }
 
-/* 다크 모드 및 PWA 환경에서 하단 safe-area 색상 통일 */
-@media (prefers-color-scheme: dark), (display-mode: standalone) {
+/* 다크 모드 body 색상 */
+@media (prefers-color-scheme: dark) {
   body {
-    background-color: #1e293b; /* 네비 색상과 통일 */
+    background-color: #1e293b; /* 네비 바와 동일한 다크 색상 */
+  }
+}
+
+/* PWA standalone 모드에서 safe-area 통일 */
+@media (display-mode: standalone) {
+  body {
+    background-color: #f8fafc; /* 라이트 모드 기본 */
+  }
+
+  /* 다크 모드일 때 오버라이드 (prefers-color-scheme과 결합) */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #1e293b;
+    }
   }
 
   .mobile-nav-bar::after {
     content: "";
     position: absolute;
-    bottom: 0;
+    bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); /* 네비 바 아래로 확장 */
     left: 0;
     right: 0;
     height: env(safe-area-inset-bottom, 0px);
-    background-color: #0f172a;
+    background-color: inherit; /* 네비 바의 background-color 상속 (background.default) */
     z-index: -1;
   }
+}
+
+/* iOS-specific: 웹킷 오버플로우와 safe-area 강화 */
+@supports (-webkit-overflow-scrolling: touch) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+.ios-environment .mobile-nav-bar::after {
+  background-color: #1e293b; /* iOS에서 강제 다크 색상 (필요 시) */
 }

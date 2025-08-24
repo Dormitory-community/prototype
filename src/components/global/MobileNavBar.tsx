@@ -71,6 +71,7 @@ export const MobileNavBar: React.FC = () => {
 
     return (
         <Paper
+            className="mobile-nav-bar"
             sx={{
                 position: "fixed",
                 left: 0,

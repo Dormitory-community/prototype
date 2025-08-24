@@ -44,16 +44,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         setIsIOS(detectIOS())
     }, [])
 
+    // Layout.tsx (useEffect 내부 추가)
     useEffect(() => {
         if (isPWA) {
-            document.body.classList.add("pwa-environment")
+            document.body.classList.add("pwa-environment");
         } else {
-            document.body.classList.remove("pwa-environment")
+            document.body.classList.remove("pwa-environment");
         }
-        return () => {
-            document.body.classList.remove("pwa-environment")
+        if (isIOS) {
+            document.body.classList.add("ios-environment"); // iOS 전용 클래스 추가
         }
-    }, [isPWA])
+        // cleanup...
+    }, [isPWA, isIOS]);
 
     return (
         <Box
