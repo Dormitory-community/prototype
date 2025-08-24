@@ -10,10 +10,10 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* 다크 모드 body 색상 */
+/* 다크 모드 body 색상 - iOS 홈바와 정확히 매칭 */
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #1e293b; /* 네비 바와 동일한 다크 색상 */
+    background-color: #0f172a; /* iOS 홈바와 동일한 진한 색상 */
   }
 }
 
@@ -23,10 +23,10 @@ body {
     background-color: #f8fafc; /* 라이트 모드 기본 */
   }
 
-  /* 다크 모드일 때 오버라이드 (prefers-color-scheme과 결합) */
+  /* 다크 모드일 때 오버라이드 */
   @media (prefers-color-scheme: dark) {
     body {
-      background-color: #1e293b;
+      background-color: #0f172a; /* iOS 홈바와 동일한 색상 */
     }
   }
 
@@ -38,14 +38,14 @@ body {
     left: 0;
     right: 0;
     height: env(safe-area-inset-bottom, 0px);
-    background-color: #f8fafc; /* 라이트 모드에서 body와 동일한 색상 */
+    background-color: #f8fafc; /* 라이트 모드 */
     z-index: -1;
   }
 
   /* 네비게이션 바 하단 확장 영역 - 다크 모드 */
   @media (prefers-color-scheme: dark) {
     .mobile-nav-bar::after {
-      background-color: #1e293b; /* 다크 모드에서 body와 동일한 색상 */
+      background-color: #0f172a; /* iOS 홈바와 정확히 매칭 */
     }
   }
 }
@@ -64,8 +64,19 @@ body {
 
     @media (prefers-color-scheme: dark) {
       .ios-environment .mobile-nav-bar::after {
-        background-color: #1e293b; /* iOS 다크 모드 */
+        background-color: #0f172a; /* iOS 다크 모드 - 홈바와 정확히 매칭 */
       }
+    }
+  }
+
+  /* iOS에서 네비게이션 바 자체 색상도 강제 적용 */
+  .ios-environment .mobile-nav-bar {
+    background-color: #f8fafc !important;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .ios-environment .mobile-nav-bar {
+      background-color: #0f172a !important; /* iOS 홈바와 동일한 색상 */
     }
   }
 }

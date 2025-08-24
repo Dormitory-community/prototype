@@ -44,7 +44,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         setIsIOS(detectIOS())
     }, [])
 
-    // Layout.tsx (useEffect 내부 추가)
     useEffect(() => {
         if (isPWA) {
             document.body.classList.add("pwa-environment");
@@ -52,9 +51,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             document.body.classList.remove("pwa-environment");
         }
         if (isIOS) {
-            document.body.classList.add("ios-environment"); // iOS 전용 클래스 추가
+            document.body.classList.add("ios-environment");
         }
-        // cleanup...
     }, [isPWA, isIOS]);
 
     return (
@@ -62,9 +60,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             sx={{
                 display: "flex",
                 flexDirection: "column",
-                minHeight: "100dvh", // 동적 뷰포트 높이 사용
+                minHeight: "100dvh",
+                // PWA에서는 Layout에서 safe-area 적용하지 않음 (Header에서 개별 적용)
                 ...(isPWA && {
-                    paddingTop: "env(safe-area-inset-top)",
                     paddingLeft: "env(safe-area-inset-left)",
                     paddingRight: "env(safe-area-inset-right)",
                 }),
@@ -76,11 +74,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    pt: hideHeader || isMessageDetail ? 0 : { xs: "48px", sm: "56px", md: "64px" },
-                    pb: isBoardDetail
-                        ? { xs: "80px", sm: "100px" } // 8px 여유 제거, 기본값 복원
+                    // PWA에서 헤더 높이 계산 시 safe-area-inset-top 포함
+                    pt: hideHeader || isMessageDetail
+                        ? (isPWA ? "env(safe-area-inset-top, 0px)" : 0)
                         : isPWA
-                            ? { xs: "48px", sm: "56px" } // 8px 여유 제거, 네비 높이와 맞춤
+                            ? "calc(env(safe-area-inset-top, 0px) + 48px)" // PWA: safe-area + header height
+                            : { xs: "48px", sm: "56px", md: "64px" }, // 일반: header height만
+                    pb: isBoardDetail
+                        ? { xs: "80px", sm: "100px" }
+                        : isPWA
+                            ? { xs: "48px", sm: "56px" }
                             : { xs: 48, sm: 56 },
                     ...(isMessageDetail && {
                         height: "100dvh",

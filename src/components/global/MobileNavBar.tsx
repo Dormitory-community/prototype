@@ -7,12 +7,15 @@ import { Groups, Dashboard, Person, Home, ChatBubble } from "@mui/icons-material
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
 import { useTheme } from '@mui/material/styles';
+import { useThemeContext } from "@/contexts/ThemeContext"
 
 export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const theme = useTheme()
+    const { mode } = useThemeContext() // 현재 테마 모드 가져오기
     const [isPWA, setIsPWA] = useState(false)
+    const [isIOS, setIsIOS] = useState(false)
 
     useEffect(() => {
         const detectPWA = () => {
@@ -24,7 +27,12 @@ export const MobileNavBar: React.FC = () => {
             return Boolean(isStandalone)
         }
 
+        const detectIOS = () => {
+            return /iPhone|iPad|iPod/i.test(navigator.userAgent)
+        }
+
         setIsPWA(detectPWA())
+        setIsIOS(detectIOS())
     }, [])
 
     const hiddenRoutes = [ROUTES.LOGIN, ROUTES.SIGNUP, ROUTES.BOARD_DETAIL, ROUTES.MESSAGE_DETAIL]
@@ -71,6 +79,14 @@ export const MobileNavBar: React.FC = () => {
         }
     }
 
+    // iOS PWA에서 홈바와 정확히 매칭되는 색상
+    const getBackgroundColor = () => {
+        if (isIOS && isPWA) {
+            return mode === 'dark' ? '#0f172a' : '#f8fafc'; // iOS 홈바와 동일한 색상
+        }
+        return theme.palette.background.default;
+    }
+
     return (
         <Paper
             className="mobile-nav-bar"
@@ -88,7 +104,7 @@ export const MobileNavBar: React.FC = () => {
                     paddingRight: "env(safe-area-inset-right, 0px)",
                     paddingBottom: "env(safe-area-inset-bottom, 0px)",
                 }),
-                backgroundColor: theme.palette.background.default, // 테마의 배경색 명시적 사용
+                backgroundColor: getBackgroundColor(), // iOS 홈바와 매칭되는 색상 사용
             }}
             elevation={3}
         >
@@ -101,7 +117,7 @@ export const MobileNavBar: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-around",
-                    backgroundColor: theme.palette.background.default, // 테마의 배경색 명시적 사용
+                    backgroundColor: getBackgroundColor(), // iOS 홈바와 매칭되는 색상 사용
                     borderTop: "1px solid",
                     borderColor: "divider",
                     "& .MuiBottomNavigationAction-root": {
