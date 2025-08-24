@@ -6,13 +6,13 @@ import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
 import { Groups, Dashboard, Person, Home, ChatBubble } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
-import { useTheme } from '@mui/material';
+// import { useTheme } from '@mui/material';
 
 export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const [isPWA, setIsPWA] = useState(false)
-    const theme = useTheme()
+    // const theme = useTheme()
 
     useEffect(() => {
         const detectPWA = () => {
@@ -88,7 +88,7 @@ export const MobileNavBar: React.FC = () => {
                     paddingRight: "env(safe-area-inset-right, 0px)",
                     paddingBottom: "env(safe-area-inset-bottom, 0px)", // 8px 여유 제거
                 }),
-                backgroundColor: theme.palette.background.default,
+                backgroundColor: "background.default",
             }}
             elevation={3}
         >
