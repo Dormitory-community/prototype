@@ -82,7 +82,7 @@ export const Header: React.FC = () => {
                 sx={{
                     justifyContent: "space-between",
                     px: { xs: 1, sm: 2, md: 3 },
-                    minHeight: { xs: 48, sm: 56, md: 64 },
+                    minHeight: { xs: 58, sm: 66, md: 74 },
                     maxWidth: "100%",
                     boxSizing: "border-box",
                 }}

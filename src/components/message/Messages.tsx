@@ -174,10 +174,6 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 height: "100vh",
                 backgroundColor: "background.default",
                 overflow: "hidden",
-                // PWA에서는 safe-area를 고려하지 않음 (body에서 이미 처리됨)
-                ...(isPWA && {
-                    height: "calc(100vh - env(safe-area-inset-top, 0px))", // 상단 safe-area 제외
-                }),
             }}
         >
             <MessageHeader userName={roomData?.userName || ""} userAvatar={roomData?.userAvatar} />
