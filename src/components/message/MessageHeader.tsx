@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
     Box,
     Typography,
@@ -29,6 +29,20 @@ const iOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigato
 const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) => {
     const navigate = useNavigate()
     const [open, setOpen] = useState(false)
+    const [isPWA, setIsPWA] = useState(false)
+
+    useEffect(() => {
+        const detectPWA = () => {
+            const isStandalone =
+                ("standalone" in window.navigator && (window.navigator as any).standalone === true) ||
+                window.matchMedia("(display-mode: standalone)").matches ||
+                window.matchMedia("(display-mode: fullscreen)").matches ||
+                (typeof document !== "undefined" && document.referrer.includes("android-app://"))
+            return Boolean(isStandalone)
+        }
+
+        setIsPWA(detectPWA())
+    }, [])
 
     const anchor = "right"
 
@@ -42,7 +56,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) =
             <Box
                 sx={{
                     position: "fixed",
-                    top: 0,
+                    top: isPWA ? "env(safe-area-inset-top, 0px)" : 0, // PWA에서 safe-area 적용
                     left: 0,
                     right: 0,
                     zIndex: 10,
@@ -54,6 +68,11 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) =
                     justifyContent: "space-between",
                     borderBottom: 1,
                     borderColor: "divider",
+                    // PWA에서 좌우 safe-area도 고려
+                    ...(isPWA && {
+                        paddingLeft: "calc(16px + env(safe-area-inset-left, 0px))",
+                        paddingRight: "calc(16px + env(safe-area-inset-right, 0px))",
+                    }),
                 }}
             >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -102,6 +121,11 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) =
                         borderTopLeftRadius: 16,
                         borderBottomLeftRadius: 16,
                         overflow: "auto",
+                        // PWA에서 드로어도 safe-area 고려
+                        ...(isPWA && {
+                            paddingTop: "env(safe-area-inset-top, 0px)",
+                            paddingLeft: "env(safe-area-inset-left, 0px)",
+                        }),
                     },
                 }}
                 ModalProps={{
@@ -153,7 +177,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) =
                                 <ListItemAvatar>
                                     <Avatar sx={{ bgcolor: "grey.500" }}>나</Avatar>
                                 </ListItemAvatar>
-                                <ListItemText primary="메론메로나" />
+                                <ListItemText primary="멜로 멜로나" />
                             </ListItem>
 
                             <ListItem>
@@ -180,6 +204,10 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) =
                             borderTop: 1,
                             borderColor: "divider",
                             backgroundColor: "background.paper",
+                            // PWA에서 하단 safe-area 고려
+                            ...(isPWA && {
+                                paddingBottom: "calc(8px + env(safe-area-inset-bottom, 0px))",
+                            }),
                         }}
                     >
                         <Button startIcon={<ArrowBack />} onClick={() => setOpen(false)}>

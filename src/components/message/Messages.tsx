@@ -163,127 +163,39 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     const CHAT_INPUT_HEIGHT_DESKTOP = 90
     const EXTRA_PADDING = 8 // 메시지와 입력창 사이 여유 공간
 
+    // MessageHeader 높이 계산 (PWA에서 safe-area 포함)
+    const MESSAGE_HEADER_HEIGHT = 64 // 기본 헤더 높이
+
     useEffect(() => {
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
         setIsPWA(isStandalone);
     }, []);
 
     return (
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100vh",
+                backgroundColor: "background.default",
+                overflow: "hidden",
+            }}
+        >
+            <MessageHeader userName={roomData?.userName || ""} userAvatar={roomData?.userAvatar} />
+
+            {/* MessageHeader를 위한 공간 확보 */}
             <Box
                 sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100vh",
-                    backgroundColor: "background.default",
-                    overflow: "hidden",
+                    height: isPWA
+                        ? `calc(${MESSAGE_HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`
+                        : `${MESSAGE_HEADER_HEIGHT}px`,
+                    flexShrink: 0,
                 }}
-            >
-                <MessageHeader userName={roomData?.userName || ""} userAvatar={roomData?.userAvatar} />
-                <Box
-                    sx={{
-                        height: {
-                            xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
-                            sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
-                        },
-                        minHeight: {
-                            xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
-                            sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
-                        },
-                        flexShrink: 0,
-                    }}
-                />
-                <Box
-                    ref={messagesContainerRef}
-                    onScroll={handleScroll}
-                    sx={{
-                        flex: 1,
-                        overflowY: "auto",
-                        px: { xs: 2, md: 3 },
-                        py: { xs: 2, md: 3 },
-                        paddingBottom: isPWA ? `calc(${EXTRA_PADDING}px + env(safe-area-inset-bottom, 0px))` : EXTRA_PADDING,
-                        display: "flex",
-                        flexDirection: "column",
-                        WebkitOverflowScrolling: "touch",
-                    }}
-                >
-                    {isLoadingMore && (
-                        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-                            <CircularProgress size={24} />
-                        </Box>
-                    )}
+            />
 
-                    {roomData?.messages.map((msg, i) => {
-                        const showAvatar = !msg.isFromMe && (i === 0 || roomData.messages[i - 1].isFromMe !== msg.isFromMe)
-                        return (
-                            <Box
-                                key={msg.id}
-                                sx={{ display: "flex", justifyContent: msg.isFromMe ? "flex-end" : "flex-start", mb: 1.5}}
-                            >
-                                <Box
-                                    sx={{
-                                        maxWidth: isMobile ? "85%" : "70%",
-                                        display: "flex",
-                                        flexDirection: msg.isFromMe ? "row-reverse" : "row",
-                                        alignItems: "flex-end",
-                                        gap: 1,
-                                    }}
-                                >
-                                    {!msg.isFromMe && showAvatar && (
-                                        <Avatar
-                                            sx={{
-                                                width: isMobile ? 32 : 36,
-                                                height: isMobile ? 32 : 36,
-                                                backgroundColor: "primary.main",
-                                                flexShrink: 0,
-                                            }}
-                                        >
-                                            {roomData.userName.charAt(0)}
-                                        </Avatar>
-                                    )}
-                                    <Box sx={{ minWidth: 0 }}>
-                                        <Paper
-                                            elevation={1}
-                                            sx={{
-                                                px: isMobile ? 2 : 2.5,
-                                                py: isMobile ? 1.5 : 2,
-                                                backgroundColor: msg.isFromMe
-                                                    ? theme.palette.primary.main
-                                                    : theme.palette.mode === "dark"
-                                                        ? theme.palette.grey[600]
-                                                        : theme.palette.grey[100],
-                                                color: msg.isFromMe ? "white" : "text.primary",
-                                                borderRadius: 2,
-                                                borderBottomLeftRadius: !msg.isFromMe ? 0.5 : 2,
-                                                borderBottomRightRadius: msg.isFromMe ? 0.5 : 2,
-                                                wordBreak: "break-word",
-                                            }}
-                                        >
-                                            <Typography variant={isMobile ? "body2" : "body1"} sx={{ whiteSpace: "pre-wrap" }}>
-                                                {msg.content}
-                                            </Typography>
-                                        </Paper>
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                mt: 0.5,
-                                                px: 1,
-                                                color: "text.secondary",
-                                                display: "block",
-                                                textAlign: msg.isFromMe ? "right" : "left",
-                                                fontSize: isMobile ? "0.7rem" : "0.75rem",
-                                            }}
-                                        >
-                                            {formatTime(msg.timestamp)}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                            </Box>
-                        )
-                    })}
-                    <div ref={messagesEndRef} />
-                </Box>
-                <Box
-                    sx={{
+            {/* ChatInput을 위한 공간 확보 */}
+            <Box
+                sx={{
                     height: {
                         xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
                         sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
@@ -294,11 +206,102 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     },
                     flexShrink: 0,
                 }}
-                />
+            />
+
+            <Box
+                ref={messagesContainerRef}
+                onScroll={handleScroll}
+                sx={{
+                    flex: 1,
+                    overflowY: "auto",
+                    px: { xs: 2, md: 3 },
+                    py: { xs: 2, md: 3 },
+                    paddingBottom: isPWA ? `calc(${EXTRA_PADDING}px + env(safe-area-inset-bottom, 0px))` : EXTRA_PADDING,
+                    display: "flex",
+                    flexDirection: "column",
+                    WebkitOverflowScrolling: "touch",
+                }}
+            >
+                {isLoadingMore && (
+                    <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                        <CircularProgress size={24} />
+                    </Box>
+                )}
+
+                {roomData?.messages.map((msg, i) => {
+                    const showAvatar = !msg.isFromMe && (i === 0 || roomData.messages[i - 1].isFromMe !== msg.isFromMe)
+                    return (
+                        <Box
+                            key={msg.id}
+                            sx={{ display: "flex", justifyContent: msg.isFromMe ? "flex-end" : "flex-start", mb: 1.5}}
+                        >
+                            <Box
+                                sx={{
+                                    maxWidth: isMobile ? "85%" : "70%",
+                                    display: "flex",
+                                    flexDirection: msg.isFromMe ? "row-reverse" : "row",
+                                    alignItems: "flex-end",
+                                    gap: 1,
+                                }}
+                            >
+                                {!msg.isFromMe && showAvatar && (
+                                    <Avatar
+                                        sx={{
+                                            width: isMobile ? 32 : 36,
+                                            height: isMobile ? 32 : 36,
+                                            backgroundColor: "primary.main",
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        {roomData.userName.charAt(0)}
+                                    </Avatar>
+                                )}
+                                <Box sx={{ minWidth: 0 }}>
+                                    <Paper
+                                        elevation={1}
+                                        sx={{
+                                            px: isMobile ? 2 : 2.5,
+                                            py: isMobile ? 1.5 : 2,
+                                            backgroundColor: msg.isFromMe
+                                                ? theme.palette.primary.main
+                                                : theme.palette.mode === "dark"
+                                                    ? theme.palette.grey[600]
+                                                    : theme.palette.grey[100],
+                                            color: msg.isFromMe ? "white" : "text.primary",
+                                            borderRadius: 2,
+                                            borderBottomLeftRadius: !msg.isFromMe ? 0.5 : 2,
+                                            borderBottomRightRadius: msg.isFromMe ? 0.5 : 2,
+                                            wordBreak: "break-word",
+                                        }}
+                                    >
+                                        <Typography variant={isMobile ? "body2" : "body1"} sx={{ whiteSpace: "pre-wrap" }}>
+                                            {msg.content}
+                                        </Typography>
+                                    </Paper>
+                                    <Typography
+                                        variant="caption"
+                                        sx={{
+                                            mt: 0.5,
+                                            px: 1,
+                                            color: "text.secondary",
+                                            display: "block",
+                                            textAlign: msg.isFromMe ? "right" : "left",
+                                            fontSize: isMobile ? "0.7rem" : "0.75rem",
+                                        }}
+                                    >
+                                        {formatTime(msg.timestamp)}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Box>
+                    )
+                })}
+                <div ref={messagesEndRef} />
+            </Box>
 
             {/* ChatInput: 화면 하단에 완전 고정 */}
             <ChatInput value={newMessage} onChange={setNewMessage} onSend={handleSendMessage} />
-            </Box>
+        </Box>
     )
 }
 
