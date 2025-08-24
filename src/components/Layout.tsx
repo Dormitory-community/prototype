@@ -7,6 +7,9 @@ import { Header } from "@/components/global/Header.tsx"
 import { MobileNavBar } from "@/components/global/MobileNavBar.tsx"
 import { useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
+import { useTheme } from '@mui/material/styles';
+import {useThemeContext} from "@/contexts/ThemeContext.tsx";
+
 
 interface LayoutProps {
     children: React.ReactNode
@@ -16,6 +19,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const location = useLocation()
     const [isPWA, setIsPWA] = useState(false)
     const [isIOS, setIsIOS] = useState(false)
+    const theme = useTheme()
+    const { mode } = useThemeContext() // 현재 테마 모드 가져오기
 
     const normalize = (route: string) => route.replace(/:.*$/, "")
 
@@ -55,13 +60,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         }
     }, [isPWA, isIOS]);
 
+    const getBackgroundColor = () => {
+        if (isIOS && isPWA) {
+            return mode === 'dark' ? '#0f172a' : '#f8fafc'; // iOS 홈바와 동일한 색상
+        }
+        return theme.palette.background.default;
+    }
     return (
         <Box
             sx={{
                 display: "flex",
                 flexDirection: "column",
                 minHeight: "100dvh",
-                // PWA에서는 Layout에서 safe-area 적용하지 않음 (Header에서 개별 적용)
                 ...(isPWA && {
                     paddingLeft: "env(safe-area-inset-left)",
                     paddingRight: "env(safe-area-inset-right)",
@@ -93,7 +103,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     width: "100%",
                     maxWidth: "100vw",
                     boxSizing: "border-box",
-                    bgcolor: "background.default",
+                    bgcolor: getBackgroundColor(),
                 }}
             >
                 {children}
