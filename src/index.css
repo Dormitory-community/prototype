@@ -21,6 +21,27 @@ html, body, #root {
   background-color: var(--app-bg); /* 핵심: body 배경을 CSS 변수로 관리 */
 }
 
+/* PWA 환경에서 상단 노치 영역을 불투명하게 만들기 */
+@media (display-mode: standalone) {
+  /* iOS PWA에서 상단 노치 영역을 앱 배경색으로 채우기 */
+  html::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top, 0px);
+    background-color: var(--app-bg);
+    z-index: 10000; /* 모든 요소 위에 표시 */
+    pointer-events: none;
+  }
+
+  /* 추가로 body에도 상단 패딩을 줘서 콘텐츠가 노치 아래로 들어가지 않도록 */
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
+
 /* 안전영역을 덮는 pseudo element: 항상 최상단(또는 nav 아래)에 위치 */
 body::after {
   content: "";

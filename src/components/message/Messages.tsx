@@ -159,12 +159,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
         return date.toLocaleDateString("ko-KR", { month: "short", day: "numeric" })
     }
 
-    const CHAT_INPUT_HEIGHT_MOBILE = 64
-    const CHAT_INPUT_HEIGHT_DESKTOP = 90
-    const EXTRA_PADDING = 8 // 메시지와 입력창 사이 여유 공간
-
-    // MessageHeader 높이 계산 (PWA에서 safe-area 포함)
-    const MESSAGE_HEADER_HEIGHT = 64 // 기본 헤더 높이
+    const MESSAGE_HEADER_HEIGHT = 64
 
     useEffect(() => {
         const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
@@ -179,35 +174,23 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 height: "100vh",
                 backgroundColor: "background.default",
                 overflow: "hidden",
+                // PWA에서는 safe-area를 고려하지 않음 (body에서 이미 처리됨)
+                ...(isPWA && {
+                    height: "calc(100vh - env(safe-area-inset-top, 0px))", // 상단 safe-area 제외
+                }),
             }}
         >
             <MessageHeader userName={roomData?.userName || ""} userAvatar={roomData?.userAvatar} />
 
-            {/* MessageHeader를 위한 공간 확보 */}
+            {/* MessageHeader를 위한 공간 확보 - PWA에서 safe-area 제외 */}
             <Box
                 sx={{
-                    height: isPWA
-                        ? `calc(${MESSAGE_HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`
-                        : `${MESSAGE_HEADER_HEIGHT}px`,
+                    height: `${MESSAGE_HEADER_HEIGHT}px`, // PWA든 아니든 고정 높이
                     flexShrink: 0,
                 }}
             />
 
-            {/* ChatInput을 위한 공간 확보 */}
-            <Box
-                sx={{
-                    height: {
-                        xs: `${CHAT_INPUT_HEIGHT_MOBILE}px`, // ✅ safe-area 제거
-                        sm: `${CHAT_INPUT_HEIGHT_DESKTOP}px`,
-                    },
-                    minHeight: {
-                        xs: `${CHAT_INPUT_HEIGHT_MOBILE}px`,
-                        sm: `${CHAT_INPUT_HEIGHT_DESKTOP}px`,
-                    },
-                    flexShrink: 0,
-                }}
-            />
-
+            {/* 메시지 영역 */}
             <Box
                 ref={messagesContainerRef}
                 onScroll={handleScroll}
@@ -216,10 +199,11 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                     overflowY: "auto",
                     px: { xs: 2, md: 3 },
                     py: { xs: 2, md: 3 },
-                    paddingBottom: isPWA ? `calc(${EXTRA_PADDING}px + env(safe-area-inset-bottom, 0px))` : EXTRA_PADDING,
                     display: "flex",
                     flexDirection: "column",
                     WebkitOverflowScrolling: "touch",
+                    // PWA에서 하단 패딩 조정
+                    paddingBottom: { xs: 2, md: 3 }, // 기본 패딩만 유지
                 }}
             >
                 {isLoadingMore && (
@@ -299,8 +283,19 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
                 <div ref={messagesEndRef} />
             </Box>
 
-            {/* ChatInput: 화면 하단에 완전 고정 */}
-            <ChatInput value={newMessage} onChange={setNewMessage} onSend={handleSendMessage} />
+            {/* ChatInput: 화면 하단에 완전 고정 - PWA에서 safe-area 자동 처리 */}
+            <ChatInput
+                value={newMessage}
+                onChange={setNewMessage}
+                onSend={handleSendMessage}
+                sx={{
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 1000,
+                }}
+            />
         </Box>
     )
 }

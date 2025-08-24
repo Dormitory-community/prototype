@@ -56,7 +56,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) =
             <Box
                 sx={{
                     position: "fixed",
-                    top: isPWA ? "env(safe-area-inset-top, 0px)" : 0, // PWA에서 safe-area 적용
+                    top: 0,
                     left: 0,
                     right: 0,
                     zIndex: 10,
@@ -68,7 +68,7 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) =
                     justifyContent: "space-between",
                     borderBottom: 1,
                     borderColor: "divider",
-                    // PWA에서 좌우 safe-area도 고려
+                    // PWA에서 좌우 safe-area만 고려 (상단은 body에서 처리)
                     ...(isPWA && {
                         paddingLeft: "calc(16px + env(safe-area-inset-left, 0px))",
                         paddingRight: "calc(16px + env(safe-area-inset-right, 0px))",
@@ -121,11 +121,6 @@ const MessageHeader: React.FC<MessageHeaderProps> = ({ userName, userAvatar }) =
                         borderTopLeftRadius: 16,
                         borderBottomLeftRadius: 16,
                         overflow: "auto",
-                        // PWA에서 드로어도 safe-area 고려
-                        ...(isPWA && {
-                            paddingTop: "env(safe-area-inset-top, 0px)",
-                            paddingLeft: "env(safe-area-inset-left, 0px)",
-                        }),
                     },
                 }}
                 ModalProps={{
