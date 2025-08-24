@@ -6,6 +6,7 @@ import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
 import { Groups, Dashboard, Person, Home, ChatBubble } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
+import {theme} from "@/theme/theme.ts";
 
 export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()
@@ -86,6 +87,7 @@ export const MobileNavBar: React.FC = () => {
                     paddingRight: "env(safe-area-inset-right, 0px)",
                     paddingBottom: "env(safe-area-inset-bottom, 0px)", // 8px 여유 제거
                 }),
+                backgroundColor: theme.palette.background.default,  // 테마 배경색 명시
             }}
             elevation={3}
         >
