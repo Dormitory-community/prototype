@@ -1,82 +1,52 @@
-/* index.css (기존 부분 수정/추가) */
-
-/* 기본 body 색상 */
-body {
-  margin: 0;
-  /*font-family: !* ... *!;*/
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f8fafc; /* 라이트 모드 */
-  -webkit-overflow-scrolling: touch;
+:root{
+  /* 기본(라이트) 값 */
+  --app-bg: #f8fafc;
+  --app-paper: #ffffff;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 다크 모드 body 색상 - iOS 홈바와 정확히 매칭 */
+/* 다크 모드일 때 변수 재정의 */
 @media (prefers-color-scheme: dark) {
-  body {
-    background-color: #0f172a; /* iOS 홈바와 동일한 진한 색상 */
+  :root {
+    --app-bg: #0f172a;     /* body와 동일한 다크 배경 */
+    --app-paper: #1e293b;
   }
 }
 
-/* PWA standalone 모드에서 safe-area 통일 */
-@media (display-mode: standalone) {
-  body {
-    background-color: #f8fafc; /* 라이트 모드 기본 */
-  }
-
-  /* 다크 모드일 때 오버라이드 */
-  @media (prefers-color-scheme: dark) {
-    body {
-      background-color: #0f172a; /* iOS 홈바와 동일한 색상 */
-    }
-  }
-
-  /* 네비게이션 바 하단 확장 영역 - 라이트 모드 */
-  .mobile-nav-bar::after {
-    content: "";
-    position: absolute;
-    bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
-    left: 0;
-    right: 0;
-    height: env(safe-area-inset-bottom, 0px);
-    background-color: #f8fafc; /* 라이트 모드 */
-    z-index: -1;
-  }
-
-  /* 네비게이션 바 하단 확장 영역 - 다크 모드 */
-  @media (prefers-color-scheme: dark) {
-    .mobile-nav-bar::after {
-      background-color: #0f172a; /* iOS 홈바와 정확히 매칭 */
-    }
-  }
+/* 레이아웃 안정화: 모바일에서 fill-available 사용 */
+html, body, #root {
+  height: 100%;
+  min-height: -webkit-fill-available; /* iOS에서 유용 */
+  margin: 0;
+  background-color: var(--app-bg); /* 핵심: body 배경을 CSS 변수로 관리 */
 }
 
-/* iOS-specific: 웹킷 오버플로우와 safe-area 강화 */
+/* 안전영역을 덮는 pseudo element: 항상 최상단(또는 nav 아래)에 위치 */
+body::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: env(safe-area-inset-bottom, 0px);
+  pointer-events: none;
+  z-index: 9999; /* 필요하면 조정 (네비게이션보다 위에 두려면 더 높게) */
+  background: var(--app-bg);
+}
+
+/* 만약 네비게이션 바 컴포넌트(.mobile-nav-bar)가 있고,
+   pseudo-element를 그 내부에 두고 싶다면 아래처럼도 가능 */
+.mobile-nav-bar::after {
+  content: "";
+  position: absolute;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  left: 0; right: 0;
+  height: env(safe-area-inset-bottom, 0px);
+  background: var(--app-bg);
+  z-index: -1;
+}
+
+/* iOS 스크롤 부드럽게 */
 @supports (-webkit-overflow-scrolling: touch) {
-  body {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  /* iOS에서 네비게이션 바 하단 확장 영역 색상 강제 설정 */
-  @media (display-mode: standalone) {
-    .ios-environment .mobile-nav-bar::after {
-      background-color: #f8fafc; /* iOS 라이트 모드 */
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .ios-environment .mobile-nav-bar::after {
-        background-color: #0f172a; /* iOS 다크 모드 - 홈바와 정확히 매칭 */
-      }
-    }
-  }
-
-  /* iOS에서 네비게이션 바 자체 색상도 강제 적용 */
-  .ios-environment .mobile-nav-bar {
-    background-color: #f8fafc !important;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .ios-environment .mobile-nav-bar {
-      background-color: #0f172a !important; /* iOS 홈바와 동일한 색상 */
-    }
-  }
+  body { -webkit-overflow-scrolling: touch; }
 }
