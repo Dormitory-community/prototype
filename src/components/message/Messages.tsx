@@ -167,7 +167,7 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
     const MESSAGE_HEADER_HEIGHT = 64 // 기본 헤더 높이
 
     useEffect(() => {
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
         setIsPWA(isStandalone);
     }, []);
 
@@ -197,12 +197,12 @@ const Messages: React.FC<MessagesProps> = ({ roomId, roomData: initialRoomData, 
             <Box
                 sx={{
                     height: {
-                        xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
-                        sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                        xs: `${CHAT_INPUT_HEIGHT_MOBILE}px`, // ✅ safe-area 제거
+                        sm: `${CHAT_INPUT_HEIGHT_DESKTOP}px`,
                     },
                     minHeight: {
-                        xs: `calc(${CHAT_INPUT_HEIGHT_MOBILE}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
-                        sm: `calc(${CHAT_INPUT_HEIGHT_DESKTOP}px + ${isPWA ? 'env(safe-area-inset-bottom, 0px)' : '0px'})`,
+                        xs: `${CHAT_INPUT_HEIGHT_MOBILE}px`,
+                        sm: `${CHAT_INPUT_HEIGHT_DESKTOP}px`,
                     },
                     flexShrink: 0,
                 }}

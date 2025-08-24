@@ -234,7 +234,7 @@ const ChatRooms: React.FC = () => {
     return (
         <>
             <ChatRoomsHeader/>
-            <Box sx={{ height: { xs: "56px", md: "64px" } }} /> {/* Spacer for header */}
+            <Box sx={{ height: `calc(56px + env(safe-area-inset-top, 0px))` }} />
             <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
             {/* 탭 */}
             {/*<Card sx={{ borderRadius: 2, mb: 2 }}>*/}

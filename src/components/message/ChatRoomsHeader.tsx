@@ -38,13 +38,16 @@ const ChatRoomsHeader: React.FC = () => {
                     borderBottom: 1,
                     borderColor: "divider",
                     position: "fixed",
-                    top: 0,
+                    top: "env(safe-area-inset-top, 0px)", // ✅ safe-area 적용
                     left: 0,
                     right: 0,
                     zIndex: 1200,
+                    paddingLeft: "calc(16px + env(safe-area-inset-left, 0px))", // ✅ 좌우도 고려
+                    paddingRight: "calc(16px + env(safe-area-inset-right, 0px))",
                 }}
             >
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
                     쪽지함
                 </Typography>
                 <IconButton onClick={toggleDrawer(true)} sx={{ color: "text.secondary" }}>
