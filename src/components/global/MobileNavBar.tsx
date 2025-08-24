@@ -6,13 +6,13 @@ import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
 import { Groups, Dashboard, Person, Home, ChatBubble } from "@mui/icons-material"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ROUTES } from "@/router"
-// import { useTheme } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 export const MobileNavBar: React.FC = () => {
     const navigate = useNavigate()
     const location = useLocation()
+    const theme = useTheme()
     const [isPWA, setIsPWA] = useState(false)
-    // const theme = useTheme()
 
     useEffect(() => {
         const detectPWA = () => {
@@ -86,9 +86,9 @@ export const MobileNavBar: React.FC = () => {
                 ...(isPWA && {
                     paddingLeft: "env(safe-area-inset-left, 0px)",
                     paddingRight: "env(safe-area-inset-right, 0px)",
-                    paddingBottom: "env(safe-area-inset-bottom, 0px)", // 8px 여유 제거
+                    paddingBottom: "env(safe-area-inset-bottom, 0px)",
                 }),
-                backgroundColor: "background.default",
+                backgroundColor: theme.palette.background.default, // 테마의 배경색 명시적 사용
             }}
             elevation={3}
         >
@@ -101,7 +101,7 @@ export const MobileNavBar: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-around",
-                    backgroundColor: "background.default",
+                    backgroundColor: theme.palette.background.default, // 테마의 배경색 명시적 사용
                     borderTop: "1px solid",
                     borderColor: "divider",
                     "& .MuiBottomNavigationAction-root": {

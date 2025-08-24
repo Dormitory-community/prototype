@@ -3,7 +3,7 @@
 /* 기본 body 색상 */
 body {
   margin: 0;
-  font-family: /* ... */;
+  /*font-family: !* ... *!;*/
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f8fafc; /* 라이트 모드 */
@@ -30,15 +30,23 @@ body {
     }
   }
 
+  /* 네비게이션 바 하단 확장 영역 - 라이트 모드 */
   .mobile-nav-bar::after {
     content: "";
     position: absolute;
-    bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); /* 네비 바 아래로 확장 */
+    bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
     left: 0;
     right: 0;
     height: env(safe-area-inset-bottom, 0px);
-    background-color: inherit; /* 네비 바의 background-color 상속 (background.default) */
+    background-color: #f8fafc; /* 라이트 모드에서 body와 동일한 색상 */
     z-index: -1;
+  }
+
+  /* 네비게이션 바 하단 확장 영역 - 다크 모드 */
+  @media (prefers-color-scheme: dark) {
+    .mobile-nav-bar::after {
+      background-color: #1e293b; /* 다크 모드에서 body와 동일한 색상 */
+    }
   }
 }
 
@@ -47,8 +55,17 @@ body {
   body {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-}
 
-.ios-environment .mobile-nav-bar::after {
-  background-color: #1e293b; /* iOS에서 강제 다크 색상 (필요 시) */
+  /* iOS에서 네비게이션 바 하단 확장 영역 색상 강제 설정 */
+  @media (display-mode: standalone) {
+    .ios-environment .mobile-nav-bar::after {
+      background-color: #f8fafc; /* iOS 라이트 모드 */
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .ios-environment .mobile-nav-bar::after {
+        background-color: #1e293b; /* iOS 다크 모드 */
+      }
+    }
+  }
 }
